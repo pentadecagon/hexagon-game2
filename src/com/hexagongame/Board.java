@@ -48,7 +48,7 @@ public class Board{
 		//calculate width of board
 		boardWidth = 0.8f * canvasWidth;
 		
-		Log.e("hexxx","calculated boardWidth="+boardWidth);
+		Log.e("hex","calculated boardWidth="+boardWidth);
 			
 		//calculate length of one side of the hexagonal board
 		calculateBoardSideLength();
@@ -70,7 +70,7 @@ public class Board{
 		//calculate the length of one side of the board
 		boardSideLength = boardWidth/ (2.0f * (float) Math.cos((Math.PI/6.0)));
 		
-		Log.e("hexxx","calculated boardSideLength="+boardSideLength);
+		Log.e("hex","calculated boardSideLength="+boardSideLength);
 	}
 	
 
@@ -78,7 +78,7 @@ public class Board{
 	private void calculateSmallHexagonSideLength()
 	{
 		smallHexSideLength = boardWidth/ (14.0f * (float) Math.cos(Math.PI/6.0));
-		Log.e("hexxx","smallHexSideLength: "+smallHexSideLength);
+		Log.e("hex","smallHexSideLength: "+smallHexSideLength);
 	}
 	
 	private void calculateDimensionsOfGridCell()
@@ -97,7 +97,7 @@ public class Board{
 		
 		y0 = canvasHeight/2.0f - boardHeight/2.0f;	
 				
-		Log.e("hexxx","calculated position of board on canvas: x0="+x0+", y0="+y0);
+		Log.e("hex","calculated position of board on canvas: x0="+x0+", y0="+y0);
 	}
 
 	public int[] findHexagonalGridCoordinatesOfPointOnCanvas(float x, float y)
