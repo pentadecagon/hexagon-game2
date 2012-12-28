@@ -138,8 +138,8 @@ public class UiView extends View{
     	decorateBoardTopRight(canvas, android.graphics.Color.GREEN);
     	decorateBoardBottomLeft(canvas, android.graphics.Color.GREEN);
     	decorateBoardBottomRight(canvas, android.graphics.Color.BLUE);
-    	decorateBoardLeft(canvas, android.graphics.Color.GREEN, android.graphics.Color.BLUE);
-    	decorateBoardRight(canvas, android.graphics.Color.BLUE, android.graphics.Color.GREEN);
+    	decorateBoardLeft(canvas, android.graphics.Color.BLUE, android.graphics.Color.GREEN);
+    	decorateBoardRight(canvas, android.graphics.Color.GREEN, android.graphics.Color.BLUE);
 	}
 	
 
