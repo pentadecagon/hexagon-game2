@@ -50,8 +50,8 @@ public class UiView extends View{
 			float canvasWidth = getWidth();
 	    	float canvasHeight = getHeight();
 	    	
-	    	Log.e("hexxx", "canvasWidth="+canvasWidth);
-	    	Log.e("hexxx", "canvasHeight="+canvasHeight);
+	    	Log.e("hex", "canvasWidth="+canvasWidth);
+	    	Log.e("hex", "canvasHeight="+canvasHeight);
 	    	
 	    	board = new Board(canvasHeight, canvasWidth);
 	    	
@@ -87,8 +87,8 @@ public class UiView extends View{
     	float xOrigin = board.getXpositionOfBoardOnCanvas();
     	float yOrigin = board.getYpositionOfBoardOnCanvas();
     	
-    	Log.e("hexxx", "board.getXpositionOfBoardOnCanvas()="+xOrigin);
-    	Log.e("hexxx", "board.getYpositionOfBoardOnCanvas()="+yOrigin);
+    	Log.e("hex", "board.getXpositionOfBoardOnCanvas()="+xOrigin);
+    	Log.e("hex", "board.getYpositionOfBoardOnCanvas()="+yOrigin);
 
     	float xHexPos, yHexPos;
 
@@ -138,6 +138,8 @@ public class UiView extends View{
     	decorateBoardTopRight(canvas, android.graphics.Color.GREEN);
     	decorateBoardBottomLeft(canvas, android.graphics.Color.GREEN);
     	decorateBoardBottomRight(canvas, android.graphics.Color.BLUE);
+    	decorateBoardLeft(canvas, android.graphics.Color.GREEN, android.graphics.Color.BLUE);
+    	decorateBoardRight(canvas, android.graphics.Color.BLUE, android.graphics.Color.GREEN);
 	}
 	
 
@@ -299,6 +301,74 @@ public class UiView extends View{
 		path.lineTo(x0 + 6.0f * board.getSmallHexSideLength() * (float) Math.cos(Math.PI/6.0), y0 + board.getSmallHexSideLength() * (1.0f + 2.0f * (float) Math.sin(Math.PI/6.0)));
 		path.lineTo(x0 + 6.0f * board.getSmallHexSideLength() * (float) Math.cos(Math.PI/6.0), y0 + board.getSmallHexSideLength() * (2.0f + 2.0f * (float) Math.sin(Math.PI/6.0)));
 		path.lineTo(x0 + 7.0f * board.getSmallHexSideLength() * (float) Math.cos(Math.PI/6.0), y0 + board.getSmallHexSideLength() * (2.0f + 3.0f * (float) Math.sin(Math.PI/6.0)));
+		canvas.drawPath(path, paint);		
+	}
+	
+	public void decorateBoardLeft(Canvas canvas, int color1, int color2)
+	{
+		float xOrigin = board.getXpositionOfBoardOnCanvas();
+    	float yOrigin = board.getYpositionOfBoardOnCanvas();
+
+    	float[] gridCoords = board.findPositionOfTopLeftOfHexagonalCell(0,-3);  	
+		
+    	float x0 = xOrigin + gridCoords[0];
+    	float y0 = yOrigin + gridCoords[1];
+    	
+		paint.setColor(color1);
+    	paint.setStrokeWidth(10);
+    	paint.setStyle(Paint.Style.STROKE);
+    	Path path = new Path();
+    	path.moveTo(x0, y0);
+		path.lineTo(x0, y0 + board.getSmallHexSideLength());
+		path.lineTo(x0 + board.getSmallHexSideLength() * (float) Math.cos(Math.PI/6.0), y0 + board.getSmallHexSideLength() * (1.0f + (float) Math.sin(Math.PI/6.0)));
+		path.lineTo(x0 + board.getSmallHexSideLength() * (float) Math.cos(Math.PI/6.0), y0 + board.getSmallHexSideLength() * (2.0f + (float) Math.sin(Math.PI/6.0)));
+		path.lineTo(x0, y0 + board.getSmallHexSideLength() * (2.0f + 2.0f * (float) Math.sin(Math.PI/6.0)));
+		path.lineTo(x0, y0 + board.getSmallHexSideLength() * (2.5f + 2.0f * (float) Math.sin(Math.PI/6.0)));
+		canvas.drawPath(path, paint);	
+		
+		paint.setColor(color2);
+		path = new Path();
+		path.moveTo(x0, y0 + board.getSmallHexSideLength() * (2.5f + 2.0f * (float) Math.sin(Math.PI/6.0)));
+		path.lineTo(x0, y0 + board.getSmallHexSideLength() * (3.0f + 2.0f * (float) Math.sin(Math.PI/6.0)));
+		path.lineTo(x0 + board.getSmallHexSideLength() * (float) Math.cos(Math.PI/6.0), y0 + board.getSmallHexSideLength() * (3.0f + 3.0f * (float) Math.sin(Math.PI/6.0)));
+		path.lineTo(x0 + board.getSmallHexSideLength() * (float) Math.cos(Math.PI/6.0), y0 + board.getSmallHexSideLength() * (4.0f + 3.0f * (float) Math.sin(Math.PI/6.0)));
+		path.lineTo(x0, y0 + board.getSmallHexSideLength() * (4.0f + 4.0f * (float) Math.sin(Math.PI/6.0)));
+		path.lineTo(x0, y0 + board.getSmallHexSideLength() * (5.0f + 4.0f * (float) Math.sin(Math.PI/6.0)));
+		
+		canvas.drawPath(path, paint);		
+	}
+	
+	public void decorateBoardRight(Canvas canvas, int color1, int color2)
+	{
+		float xOrigin = board.getXpositionOfBoardOnCanvas();
+    	float yOrigin = board.getYpositionOfBoardOnCanvas();
+
+    	float[] gridCoords = board.findPositionOfTopLeftOfHexagonalCell(7,-3);  	
+		
+    	float x0 = xOrigin + gridCoords[0];
+    	float y0 = yOrigin + gridCoords[1];
+    	
+		paint.setColor(color1);
+    	paint.setStrokeWidth(10);
+    	paint.setStyle(Paint.Style.STROKE);
+    	Path path = new Path();
+    	path.moveTo(x0, y0);
+		path.lineTo(x0, y0 + board.getSmallHexSideLength());
+		path.lineTo(x0 - board.getSmallHexSideLength() * (float) Math.cos(Math.PI/6.0), y0 + board.getSmallHexSideLength() * (1.0f + (float) Math.sin(Math.PI/6.0)));
+		path.lineTo(x0 - board.getSmallHexSideLength() * (float) Math.cos(Math.PI/6.0), y0 + board.getSmallHexSideLength() * (2.0f + (float) Math.sin(Math.PI/6.0)));
+		path.lineTo(x0, y0 + board.getSmallHexSideLength() * (2.0f + 2.0f * (float) Math.sin(Math.PI/6.0)));
+		path.lineTo(x0, y0 + board.getSmallHexSideLength() * (2.5f + 2.0f * (float) Math.sin(Math.PI/6.0)));
+		canvas.drawPath(path, paint);	
+		
+		paint.setColor(color2);
+		path = new Path();
+		path.moveTo(x0, y0 + board.getSmallHexSideLength() * (2.5f + 2.0f * (float) Math.sin(Math.PI/6.0)));
+		path.lineTo(x0, y0 + board.getSmallHexSideLength() * (3.0f + 2.0f * (float) Math.sin(Math.PI/6.0)));
+		path.lineTo(x0 - board.getSmallHexSideLength() * (float) Math.cos(Math.PI/6.0), y0 + board.getSmallHexSideLength() * (3.0f + 3.0f * (float) Math.sin(Math.PI/6.0)));
+		path.lineTo(x0 - board.getSmallHexSideLength() * (float) Math.cos(Math.PI/6.0), y0 + board.getSmallHexSideLength() * (4.0f + 3.0f * (float) Math.sin(Math.PI/6.0)));
+		path.lineTo(x0, y0 + board.getSmallHexSideLength() * (4.0f + 4.0f * (float) Math.sin(Math.PI/6.0)));
+		path.lineTo(x0, y0 + board.getSmallHexSideLength() * (5.0f + 4.0f * (float) Math.sin(Math.PI/6.0)));
+		
 		canvas.drawPath(path, paint);		
 	}
 }
