@@ -7,6 +7,15 @@ import android.util.Log;
 
 public class Board{
 
+	//hexagonal board
+	public static final int BOARD_GEOMETRY_HEX = 0;
+	
+	//square board
+	public static final int BOARD_GEOMETRY_RECT = 1;
+
+	//constant giving shape of board: hexagonal, square etc
+	public int boardShape = BOARD_GEOMETRY_HEX;
+
 	//width of canvas
 	private static float canvasWidth;
 
@@ -15,10 +24,7 @@ public class Board{
 		
 	//width of board
 	private static float boardWidth;
-	
-	//length of one side of the board
-	private static float boardSideLength;
-	
+
 	//x0, x-position of the top-left corner of the hexagon relative to the canvas
 	private static float x0;
 	
@@ -35,10 +41,11 @@ public class Board{
 
 	private HashMap<Integer, int[]> boardConfig;
 
-	public Board(float canvasHeight, float canvasWidth) {
+	public Board(float canvasHeight, float canvasWidth, int boardShape) {
 
 		this.canvasWidth = canvasWidth;
 		this.canvasHeight = canvasHeight;
+		this.boardShape = boardShape;
 
 		initialize();
 	}
@@ -49,9 +56,6 @@ public class Board{
 		boardWidth = 0.8f * canvasWidth;
 		
 		Log.e("hex","calculated boardWidth="+boardWidth);
-			
-		//calculate length of one side of the hexagonal board
-		calculateBoardSideLength();
 
 		//calculate the length of the side of one of the small hexagons that fills up the board
 		calculateSmallHexagonSideLength();
@@ -63,18 +67,7 @@ public class Board{
 		//relative to the canvas
 		calculatePositionOfBoardOnCanvas();
 	}
-	
-	
-	private void calculateBoardSideLength()
-	{
-		//calculate the length of one side of the board
-		boardSideLength = boardWidth/ (2.0f * (float) Math.cos((Math.PI/6.0)));
-		
-		Log.e("hex","calculated boardSideLength="+boardSideLength);
-	}
-	
 
-	
 	private void calculateSmallHexagonSideLength()
 	{
 		smallHexSideLength = boardWidth/ (14.0f * (float) Math.cos(Math.PI/6.0));
@@ -93,7 +86,14 @@ public class Board{
 		
 		x0 = 0.1f * boardWidth;
 		
-		float boardHeight = hCell * 9.0f;
+		float boardHeight;
+		if (this.boardShape == Board.BOARD_GEOMETRY_RECT)
+		{
+			boardHeight = hCell * 7.0f;
+		} else
+		{
+			boardHeight = hCell * 9.0f;
+		}
 		
 		y0 = canvasHeight/2.0f - boardHeight/2.0f;	
 				

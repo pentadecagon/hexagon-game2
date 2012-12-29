@@ -33,10 +33,6 @@ public class HexActivity extends Activity {
     private void startWork()
     {
     	findViewById(R.id.boardview);
-    	
-    	Context context = getApplicationContext();
-		Toast toast = Toast.makeText(context, "First player to make a path from one side to the other wins. Blue goes first.", Toast.LENGTH_SHORT);
-		toast.show();
     }
 
 }
