@@ -352,55 +352,32 @@ public class UiView extends View{
     	decorateRectBoardVerticalEdges(canvas, android.graphics.Color.BLUE);
 	}
 	
-	public void drawHexagon(Canvas canvas, float xStart, float yStart, float hexSide, int color)
+	public void drawHexagon(Canvas canvas, float x, float y, float hexSide, int color)
 	{
 		paint.setColor(color);
         paint.setStyle(Paint.Style.FILL);
         
 		Path path = new Path();
 		
-		float xOrig, yOrig, xNext, yNext;
-		xOrig = xStart;
-		yOrig = yStart;
-		xNext = xOrig;
-		yNext = yOrig;
-		
-		path.moveTo(xNext, yNext);
+		// vx, vy represents the vector of the first edge of the hexagon
+		float vx = hexSide * (float) Math.cos(Math.PI/6.0);
+		float vy = - hexSide * (float) Math.sin(Math.PI/6.0);
+		final float co = (float)Math.cos(Math.PI/3);
+		final float si = (float)Math.sin(Math.PI/3);
 
-		xNext = xNext + hexSide * (float) Math.cos(Math.PI/6.0);
-		yNext = yNext - hexSide * (float) Math.sin(Math.PI/6.0);
-		
-		path.lineTo(xNext, yNext);
-		
-		xNext = xNext + hexSide * (float) Math.cos(Math.PI/6.0);
-		yNext = yNext + hexSide * (float) Math.sin(Math.PI/6.0);
-		
-		path.lineTo(xNext, yNext);
-		
-		yNext = yNext + hexSide;
-		
-		path.lineTo(xNext, yNext);
-		
-		xNext = xNext - hexSide * (float) Math.cos(Math.PI/6.0);
-		yNext = yNext + hexSide * (float) Math.sin(Math.PI/6.0);
-		
-		path.lineTo(xNext, yNext);
-		
-		xNext = xNext - hexSide * (float) Math.cos(Math.PI/6.0);
-		yNext = yNext - hexSide * (float) Math.sin(Math.PI/6.0);
-		
-		path.lineTo(xNext, yNext);
-		
-		xNext = xOrig;
-		yNext = yOrig;
-		
-		path.lineTo(xNext, yNext);
-		
+		path.moveTo( x,  y );
+		for( int i=0; i<6; ++i ){
+			x += vx;
+			y += vy;
+			path.lineTo( x, y );
+			// now rotate the edge vector by Pi/3
+			float vx_temp = co * vx - si * vy;
+			vy = si * vx + co * vy;
+			vx=vx_temp;
+		}
 		canvas.drawPath(path, paint);
 	}
-	
-
-	
+		
 	public void decorateBoardTopLeft(Canvas canvas, int color)
 	{
 		float xOrigin = board.getXpositionOfBoardOnCanvas();
