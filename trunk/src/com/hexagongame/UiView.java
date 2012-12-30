@@ -3,7 +3,10 @@ package com.hexagongame;
 import java.util.HashMap;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
@@ -25,7 +28,9 @@ public class UiView extends View{
 	
 	private int boardShape = Board.BOARD_GEOMETRY_HEX;
 	
-	//flag saying whether ontouch is initialized
+	private int[] lastChange = null;
+	
+	//flag saying whether ontouch function is initialized
 	private boolean onTouchInit = false;
 	
 	public UiView(Context context, AttributeSet attrs) {
@@ -42,6 +47,7 @@ public class UiView extends View{
 		board = null;
 		gameConfig = new HashMap<String, Integer>();
 		playerTurn = 0;
+		lastChange = null;
 		
 		//show introductory message
     	Context context = getContext();
@@ -99,16 +105,50 @@ public class UiView extends View{
 		    				float y = (float) event.getY();
 		    				if (y < 0.15f * canvasWidth)
 		    				{
-		    					if (x > 0.15f * canvasWidth && x < 0.4f * canvasWidth)
+		    					if (x > 0.25f * canvasWidth && x < 0.35f * canvasWidth)
 		    					{
 		    						//if user has clicked on the hexagonal shape in the nav, redraw the board as a hexagon
 		    						boardShape = Board.BOARD_GEOMETRY_HEX;
 		    						viewInit();
 		    						UiView.this.postInvalidate();
-		    					} else if (x >= 0.4f * canvasWidth && x < 0.5f * canvasWidth)
+		    					} else if (x >= 0.6f * canvasWidth && x < 0.7f * canvasWidth)
 		    					{
 		    						//if user has clicked on the rectangular shape in the nav, redraw the board as a rectangle
 		    						boardShape = Board.BOARD_GEOMETRY_RECT;
+		    						viewInit();
+		    						UiView.this.postInvalidate();
+		    					}
+		    				} else if (y > 0.85f * canvasWidth)
+		    				{
+		    					if (x > 0.2 * canvasWidth && x < 0.3 * canvasWidth)
+		    					{
+			    					//turn indicator: if user taps on the circle, show a message showing whose turn it is next
+			    					Context context = getContext();
+			    					String turnMessage = "";
+			    					if (playerTurn == 0)
+			    					{
+			    						turnMessage = "Blue's turn!";
+			    					} else
+			    					{
+			    						turnMessage = "Green's turn!";
+			    					}
+			    					Toast toast = Toast.makeText(context, turnMessage, Toast.LENGTH_SHORT);
+			    					toast.show();
+		    					} else if (x >= 0.45 * canvasWidth && x <= 0.55 * canvasWidth)
+		    					{
+		    						Log.e("hex", "undo button clicked");
+		    						//undo button
+		    						if (lastChange != null)
+		    						{
+		    							gameConfig.put(lastChange[0]+"_"+lastChange[1], null);
+		    							playerTurn = (playerTurn == 1) ? 0 : 1;
+		    							lastChange = null;
+		    							UiView.this.postInvalidate();
+		    						}
+		    					}  else if (x >= 0.7 * canvasWidth && x <= 0.8 * canvasWidth)
+		    					{
+		    						Log.e("hex", "redo button clicked");
+		    						
 		    						viewInit();
 		    						UiView.this.postInvalidate();
 		    					}
@@ -122,10 +162,14 @@ public class UiView extends View{
 		    				{
 		    					gameConfig.put(coords[0]+"_"+coords[1], android.graphics.Color.BLUE);
 		    					playerTurn = 1;
+		    					//save last change in case we need to undo it
+		    					lastChange = coords;
 		    				} else
 		    				{
 		    					gameConfig.put(coords[0]+"_"+coords[1], android.graphics.Color.GREEN);
 		    					playerTurn = 0;
+		    					//save last change in case we need to undo it
+		    					lastChange = coords;
 		    				}
 		    			
 		    				
@@ -140,7 +184,9 @@ public class UiView extends View{
 		}
 		
 		//draw the navigation allowing the user to select a shape
-		drawNav(canvas);
+		drawTopNav(canvas);
+		//draw the bottom nav containing turn indicator & undo functionality
+		drawBottomNav(canvas);
 
 		if (board.boardShape == Board.BOARD_GEOMETRY_RECT)
 		{
@@ -151,7 +197,7 @@ public class UiView extends View{
 		}
 	}
 
-	protected void drawNav(Canvas canvas) {
+	protected void drawTopNav(Canvas canvas) {
 		drawNavHexagon(canvas);
 		drawNavSquare(canvas);
 	}
@@ -163,14 +209,14 @@ public class UiView extends View{
 		if (board.boardShape == Board.BOARD_GEOMETRY_HEX)
 		{
 			hexSide = 0.07f * canvasWidth;
-			x0 = 0.15f * canvasWidth;
-			y0 = 0.06f * canvasWidth;
+			x0 = 0.3f * canvasWidth - hexSide * (float) Math.cos(Math.PI/6.0);
+			y0 = 0.12f * canvasWidth - hexSide * 0.5f;
 			lineWidth = 10;
 		} else
 		{
 			hexSide = 0.05f * canvasWidth;
-			x0 = 0.15f * canvasWidth;
-			y0 = 0.07f * canvasWidth;
+			x0 = 0.3f * canvasWidth - hexSide * (float) Math.cos(Math.PI/6.0);
+			y0 = 0.12f * canvasWidth - hexSide * 0.5f;
 			lineWidth = 2;
 		}
 
@@ -211,7 +257,13 @@ public class UiView extends View{
 		xNext = x0;
 		yNext = y0;
 		
-		path.lineTo(xNext, yNext - 0.07f * hexSide);
+		if (board.boardShape == Board.BOARD_GEOMETRY_HEX)
+		{
+			path.lineTo(xNext, yNext - 0.07f * hexSide);
+		} else
+		{
+			path.lineTo(xNext, yNext);
+		}
     	
     	canvas.drawPath(path, paint);
 	}
@@ -223,14 +275,14 @@ public class UiView extends View{
 		if (board.boardShape == Board.BOARD_GEOMETRY_RECT)
 		{
 			squareWidth = 0.1f * canvasWidth;
-			x0 = 0.4f * canvasWidth;
-			y0 = 0.05f * canvasWidth;		
+			x0 = 0.65f * canvasWidth - squareWidth/2.0f;
+			y0 = 0.12f * canvasWidth - squareWidth/2.0f;
 			lineWidth = 10;	
 		} else
 		{
-			squareWidth = 0.08f * canvasWidth;
-			x0 = 0.4f * canvasWidth;
-			y0 = 0.06f * canvasWidth;				
+			squareWidth = 0.1f * canvasWidth;
+			x0 = 0.65f * canvasWidth - squareWidth/2.0f;
+			y0 = 0.12f * canvasWidth - squareWidth/2.0f;		
 			lineWidth = 2;
 		}
 
@@ -243,9 +295,76 @@ public class UiView extends View{
     	path.lineTo(x0 + squareWidth, y0);
     	path.lineTo(x0 + squareWidth, y0 + squareWidth);
     	path.lineTo(x0, y0 + squareWidth);
-    	path.lineTo(x0, y0 - 0.07f * squareWidth);
+    	if (board.boardShape == Board.BOARD_GEOMETRY_RECT)
+		{
+    		path.lineTo(x0, y0 - 0.07f * squareWidth);
+		} else
+		{
+			path.lineTo(x0, y0);
+		}
     	
     	canvas.drawPath(path, paint);
+	}
+	
+	protected void drawBottomNav(Canvas canvas)
+	{
+		drawTurnIndicator(canvas);
+		drawUndoIcon(canvas);
+		drawRefreshIcon(canvas);
+	}
+	
+	protected void drawTurnIndicator(Canvas canvas)
+	{
+		//indicate whose turn it is next
+		float canvasWidth = getWidth();
+		float canvasHeight = getHeight();
+		
+		if (playerTurn == 0)
+		{
+			paint.setColor(android.graphics.Color.BLUE);
+		} else
+		{
+			paint.setColor(android.graphics.Color.GREEN);
+		}
+    	paint.setStyle(Paint.Style.FILL);
+    	
+    	float cx = 0.25f * canvasWidth;
+    	float cy = 0.95f * canvasHeight;
+    	
+		canvas.drawCircle(cx, cy, 0.15f * cx, paint);	
+	}
+	
+	protected void drawUndoIcon(Canvas canvas) {
+		//indicate whose turn it is next
+		float canvasWidth = getWidth();
+		float canvasHeight = getHeight();
+
+		Bitmap bmp;
+		if (lastChange != null)
+		{
+			bmp = BitmapFactory.decodeResource(getResources(), R.drawable.undo);
+		} else {
+			bmp = BitmapFactory.decodeResource(getResources(), R.drawable.undo_black);
+		}
+		
+		float cx = 0.5f * canvasWidth - bmp.getWidth()/2.0f;
+		float cy = 0.95f * canvasHeight - bmp.getHeight()/2.0f;
+
+		canvas.drawBitmap(bmp, cx, cy, paint);
+	}
+	
+	public void drawRefreshIcon(Canvas canvas)
+	{
+		//indicate whose turn it is next
+		float canvasWidth = getWidth();
+		float canvasHeight = getHeight();
+
+		Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.refresh);
+	
+		float cx = 0.75f * canvasWidth - bmp.getWidth()/2.0f;
+		float cy = 0.95f * canvasHeight - bmp.getHeight()/2.0f;
+
+		canvas.drawBitmap(bmp, cx, cy, paint);
 	}
 	
 	protected void drawHexBoard(Canvas canvas) {
