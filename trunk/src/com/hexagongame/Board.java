@@ -1,5 +1,6 @@
 package com.hexagongame;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.util.Log;
@@ -39,7 +40,7 @@ public class Board{
 	//width of the rectangular grid cell
 	private static float wCell;
 
-	private HashMap<Integer, int[]> boardConfig;
+	public ArrayList<Hexagon> hexagonList = null;
 
 	public Board(float canvasHeight, float canvasWidth, int boardShape) {
 
@@ -66,6 +67,123 @@ public class Board{
 		//calculate (x0, y0) position of the board (position of the top-left point of the hexagon)
 		//relative to the canvas
 		calculatePositionOfBoardOnCanvas();
+		
+		setupListOfHexagons();
+	}
+	
+	private void setupListOfHexagons()
+	{
+		Log.e("hex","called setupListOfHexagons");
+		
+		hexagonList = new ArrayList<Hexagon>();
+		
+		//construct the list of hexagons that will make up the board
+		if (boardShape == Board.BOARD_GEOMETRY_RECT)
+		{
+			setupRectBoardListOfHexagons();
+		} else
+		{
+			setupHexBoardListOfHexagons();
+		}
+	}
+	
+	private void setupHexBoardListOfHexagons()
+	{
+		Log.e("hex","called setupHexBoardListOfHexagons");
+		
+		//create a list of hexagons that will be used to populate the hexagonally-shaped board
+    	float xOrigin = this.getXpositionOfBoardOnCanvas();
+    	float yOrigin = this.getYpositionOfBoardOnCanvas();
+    	
+    	//Log.e("hex", "board.getXpositionOfBoardOnCanvas()="+xOrigin);
+    	//Log.e("hex", "board.getYpositionOfBoardOnCanvas()="+yOrigin);
+
+    	float xHexPos, yHexPos;
+
+    	float[] hexCellPos;
+
+    	int color;
+    	int iLowerLimit, iUpperLimit;
+    	
+    	Hexagon hexagon;
+
+    	for (int j = -1; j > -10; j--)
+    	{
+    		//corners of hexagonal board
+    		if (j == -1 || j == -9)
+    		{
+    			iLowerLimit = 3;
+    			iUpperLimit = 3;
+    		} else if (j == -2 || j == -8)
+    		{
+    			iLowerLimit = 2;
+    			iUpperLimit = 5;
+    		} else
+    		{
+    			iLowerLimit = (j % 2 == 0) ? 1 : 0;
+    			iUpperLimit = 6;
+    		}
+	    	for (int i = iLowerLimit; i < (iUpperLimit + 1); i++)
+	    	{
+	    		//Log.e("hex", "setupHexBoardListOfHexagons: finding position of cell: "+i+", "+j);
+	    		
+	        	hexCellPos = this.findPositionOfCenterOfHexagonalCell(i, j);
+	        	
+	        	//Log.e("hex", "setupHexBoardListOfHexagons: found position of cell: "+hexCellPos[0]+", "+hexCellPos[1]);
+
+		        xHexPos = xOrigin + hexCellPos[0];
+		        yHexPos = yOrigin + hexCellPos[1];
+	
+		        color = android.graphics.Color.WHITE;
+
+		        hexagon = new Hexagon(xHexPos, yHexPos, color);
+		        
+		        hexagonList.add(hexagon);
+	    	}
+    	}
+		
+	}
+	
+	private void setupRectBoardListOfHexagons()
+	{
+		Log.e("hex","called setupHexBoardListOfHexagons");
+		
+		//create a list of hexagons that will be used to populate the rectangular board
+    	float xOrigin = this.getXpositionOfBoardOnCanvas();
+    	float yOrigin = this.getYpositionOfBoardOnCanvas();
+    	
+    	Log.e("hex", "board.getXpositionOfBoardOnCanvas()="+xOrigin);
+    	Log.e("hex", "board.getYpositionOfBoardOnCanvas()="+yOrigin);
+
+    	float xHexPos, yHexPos;
+
+    	float[] hexCellPos;
+
+    	int color;
+    	int iLowerLimit, iUpperLimit;
+    	
+    	Hexagon hexagon;
+
+    	for (int j = -1; j > -8; j--)
+    	{
+    		//corners of hexagonal board
+    		iLowerLimit = (j % 2 == 0) ? 1 : 0;
+			iUpperLimit = 6;
+			
+	    	for (int i = iLowerLimit; i < (iUpperLimit + 1); i++)
+	    	{	
+	        	hexCellPos = this.findPositionOfCenterOfHexagonalCell(i, j);
+
+		        xHexPos = xOrigin + hexCellPos[0];
+		        yHexPos = yOrigin + hexCellPos[1];	
+
+		        color = android.graphics.Color.WHITE;
+		        
+		        hexagon = new Hexagon(xHexPos, yHexPos, color);
+		        
+		        hexagonList.add(hexagon);
+	    	}
+    	}
 	}
 
 	private void calculateSmallHexagonSideLength()
@@ -80,7 +198,6 @@ public class Board{
 		hCell = smallHexSideLength * (1.0f + (float) Math.cos((Math.PI/ 3.0)));
 	}
 	
-
 	private void calculatePositionOfBoardOnCanvas()
 	{
 		
@@ -99,88 +216,20 @@ public class Board{
 				
 		Log.e("hex","calculated position of board on canvas: x0="+x0+", y0="+y0);
 	}
-
-	public int[] findHexagonalGridCoordinatesOfPointOnCanvas(float x, float y)
-	{
-		//find position relative to top-left point of hexagon
-		float xRel = x - x0;
-		float yRel = -(y - y0);
-		
-		//find coordinates of rectangular cell
-		int rectGridPosY = (int) Math.floor(yRel/hCell) +1;
-		int rectGridPosX;
-		if (rectGridPosY % 2 == 0)
-		{
-			rectGridPosX = (int) Math.floor((xRel/wCell + 0.5));
-		} else
-		{
-			rectGridPosX = (int) Math.floor(xRel/wCell);
-		}
-		
-		//get position of point relative to rectangular cell
-		//get y-position of point relative to rectangular cell
-		float yPosRelRect = yRel % hCell;
-		//get x-position of point relative to rectangular cell
-		float xPosRelRect;
-		if (rectGridPosY % 2 == 0)
-		{
-			xPosRelRect = (xRel + 0.5f * wCell) % wCell;
-		} else
-		{
-			xPosRelRect = xRel % wCell;
-		}
-		
-		//if the point is in either of the bottom two corners, it's in the hex corresponding directly
-		//to this rectangular cell, otherwise it's in one of the adjacent cells
-		int hexGridPosX, hexGridPosY;
-		if (xPosRelRect >= wCell/2.0)
-		{
-			if (yPosRelRect > xPosRelRect * (float) Math.sin(Math.PI/6.0))
-			{
-				//point is in the main part of the rectangular grid (not the bottom two corners) and is
-				//therefore in the corresponding hexagonal cell
-				hexGridPosX = rectGridPosX;
-				hexGridPosY = rectGridPosY;
-			} else
-			{
-				//point is in the bottom right corner of the rectangular grid cell and is therefore in
-				//the hexagonal cell below right
-				hexGridPosY = rectGridPosY - 1; 
-				if (rectGridPosY % 2 == 0)
-				{
-					hexGridPosX = rectGridPosX;
-				} else
-				{
-					hexGridPosX = rectGridPosX + 1;
-				}
-			}
-		} else
-		{
-			if (yPosRelRect > (wCell/2.0 - xPosRelRect) * (float) Math.sin(Math.PI/6.0))
-			{
-				//point is in the main part of the rectangular grid (not the bottom two corners) and is
-				//therefore in the corresponding hexagonal cell
-				hexGridPosX = rectGridPosX;
-				hexGridPosY = rectGridPosY;
-			} else
-			{
-				//point is in the bottom left corner of the rectangular grid cell and is therefore in
-				//the hexagonal cell below left
-				hexGridPosY = rectGridPosY - 1; 
-				if (rectGridPosY % 2 == 0)
-				{
-					hexGridPosX = rectGridPosX - 1;
-				} else
-				{
-					hexGridPosX = rectGridPosX;
-				}
-			}	
-		}
-		
-		int[] hexGridCoords = {hexGridPosX, hexGridPosY};
-		return hexGridCoords;	
-	}
 	
+	Hexagon findHexagonFromPointOnCanvas(float x, float y){
+	    Hexagon besthex = null;
+	    float besthex_dist = smallHexSideLength*smallHexSideLength;
+	    for( Hexagon hex: hexagonList ){
+	       float dhex =  (hex.x-x)*(hex.x-x)+(hex.y-y)*(hex.y-y);
+	       if( dhex < besthex_dist){
+	           besthex = hex;
+	           besthex_dist = dhex;
+	       }
+	    }
+	    return besthex;
+	}
+
 	public float[] findPositionOfTopLeftOfHexagonalCell(int hexGridCoordX, int hexGridCoordY)
 	{
 		//find the position of the top-left of the hexagon relative to the (0, 0) position of the board
@@ -193,6 +242,23 @@ public class Board{
 		} else
 		{
 			xRel = wCell * (float) hexGridCoordX;
+		}
+		float[] hexCellPos = {xRel, yRel};
+		return hexCellPos;
+	}
+	
+	public float[] findPositionOfCenterOfHexagonalCell(int hexGridCoordX, int hexGridCoordY)
+	{
+		//find the position of the top-left of the hexagon relative to the (0, 0) position of the board
+		float yRel = hCell * (-(float) hexGridCoordY - 0.5f);
+		float xRel;
+		//check if this is an even or odd row in the grid
+		if (hexGridCoordY % 2 == 0)
+		{
+			xRel = wCell * (float) hexGridCoordX;
+		} else
+		{
+			xRel = wCell * ((float) hexGridCoordX + 0.5f);
 		}
 		float[] hexCellPos = {xRel, yRel};
 		return hexCellPos;
@@ -221,10 +287,5 @@ public class Board{
 	public float getWCell()
 	{
 		return wCell;
-	}
-	
-	public HashMap<Integer, int[]> getBoardConfig()
-	{
-		return boardConfig;
 	}
 }

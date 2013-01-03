@@ -1,12 +1,11 @@
 package com.hexagongame;
 
-import java.util.HashMap;
-
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
@@ -21,23 +20,38 @@ public class UiView extends View{
 
 	//the paint object used by the canvas
 	private Paint paint;
-	
-	private HashMap<String, Integer> gameConfig;
 
 	private int playerTurn = 0;
 	
-	private int boardShape = Board.BOARD_GEOMETRY_HEX;
+	public int boardShape = Board.BOARD_GEOMETRY_HEX;
 	
-	private int[] lastChange = null;
+	private Hexagon lastChange = null;
 	
 	//flag saying whether ontouch function is initialized
 	private boolean onTouchInit = false;
+	
+	private long playerTurnToastStartTime = 0;
+	
+	/**
+	 * Game mode
+	 * 0 = 2-player (default)
+	 * 1 = play against phone
+	 */
+	public int gameMode = 0;
+	
+	/**
+	 * Phone player ID
+	 * only used if gameMode = 1 (play against phone)
+	 * 0 = player goes first
+	 * 1 = phone goes first
+	 */
+	public int phonePlayerId = 0;
 	
 	public UiView(Context context, AttributeSet attrs) {
 		
 		super(context, attrs);
 
-		paint = new Paint();	
+		paint = new Paint();
 
 		viewInit();
 	}
@@ -45,146 +59,143 @@ public class UiView extends View{
 	public void viewInit()
 	{
 		board = null;
-		gameConfig = new HashMap<String, Integer>();
 		playerTurn = 0;
-		lastChange = null;
-		
+		lastChange = null;	
+
 		//show introductory message
     	Context context = getContext();
 		Toast toast = Toast.makeText(context, "First player to make a path from one side to the other wins. Blue goes first.", Toast.LENGTH_SHORT);
 		toast.show();
 	}
 	
-	public void setBoard(Board board)
+	private void setupBoard()
 	{
-		this.board = board;
-	}
-	
-	public Board getBoard()
-	{
-		return board;
+		//note: we have to call this method from within onDraw, rather than from within the constructor, because otherwise
+		//the getHeight and getWidth methods just return 0
+		float canvasWidth = getWidth();
+    	float canvasHeight = getHeight();
+    	
+		board = new Board(canvasHeight, canvasWidth, boardShape);
+
 	}
 
 	@Override
 	protected void onDraw(Canvas canvas) {
-		
+
+		//unfortunately, we have to do this here rather than in the constructor because the getHeight and getWidth
+		//functions do not work there
 		if (board == null)
 		{
-			float canvasWidth = getWidth();
-	    	float canvasHeight = getHeight();
-	    	
-	    	Log.e("hex", "canvasWidth="+canvasWidth);
-	    	Log.e("hex", "canvasHeight="+canvasHeight);
-	    	
-	    	board = new Board(canvasHeight, canvasWidth, boardShape);
-	    	
-	    	if (!onTouchInit)
-	    	{
-	    		//initialize the ontouch event
-		    	this.setOnTouchListener(new View.OnTouchListener() {
+			setupBoard();
+		}
+	    if (!onTouchInit)
+	    {
+	    	//initialize the ontouch event
+		    this.setOnTouchListener(new View.OnTouchListener() {
 		    		
-		    		public boolean onTouch(View v, MotionEvent event) {
+		    	public boolean onTouch(View v, MotionEvent event) {
 	
-		    			Log.e("hex", "ontouch x="+event.getX());
-		    	    	Log.e("hex", "ontouch y="+event.getY());
+		   			Log.e("hex", "ontouch x="+event.getX());
+		    	    Log.e("hex", "ontouch y="+event.getY());
 		    	    	
-		    	    	//prevent null pointer exceptions
-		    	    	if (board == null)
-		    	    	{
-		    	    		return false;
-		    	    	}
-		    	    	
-		    			int[] coords = board.findHexagonalGridCoordinatesOfPointOnCanvas((float) event.getX(), (float) event.getY());
-	
-		    			if (gameConfig.get(coords[0]+"_"+coords[1]) == null) //hexagon is out of scope of board
-		    			{	    
-		    				Log.e("hex", "hex is out of scope of board");
-		    				//check if user has clicked on the nav
-		    				float canvasWidth = getWidth();
-		    				float x = (float) event.getX();
-		    				float y = (float) event.getY();
-		    				if (y < 0.15f * canvasWidth)
-		    				{
-		    					if (x > 0.25f * canvasWidth && x < 0.35f * canvasWidth)
-		    					{
-		    						//if user has clicked on the hexagonal shape in the nav, redraw the board as a hexagon
-		    						boardShape = Board.BOARD_GEOMETRY_HEX;
-		    						viewInit();
-		    						UiView.this.postInvalidate();
-		    					} else if (x >= 0.6f * canvasWidth && x < 0.7f * canvasWidth)
-		    					{
-		    						//if user has clicked on the rectangular shape in the nav, redraw the board as a rectangle
-		    						boardShape = Board.BOARD_GEOMETRY_RECT;
-		    						viewInit();
-		    						UiView.this.postInvalidate();
-		    					}
-		    				} else if (y > 0.85f * canvasWidth)
-		    				{
-		    					if (x > 0.2 * canvasWidth && x < 0.3 * canvasWidth)
-		    					{
-			    					//turn indicator: if user taps on the circle, show a message showing whose turn it is next
-			    					Context context = getContext();
-			    					String turnMessage = "";
-			    					if (playerTurn == 0)
-			    					{
-			    						turnMessage = "Blue's turn!";
-			    					} else
-			    					{
-			    						turnMessage = "Green's turn!";
-			    					}
-			    					Toast toast = Toast.makeText(context, turnMessage, Toast.LENGTH_SHORT);
-			    					toast.show();
-		    					} else if (x >= 0.45 * canvasWidth && x <= 0.55 * canvasWidth)
-		    					{
-		    						Log.e("hex", "undo button clicked");
-		    						//undo button
-		    						if (lastChange != null)
-		    						{
-		    							gameConfig.put(lastChange[0]+"_"+lastChange[1], null);
-		    							playerTurn = (playerTurn == 1) ? 0 : 1;
-		    							lastChange = null;
-		    							UiView.this.postInvalidate();
-		    						}
-		    					}  else if (x >= 0.7 * canvasWidth && x <= 0.8 * canvasWidth)
-		    					{
-		    						Log.e("hex", "redo button clicked");
-		    						
-		    						viewInit();
-		    						UiView.this.postInvalidate();
-		    					}
-		    				}
-		    				
-		    				//do nothing
-		    			} else if (gameConfig.get(coords[0]+"_"+coords[1]) == android.graphics.Color.WHITE) //hexagon is on board, but unused
+		    	    //prevent null pointer exceptions
+		    	    if (board == null)
+		    	    {
+		    	    	return false;
+		    	    }
+
+		    	    Hexagon hexagon = board.findHexagonFromPointOnCanvas((float) event.getX(), (float) event.getY());
+		    	    
+		    		if (hexagon == null) //hexagon is out of scope of board
+		    		{    
+		    			Log.e("hex", "hex is out of scope of board");
+		    			//check if user has clicked on the nav
+		    			float canvasWidth = getWidth();
+		    			float x = (float) event.getX();
+		    			float y = (float) event.getY();
+		    			if (y > 0.85f * canvasWidth)
 		    			{
-		    				Log.e("hex", "hex is white");
-		    				if (playerTurn == 0)
+		    				if (x > 0.2 * canvasWidth && x < 0.3 * canvasWidth)
 		    				{
-		    					gameConfig.put(coords[0]+"_"+coords[1], android.graphics.Color.BLUE);
-		    					playerTurn = 1;
-		    					//save last change in case we need to undo it
-		    					lastChange = coords;
-		    				} else
+			    				//turn indicator: if user taps on the circle, show a message showing whose turn it is next
+			    				Context context = getContext();
+			    				String turnMessage = "";
+			    				if (playerTurn == 0)
+			    				{
+			    					turnMessage = "Blue's turn!";
+			    				} else
+			    				{
+			    					turnMessage = "Green's turn!";
+			    				}
+			    				//make sure toast is not triggered multiple times
+			    				if ((System.currentTimeMillis() - playerTurnToastStartTime) > 2000)
+			    				{
+				    				Toast toast = Toast.makeText(context, turnMessage, Toast.LENGTH_SHORT);
+				    				playerTurnToastStartTime = System.currentTimeMillis();
+				    				toast.show();		    					
+			    				}
+			    					
+		    				} else if (x >= 0.45 * canvasWidth && x <= 0.55 * canvasWidth)
 		    				{
-		    					gameConfig.put(coords[0]+"_"+coords[1], android.graphics.Color.GREEN);
-		    					playerTurn = 0;
-		    					//save last change in case we need to undo it
-		    					lastChange = coords;
+		    					Log.e("hex", "undo button clicked");
+		    					//undo button
+		    					if (lastChange != null)
+		    					{
+		    						lastChange.color = android.graphics.Color.WHITE;
+		    						playerTurn = (playerTurn == 1) ? 0 : 1;
+		    						lastChange = null;
+		    						UiView.this.postInvalidate();
+		    					}
+		    				}  else if (x >= 0.7 * canvasWidth && x <= 0.8 * canvasWidth)
+		    				{
+		    					Log.e("hex", "redo button clicked");
+
+		    					Activity ac = (Activity) getContext();
+		    					ac.startActivity(new Intent(ac, ChooseBoardActivity.class));
 		    				}
+		    			}
+		    				
+		    			//do nothing
+		    		} else if (hexagon.color == android.graphics.Color.WHITE) //hexagon is on board, but unused
+		    		{
+		    			Log.e("hex", "hex is white");
+		    			if (playerTurn == 0)
+		    			{
+		    				hexagon.color = android.graphics.Color.BLUE;
+		    				playerTurn = 1;
+		    				//save last change in case we need to undo it
+		    				lastChange = hexagon;
+		    			} else
+		    			{
+		    				hexagon.color = android.graphics.Color.GREEN;
+		    				playerTurn = 0;
+		    				//save last change in case we need to undo it
+		    				lastChange = hexagon;
+		    			}
 		    			
 		    				
-		    				UiView.this.postInvalidate();				
-		    			}
-		    			return true;
+		    			UiView.this.postInvalidate();				
 		    		}
-		    	});
+		    		return true;
+		    	}
+		    });
 		    	
-		    	onTouchInit = true;
-	    	}
+		    onTouchInit = true;
+	    }
+
+		//TODO: implement complete play-against-phone functionality
+		//here, the player is playing against the phone and the phone is blue (goes first), so we just
+		//select the first hexagon
+		if (gameMode == 1 && phonePlayerId == 0)
+		{
+			Hexagon hexagon = board.hexagonList.get(0);
+			if (hexagon.color == android.graphics.Color.WHITE)
+			{
+				hexagon.color = android.graphics.Color.BLUE;
+				playerTurn = 1;
+			}
 		}
-		
-		//draw the navigation allowing the user to select a shape
-		drawTopNav(canvas);
+	    
 		//draw the bottom nav containing turn indicator & undo functionality
 		drawBottomNav(canvas);
 
@@ -195,125 +206,17 @@ public class UiView extends View{
 		{
 			drawHexBoard(canvas);
 		}
-	}
-
-	protected void drawTopNav(Canvas canvas) {
-		drawNavHexagon(canvas);
-		drawNavSquare(canvas);
+		
 	}
 	
-	protected void drawNavHexagon(Canvas canvas) {
-		float canvasWidth = getWidth();
-
-		float hexSide, x0, y0, lineWidth;
-		if (board.boardShape == Board.BOARD_GEOMETRY_HEX)
-		{
-			hexSide = 0.07f * canvasWidth;
-			x0 = 0.3f * canvasWidth - hexSide * (float) Math.cos(Math.PI/6.0);
-			y0 = 0.12f * canvasWidth - hexSide * 0.5f;
-			lineWidth = 10;
-		} else
-		{
-			hexSide = 0.05f * canvasWidth;
-			x0 = 0.3f * canvasWidth - hexSide * (float) Math.cos(Math.PI/6.0);
-			y0 = 0.12f * canvasWidth - hexSide * 0.5f;
-			lineWidth = 2;
-		}
-
-		float xNext = x0;
-		float yNext = y0;
-
-		paint.setColor(android.graphics.Color.WHITE);
-    	paint.setStrokeWidth(lineWidth);
-    	paint.setStyle(Paint.Style.STROKE);
-    	Path path = new Path();
-    	
-		path.moveTo(xNext, yNext);
-
-		xNext = xNext + hexSide * (float) Math.cos(Math.PI/6.0);
-		yNext = yNext - hexSide * (float) Math.sin(Math.PI/6.0);
-		
-		path.lineTo(xNext, yNext);
-		
-		xNext = xNext + hexSide * (float) Math.cos(Math.PI/6.0);
-		yNext = yNext + hexSide * (float) Math.sin(Math.PI/6.0);
-		
-		path.lineTo(xNext, yNext);
-		
-		yNext = yNext + hexSide;
-		
-		path.lineTo(xNext, yNext);
-		
-		xNext = xNext - hexSide * (float) Math.cos(Math.PI/6.0);
-		yNext = yNext + hexSide * (float) Math.sin(Math.PI/6.0);
-		
-		path.lineTo(xNext, yNext);
-		
-		xNext = xNext - hexSide * (float) Math.cos(Math.PI/6.0);
-		yNext = yNext - hexSide * (float) Math.sin(Math.PI/6.0);
-		
-		path.lineTo(xNext, yNext);
-		
-		xNext = x0;
-		yNext = y0;
-		
-		if (board.boardShape == Board.BOARD_GEOMETRY_HEX)
-		{
-			path.lineTo(xNext, yNext - 0.07f * hexSide);
-		} else
-		{
-			path.lineTo(xNext, yNext);
-		}
-    	
-    	canvas.drawPath(path, paint);
-	}
-	
-	protected void drawNavSquare(Canvas canvas) {
-		float canvasWidth = getWidth();
-
-		float squareWidth, x0, y0, lineWidth;
-		if (board.boardShape == Board.BOARD_GEOMETRY_RECT)
-		{
-			squareWidth = 0.1f * canvasWidth;
-			x0 = 0.65f * canvasWidth - squareWidth/2.0f;
-			y0 = 0.12f * canvasWidth - squareWidth/2.0f;
-			lineWidth = 10;	
-		} else
-		{
-			squareWidth = 0.1f * canvasWidth;
-			x0 = 0.65f * canvasWidth - squareWidth/2.0f;
-			y0 = 0.12f * canvasWidth - squareWidth/2.0f;		
-			lineWidth = 2;
-		}
-
-		paint.setColor(android.graphics.Color.WHITE);
-    	paint.setStrokeWidth(lineWidth);
-    	paint.setStyle(Paint.Style.STROKE);
-    	Path path = new Path();
-    	
-    	path.moveTo(x0, y0);
-    	path.lineTo(x0 + squareWidth, y0);
-    	path.lineTo(x0 + squareWidth, y0 + squareWidth);
-    	path.lineTo(x0, y0 + squareWidth);
-    	if (board.boardShape == Board.BOARD_GEOMETRY_RECT)
-		{
-    		path.lineTo(x0, y0 - 0.07f * squareWidth);
-		} else
-		{
-			path.lineTo(x0, y0);
-		}
-    	
-    	canvas.drawPath(path, paint);
-	}
-	
-	protected void drawBottomNav(Canvas canvas)
+	private void drawBottomNav(Canvas canvas)
 	{
 		drawTurnIndicator(canvas);
 		drawUndoIcon(canvas);
 		drawRefreshIcon(canvas);
 	}
 	
-	protected void drawTurnIndicator(Canvas canvas)
+	private void drawTurnIndicator(Canvas canvas)
 	{
 		//indicate whose turn it is next
 		float canvasWidth = getWidth();
@@ -334,7 +237,7 @@ public class UiView extends View{
 		canvas.drawCircle(cx, cy, 0.15f * cx, paint);	
 	}
 	
-	protected void drawUndoIcon(Canvas canvas) {
+	private void drawUndoIcon(Canvas canvas) {
 		//indicate whose turn it is next
 		float canvasWidth = getWidth();
 		float canvasHeight = getHeight();
@@ -367,55 +270,9 @@ public class UiView extends View{
 		canvas.drawBitmap(bmp, cx, cy, paint);
 	}
 	
-	protected void drawHexBoard(Canvas canvas) {
-    	float xOrigin = board.getXpositionOfBoardOnCanvas();
-    	float yOrigin = board.getYpositionOfBoardOnCanvas();
-    	
-    	Log.e("hex", "board.getXpositionOfBoardOnCanvas()="+xOrigin);
-    	Log.e("hex", "board.getYpositionOfBoardOnCanvas()="+yOrigin);
-
-    	float xHexPos, yHexPos;
-
-    	float[] hexCellPos;
-
-    	int color;
-    	int iLowerLimit, iUpperLimit;
-
-    	for (int j = -1; j > -10; j--)
-    	{
-    		//corners of hexagonal board
-    		if (j == -1 || j == -9)
-    		{
-    			iLowerLimit = 3;
-    			iUpperLimit = 3;
-    		} else if (j == -2 || j == -8)
-    		{
-    			iLowerLimit = 2;
-    			iUpperLimit = 5;
-    		} else
-    		{
-    			iLowerLimit = (j % 2 == 0) ? 1 : 0;
-    			iUpperLimit = 6;
-    		}
-	    	for (int i = iLowerLimit; i < (iUpperLimit + 1); i++)
-	    	{
-	        	hexCellPos = board.findPositionOfTopLeftOfHexagonalCell(i, j);
-
-		        xHexPos = xOrigin + hexCellPos[0];
-		        yHexPos = yOrigin + hexCellPos[1];	
-
-		        if (gameConfig.get(i+"_"+j) == null)
-		        {
-		        	color = android.graphics.Color.WHITE;
-		        	gameConfig.put(i+"_"+j, color);		        	
-		        } else
-		        {
-		        	color = gameConfig.get(i+"_"+j);
-		        }
-		        
-		        drawHexagon(canvas, xHexPos, yHexPos, board.getSmallHexSideLength(), color);
-	        	
-	    	}
+	private void drawHexBoard(Canvas canvas) {   	
+    	for( Hexagon hex : board.hexagonList ){
+    		drawHexagon(canvas, hex);
     	}
     	
     	decorateBoardTopLeft(canvas, android.graphics.Color.BLUE);
@@ -426,57 +283,26 @@ public class UiView extends View{
     	decorateBoardRight(canvas, android.graphics.Color.GREEN, android.graphics.Color.BLUE);	
 	}
 	
-	protected void drawSquareBoard(Canvas canvas) {
-    	float xOrigin = board.getXpositionOfBoardOnCanvas();
-    	float yOrigin = board.getYpositionOfBoardOnCanvas();
-    	
-    	Log.e("hex", "board.getXpositionOfBoardOnCanvas()="+xOrigin);
-    	Log.e("hex", "board.getYpositionOfBoardOnCanvas()="+yOrigin);
-
-    	float xHexPos, yHexPos;
-
-    	float[] hexCellPos;
-
-    	int color;
-    	int iLowerLimit, iUpperLimit;
-
-    	for (int j = -1; j > -8; j--)
-    	{
-    		//corners of hexagonal board
-    		iLowerLimit = (j % 2 == 0) ? 1 : 0;
-			iUpperLimit = 6;
-			
-	    	for (int i = iLowerLimit; i < (iUpperLimit + 1); i++)
-	    	{	
-	        	hexCellPos = board.findPositionOfTopLeftOfHexagonalCell(i, j);
-
-		        xHexPos = xOrigin + hexCellPos[0];
-		        yHexPos = yOrigin + hexCellPos[1];	
-
-		        if (gameConfig.get(i+"_"+j) == null)
-		        {
-		        	color = android.graphics.Color.WHITE;
-		        	gameConfig.put(i+"_"+j, color);		        	
-		        } else
-		        {
-		        	color = gameConfig.get(i+"_"+j);
-		        }
-		        
-		        drawHexagon(canvas, xHexPos, yHexPos, board.getSmallHexSideLength(), color);
-	        	
-	    	}
+	private void drawSquareBoard(Canvas canvas) {
+		for( Hexagon hex : board.hexagonList ){
+    		drawHexagon(canvas, hex);
     	}
     	
     	decorateRectBoardHorizontalEdges(canvas, android.graphics.Color.GREEN);
     	decorateRectBoardVerticalEdges(canvas, android.graphics.Color.BLUE);
 	}
 	
-	public void drawHexagon(Canvas canvas, float x, float y, float hexSide, int color)
+	public void drawHexagon(Canvas canvas, Hexagon hex)
 	{
-		paint.setColor(color);
+		paint.setColor(hex.color);
         paint.setStyle(Paint.Style.FILL);
         
 		Path path = new Path();
+		
+		float x = hex.x - board.getWCell()/2.0f;
+		float y = hex.y - board.getHCell()/2.0f;
+		
+		float hexSide = board.getSmallHexSideLength();
 		
 		// vx, vy represents the vector of the first edge of the hexagon
 		float vx = hexSide * (float) Math.cos(Math.PI/6.0);

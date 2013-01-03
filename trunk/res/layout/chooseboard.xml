@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+  <LinearLayout
+      android:orientation="horizontal"
+      android:layout_width="fill_parent"
+      android:layout_height="fill_parent"
+      android:layout_weight="1">
+	<TextView android:text="Board shape"
+	    android:layout_width="100dp"
+	    android:paddingLeft="16dp"
+	    android:paddingTop="5dp"
+  		android:layout_height="wrap_content"/>
+	<com.hexagongame.ChooseBoardView
+	  android:id="@+id/chooseboardview"
+	  android:layout_width="fill_parent"
+	  android:layout_height="100dp"
+	  />
+  </LinearLayout>
+	
+  <LinearLayout
+      android:orientation="horizontal"
+      android:layout_width="fill_parent"
+      android:layout_height="fill_parent"
+      android:layout_weight="1">
+	<TextView android:text="Mode"
+	  android:layout_width="100dp"
+	  android:paddingLeft="16dp"
+  	  android:layout_height="wrap_content"/>
+	<RadioGroup android:id="@+id/game_mode"
+	  android:layout_width="match_parent"
+	  android:layout_height="wrap_content">
+		<RadioButton android:id="@+id/person"
+		android:text="2 Person"
+		android:checked="true"/>
+		<RadioButton android:id="@+id/phone"
+		android:text="Play against phone"/>
+	</RadioGroup>
+  </LinearLayout>
+
+  <LinearLayout
+      android:id="@+id/player_order"
+      android:visibility="gone"
+      android:orientation="horizontal"
+      android:layout_width="fill_parent"
+      android:layout_height="fill_parent"
+      android:layout_weight="1">
+	<TextView android:text="Player order"
+	  android:layout_width="100dp"
+	  android:paddingLeft="16dp"
+  	  android:layout_height="wrap_content"/>
+	<RadioGroup android:id="@+id/phone_player_id"
+	  android:layout_width="match_parent"
+	  android:layout_height="wrap_content">
+		<RadioButton android:id="@+id/blue"
+		android:text="Phone is blue (goes first)"
+		android:checked="true"/>
+		<RadioButton android:id="@+id/green"
+		android:text="Phone is green (goes second)"/>
+	</RadioGroup>
+  </LinearLayout>
+  <LinearLayout
+      android:orientation="horizontal"
+      android:layout_width="fill_parent"
+      android:layout_height="fill_parent"
+      android:layout_weight="1">
+	<RelativeLayout 
+    android:layout_width="fill_parent" 
+    android:layout_height="fill_parent">
+    <Button
+        android:id="@+id/go"
+        android:layout_width="150dip" 
+		android:layout_height="60dip"
+		android:layout_centerInParent="true"
+		android:layout_alignParentTop="true"
+        android:text="GO"
+        android:textColor="#ffffff"
+        android:background="@drawable/chooseboard_button" />
+  	</RelativeLayout>
+  </LinearLayout>      
+</LinearLayout>
