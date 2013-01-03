@@ -201,7 +201,7 @@ public class Board{
 	private void calculatePositionOfBoardOnCanvas()
 	{
 		
-		x0 = 0.1f * boardWidth;
+		x0 = 0.1f * canvasWidth;
 		
 		float boardHeight;
 		if (this.boardShape == Board.BOARD_GEOMETRY_RECT)
