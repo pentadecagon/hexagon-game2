@@ -186,14 +186,35 @@ public class UiView extends View{
 
 		//TODO: implement complete play-against-phone functionality
 		//here, the player is playing against the phone and the phone is blue (goes first), so we just
-		//select the first hexagon
-		if (gameMode == 1 && phonePlayerId == 0)
+		//select the first available hexagon
+		if (gameMode == 1)
 		{
-			Hexagon hexagon = board.hexagonList.get(0);
-			if (hexagon.color == android.graphics.Color.WHITE)
+			if (phonePlayerId == 0 && playerTurn == 0) //phone is blue
 			{
-				hexagon.color = android.graphics.Color.BLUE;
-				playerTurn = 1;
+				//just select the first hexagon that's not taken
+				for (Hexagon hexagon: board.hexagonList)
+				{
+					if (hexagon.color == android.graphics.Color.WHITE)
+					{
+						hexagon.color = android.graphics.Color.BLUE;
+						playerTurn = 1;
+						lastChange = hexagon;
+						break;
+					}
+				}
+			} else if (phonePlayerId == 1 && playerTurn == 1) //phone is blue
+			{
+				//just select the first hexagon that's not taken
+				for (Hexagon hexagon: board.hexagonList)
+				{
+					if (hexagon.color == android.graphics.Color.WHITE)
+					{
+						hexagon.color = android.graphics.Color.GREEN;
+						playerTurn = 0;
+						lastChange = hexagon;
+						break;
+					}
+				}
 			}
 		}
 	    
