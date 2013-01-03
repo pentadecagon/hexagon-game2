@@ -3,6 +3,8 @@ package com.hexagongame;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Button;
+import android.widget.Toast;
 
 public class HexActivity extends Activity {
 
@@ -20,17 +22,24 @@ public class HexActivity extends Activity {
   	  super.onResume();
   	  
   	  initializeLayout();
-  	  startWork();
     }
     
     private void initializeLayout()
     {
     	setContentView(R.layout.main);
+    	
+    	String gameModeStr = getIntent().getStringExtra(ChooseBoardActivity.ID_GAME_MODE);
+        int gameMode = (gameModeStr != null) ? Integer.valueOf(gameModeStr) : 0;
+        
+        String phonePlayerIdStr = getIntent().getStringExtra(ChooseBoardActivity.ID_PHONE_PLAYER_ID);
+        int phonePlayerId = (phonePlayerIdStr != null) ? Integer.valueOf(phonePlayerIdStr) : 0;
+        
+        String boardShapeStr = getIntent().getStringExtra(ChooseBoardActivity.ID_BOARD_VIEW);
+        int boardShape = (boardShapeStr != null) ? Integer.valueOf(boardShapeStr) : 0;
+        
+        UiView uiView = (UiView) findViewById(R.id.boardview);       
+        uiView.gameMode = gameMode;
+        uiView.phonePlayerId = phonePlayerId;
+        uiView.boardShape = boardShape;
     }
-    
-    private void startWork()
-    {
-    	findViewById(R.id.boardview);
-    }
-
 }
