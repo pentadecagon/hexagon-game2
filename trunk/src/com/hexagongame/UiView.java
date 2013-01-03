@@ -111,9 +111,10 @@ public class UiView extends View{
 		    			Log.e("hex", "hex is out of scope of board");
 		    			//check if user has clicked on the nav
 		    			float canvasWidth = getWidth();
+		    			float canvasHeight = getHeight();
 		    			float x = (float) event.getX();
 		    			float y = (float) event.getY();
-		    			if (y > 0.85f * canvasWidth)
+		    			if (y > 0.9f * canvasHeight)
 		    			{
 		    				if (x > 0.2 * canvasWidth && x < 0.3 * canvasWidth)
 		    				{
