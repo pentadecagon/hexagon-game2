@@ -248,10 +248,10 @@ public class Board{
 		float boardHeight;
 		if (this.boardShape == Board.BOARD_GEOMETRY_RECT)
 		{
-			boardHeight = hCell * 7.0f;
+			boardHeight = hCell * 7.0f - smallHexSideLength * (float) Math.sin((Math.PI/ 6.0));
 		} else
 		{
-			boardHeight = hCell * 9.0f;
+			boardHeight = hCell * 9.0f - smallHexSideLength * (float) Math.sin((Math.PI/ 6.0));
 		}
 		
 		y0 = canvasHeight/2.0f - boardHeight/2.0f;	

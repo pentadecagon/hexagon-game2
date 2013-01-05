@@ -129,6 +129,8 @@ public class UiView extends View{
 				}
 			}
 		}
+		
+		drawBackground(canvas);
 	    
 		//draw the bottom nav containing turn indicator & undo functionality
 		drawBottomNav(canvas);
@@ -224,7 +226,76 @@ public class UiView extends View{
 		}
 		return true;
     };
+    
+    private void drawBackground(Canvas canvas)
+    {
+    	if (board.boardShape == Board.BOARD_GEOMETRY_RECT)
+		{
+    		drawSquareBackground(canvas);
+		} else
+		{
+			drawHexBackground(canvas);
+		}
+    }
 	
+    private void drawHexBackground(Canvas canvas)
+    {
+    	float canvasHeight = getHeight();
+    	float canvasWidth = getWidth();
+
+    	float padding = 0.02f * canvasHeight;
+    	
+    	paint.setColor(android.graphics.Color.parseColor("#0000FF"));
+    	paint.setStyle(Paint.Style.FILL);
+    	Path path = new Path();
+    	path.moveTo(0.0f, 0.1f * canvasHeight);
+    	path.lineTo(0.5f * canvasWidth - padding, 0.1f * canvasHeight);
+    	path.lineTo(0.5f * canvasWidth + padding, 0.9f * canvasHeight);
+    	path.lineTo(canvasWidth, 0.9f * canvasHeight);
+    	path.lineTo(canvasWidth, 0.5f * canvasHeight + padding);
+    	path.lineTo(0.0f, 0.5f * canvasHeight - padding);
+    	path.lineTo(0.0f, 0.1f * canvasHeight);
+    	canvas.drawPath(path, paint);
+    	
+    	paint.setColor(android.graphics.Color.parseColor("#24D330"));
+    	paint.setStyle(Paint.Style.FILL);
+    	path = new Path();
+    	path.moveTo(0.5f * canvasWidth + padding, 0.1f * canvasHeight);
+    	path.lineTo(canvasWidth, 0.1f * canvasHeight);
+    	path.lineTo(canvasWidth, 0.5f * canvasHeight - padding);
+    	path.lineTo(0.0f, 0.5f * canvasHeight + padding);
+    	path.lineTo(0.0f, 0.9f * canvasHeight);
+    	path.lineTo(0.5f * canvasWidth - padding, 0.9f * canvasHeight);
+    	path.lineTo(0.5f * canvasWidth + padding, 0.1f * canvasHeight);
+    	canvas.drawPath(path, paint);
+    }
+    
+    private void drawSquareBackground(Canvas canvas)
+    {
+    	float canvasHeight = getHeight();
+    	float canvasWidth = getWidth();
+	
+    	paint.setColor(android.graphics.Color.parseColor("#0000FF"));
+    	paint.setStyle(Paint.Style.FILL);
+    	Path path = new Path();
+    	path.moveTo(0.0f, 0.23f * canvasHeight);
+    	path.lineTo(0.0f, 0.77f * canvasHeight);
+    	path.lineTo(canvasWidth, 0.23f * canvasHeight);
+    	path.lineTo(canvasWidth, 0.77f * canvasHeight);
+    	path.lineTo(0.0f, 0.23f * canvasHeight);
+    	canvas.drawPath(path, paint);
+    	
+    	paint.setColor(android.graphics.Color.parseColor("#24D330"));
+    	paint.setStyle(Paint.Style.FILL);
+    	path = new Path();
+    	path.moveTo(0.0f, 0.19f * canvasHeight);
+    	path.lineTo(canvasWidth, 0.19f * canvasHeight);
+    	path.lineTo(0.0f, 0.81f * canvasHeight);
+    	path.lineTo(canvasWidth, 0.81f * canvasHeight);
+    	path.lineTo(0.0f, 0.19f * canvasHeight);
+    	canvas.drawPath(path, paint);
+    }
+    
 	private void drawBottomNav(Canvas canvas)
 	{
 		drawTurnIndicator(canvas);
