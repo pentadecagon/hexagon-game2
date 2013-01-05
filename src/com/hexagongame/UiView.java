@@ -135,14 +135,9 @@ public class UiView extends View{
 		//draw the bottom nav containing turn indicator & undo functionality
 		drawBottomNav(canvas);
 
-		if (board.boardShape == Board.BOARD_GEOMETRY_RECT)
-		{
-			drawSquareBoard(canvas);
-		} else
-		{
-			drawHexBoard(canvas);
-		}
-		
+    	for( Hexagon hex : board.hexagonList ){
+    		drawHexagon(canvas, hex);
+    	}			
 	}
 	
 	private OnTouchListener touchListener = new View.OnTouchListener() {
@@ -295,17 +290,6 @@ public class UiView extends View{
 		canvas.drawBitmap(bmp, cx, cy, paint);
 	}
 	
-	private void drawHexBoard(Canvas canvas) {   	
-    	for( Hexagon hex : board.hexagonList ){
-    		drawHexagon(canvas, hex);
-    	}	
-	}
-	
-	private void drawSquareBoard(Canvas canvas) {
-		for( Hexagon hex : board.hexagonList ){
-    		drawHexagon(canvas, hex);
-    	}
-	}
 	
 	public void drawHexagon(Canvas canvas, Hexagon hex)
 	{
