@@ -91,8 +91,6 @@ public class UiView extends View{
 		{
 			setupBoard();
 		}
-		
-		this.setOnTouchListener(touchListener);
 	}
 	
 	@Override
@@ -139,97 +137,92 @@ public class UiView extends View{
     		drawHexagon(canvas, hex);
     	}			
 	}
-	
-	private OnTouchListener touchListener = new View.OnTouchListener() {
-		
-    	public boolean onTouch(View v, MotionEvent event) {
-            if (event.getAction() != MotionEvent.ACTION_DOWN ){
-            	return false;
-            }
+	@Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (event.getAction() != MotionEvent.ACTION_DOWN ){
+        	return false;
+        }
 
-   			Log.e("hex", "ontouch x="+event.getX());
-    	    Log.e("hex", "ontouch y="+event.getY());
-    	    	
-    	    //prevent null pointer exceptions
-    	    if (board == null)
-    	    {
-    	    	return false;
-    	    }
+		Log.e("hex", "ontouch x="+event.getX());
+	    Log.e("hex", "ontouch y="+event.getY());
+	    	
+	    //prevent null pointer exceptions
+	    if (board == null)
+	    {
+	    	return false;
+	    }
 
-    	    Hexagon hexagon = board.findHexagonFromPointOnCanvas((float) event.getX(), (float) event.getY());
-    	    
-    		if (hexagon == null) //hexagon is out of scope of board
-    		{
-    			Log.e("hex", "hex is out of scope of board");
-    			//check if user has clicked on the nav
-    			float canvasWidth = getWidth();
-    			float canvasHeight = getHeight();
-    			float x = (float) event.getX();
-    			float y = (float) event.getY();
-    			if (y > 0.9f * canvasHeight)
-    			{
-    				if (x > 0.2 * canvasWidth && x < 0.3 * canvasWidth)
+	    Hexagon hexagon = board.findHexagonFromPointOnCanvas((float) event.getX(), (float) event.getY());
+	    
+		if (hexagon == null) //hexagon is out of scope of board
+		{
+			Log.e("hex", "hex is out of scope of board");
+			//check if user has clicked on the nav
+			float canvasWidth = getWidth();
+			float canvasHeight = getHeight();
+			float x = (float) event.getX();
+			float y = (float) event.getY();
+			if (y > 0.9f * canvasHeight)
+			{
+				if (x > 0.2 * canvasWidth && x < 0.3 * canvasWidth)
+				{
+    				//turn indicator: if user taps on the circle, show a message showing whose turn it is next
+    				Context context = getContext();
+    				String turnMessage = "";
+    				if (playerTurn == 0)
     				{
-	    				//turn indicator: if user taps on the circle, show a message showing whose turn it is next
-	    				Context context = getContext();
-	    				String turnMessage = "";
-	    				if (playerTurn == 0)
-	    				{
-	    					turnMessage = "Blue's turn!";
-	    				} else
-	    				{
-	    					turnMessage = "Green's turn!";
-	    				}
-	    				//make sure toast is not triggered multiple times
-	    				if ((System.currentTimeMillis() - playerTurnToastStartTime) > 2000)
-	    				{
-		    				Toast toast = Toast.makeText(context, turnMessage, Toast.LENGTH_SHORT);
-		    				playerTurnToastStartTime = System.currentTimeMillis();
-		    				toast.show();	    					
-	    				}
-	    					
-    				} else if (x >= 0.45 * canvasWidth && x <= 0.55 * canvasWidth)
+    					turnMessage = "Blue's turn!";
+    				} else
     				{
-    					Log.e("hex", "undo button clicked");
-    					//undo button
-    					if (lastChange != null)
-    					{
-    						lastChange.color = HEX_UNUSED_COLOR;
-    						playerTurn = (playerTurn == 1) ? 0 : 1;
-    						lastChange = null;
-    						UiView.this.postInvalidate();
-    					}
-    				} else if (x >= 0.7 * canvasWidth && x <= 0.8 * canvasWidth)
-    				{
-    					Log.e("hex", "redo button clicked");
-
-    					Activity ac = (Activity) getContext();
-    					ac.startActivity(new Intent(ac, ChooseBoardActivity.class));
+    					turnMessage = "Green's turn!";
     				}
-    			}
-    				
-    			//do nothing
-    		} else if (hexagon.color == HEX_UNUSED_COLOR) //hexagon is on board, but unused
-    		{
-    			Log.e("hex", "hex is white");
-    			if (playerTurn == 0)
-    			{
-    				hexagon.color = BLUE;
-    				playerTurn = 1;
-    				//save last change in case we need to undo it
-    				lastChange = hexagon;
-    			} else
-    			{
-    				hexagon.color = GREEN;
-    				playerTurn = 0;
-    				//save last change in case we need to undo it
-    				lastChange = hexagon;
-    			}
+    				//make sure toast is not triggered multiple times
+    				if ((System.currentTimeMillis() - playerTurnToastStartTime) > 2000)
+    				{
+	    				Toast toast = Toast.makeText(context, turnMessage, Toast.LENGTH_SHORT);
+	    				playerTurnToastStartTime = System.currentTimeMillis();
+	    				toast.show();	    					
+    				}
+    					
+				} else if (x >= 0.45 * canvasWidth && x <= 0.55 * canvasWidth)
+				{
+					Log.e("hex", "undo button clicked");
+					//undo button
+					if (lastChange != null)
+					{
+						lastChange.color = HEX_UNUSED_COLOR;
+						playerTurn = (playerTurn == 1) ? 0 : 1;
+						lastChange = null;
+						UiView.this.postInvalidate();
+					}
+				} else if (x >= 0.7 * canvasWidth && x <= 0.8 * canvasWidth)
+				{
+					Log.e("hex", "redo button clicked");
 
-    			UiView.this.postInvalidate();				
-    		}
-    		return true;
-    	}
+					Activity ac = (Activity) getContext();
+					ac.startActivity(new Intent(ac, ChooseBoardActivity.class));
+				}
+			}
+				
+			//do nothing
+		} else if (hexagon.color == HEX_UNUSED_COLOR) //hexagon is on board, but unused
+		{
+			Log.e("hex", "hex is white");
+			if (playerTurn == 0)
+			{
+				hexagon.color = BLUE;
+				playerTurn = 1;
+			} else
+			{
+				hexagon.color = GREEN;
+				playerTurn = 0;
+			}
+			//save last change in case we need to undo it
+			lastChange = hexagon;
+
+			invalidate();			
+		}
+		return true;
     };
 	
 	private void drawBottomNav(Canvas canvas)
