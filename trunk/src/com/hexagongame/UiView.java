@@ -213,6 +213,7 @@ public class UiView extends View{
 				hexagon.color = GREEN;
 				playerTurn = 0;
 			}
+			board.isWinner(1-playerTurn,  hexagon.color );
 			//save last change in case we need to undo it
 			history.add( hexagon );
 
