@@ -1,5 +1,7 @@
 package com.hexagongame;
 
+import java.util.ArrayList;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -25,7 +27,7 @@ public class UiView extends View{
 	
 	public int boardShape = Board.BOARD_GEOMETRY_HEX;
 	
-	private Hexagon lastChange = null;
+	private ArrayList<Hexagon> history = new ArrayList<Hexagon>();
 
 	private long playerTurnToastStartTime = 0;
 	
@@ -61,9 +63,7 @@ public class UiView extends View{
 	
 	public void viewInit()
 	{
-		board = null;
 		playerTurn = 0;
-		lastChange = null;	
 
 		//show introductory message
     	Context context = getContext();
@@ -101,29 +101,17 @@ public class UiView extends View{
 		//select the first available hexagon
 		if (gameMode == 1)
 		{
-			if (phonePlayerId == 0 && playerTurn == 0) //phone is blue
+			if (phonePlayerId == playerTurn ) 
 			{
+				final int newcolor = phonePlayerId == 1 ? GREEN : BLUE;
 				//just select the first hexagon that's not taken
 				for (Hexagon hexagon: board.hexagonList)
 				{
 					if (hexagon.color == HEX_UNUSED_COLOR)
 					{
-						hexagon.color = BLUE;
-						playerTurn = 1;
-						lastChange = hexagon;
-						break;
-					}
-				}
-			} else if (phonePlayerId == 1 && playerTurn == 1) //phone is blue
-			{
-				//just select the first hexagon that's not taken
-				for (Hexagon hexagon: board.hexagonList)
-				{
-					if (hexagon.color == HEX_UNUSED_COLOR)
-					{
-						hexagon.color = GREEN;
-						playerTurn = 0;
-						lastChange = hexagon;
+						hexagon.color = newcolor;
+						playerTurn = 1 - playerTurn;
+						history.add( hexagon );
 						break;
 					}
 				}
@@ -139,6 +127,19 @@ public class UiView extends View{
     		drawHexagon(canvas, hex);
     	}			
 	}
+	
+	void undo(){
+		for( int i=0; i<gameMode+1; ++i ){ // need to undo twice when playi8ng against the computer
+			if ( history.size() > 0 )
+			{
+				Hexagon lastChange = history.remove(history.size()-1);
+				lastChange.color = HEX_UNUSED_COLOR;
+				playerTurn = 1-playerTurn;
+				invalidate();
+			}
+		}
+	}
+	
 	@Override
     public boolean onTouchEvent(MotionEvent event) {
         if (event.getAction() != MotionEvent.ACTION_DOWN ){
@@ -189,14 +190,7 @@ public class UiView extends View{
 				} else if (x >= 0.45 * canvasWidth && x <= 0.55 * canvasWidth)
 				{
 					Log.e("hex", "undo button clicked");
-					//undo button
-					if (lastChange != null)
-					{
-						lastChange.color = HEX_UNUSED_COLOR;
-						playerTurn = (playerTurn == 1) ? 0 : 1;
-						lastChange = null;
-						UiView.this.postInvalidate();
-					}
+					undo();
 				} else if (x >= 0.7 * canvasWidth && x <= 0.8 * canvasWidth)
 				{
 					Log.e("hex", "redo button clicked");
@@ -220,7 +214,7 @@ public class UiView extends View{
 				playerTurn = 0;
 			}
 			//save last change in case we need to undo it
-			lastChange = hexagon;
+			history.add( hexagon );
 
 			invalidate();			
 		}
@@ -330,7 +324,7 @@ public class UiView extends View{
 		float canvasHeight = getHeight();
 
 		Bitmap bmp;
-		if (lastChange != null)
+		if ( history.size() > 0 )
 		{
 			bmp = BitmapFactory.decodeResource(getResources(), R.drawable.undo);
 		} else {
