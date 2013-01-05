@@ -143,6 +143,9 @@ public class UiView extends View{
 	private OnTouchListener touchListener = new View.OnTouchListener() {
 		
     	public boolean onTouch(View v, MotionEvent event) {
+            if (event.getAction() != MotionEvent.ACTION_DOWN ){
+            	return false;
+            }
 
    			Log.e("hex", "ontouch x="+event.getX());
     	    Log.e("hex", "ontouch y="+event.getY());
