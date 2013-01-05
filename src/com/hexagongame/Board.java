@@ -1,6 +1,8 @@
 package com.hexagongame;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import android.util.Log;
 
@@ -344,4 +346,38 @@ public class Board{
 	{
 		return wCell;
 	}
+	
+	static void addToSet( HashSet<Hexagon> s, Hexagon h ){
+		if( s.contains(h))
+			return;
+		
+		s.add(h);
+		for( Hexagon u : h.adjacent ){
+			if( u.color == h.color )
+				addToSet( s, u );
+		}
+	}
+	
+	boolean isWinner( int p, int color )
+	{
+		HashSet<Hexagon> s1 = new HashSet<Hexagon>();
+		HashSet<Hexagon> s2 = new HashSet<Hexagon>();
+		for( Hexagon hex : hexagonList ){
+			if( hex.color == color ){
+				if( hex.touches_edge[p] )
+					addToSet( s1, hex );
+				if( hex.touches_edge[p+2])
+					addToSet( s2, hex );
+			}
+		}
+		s1.retainAll(s2 );
+		if( s1.size() > 0 ){
+			Log.i("hex", "WINNER!");
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+
 }
