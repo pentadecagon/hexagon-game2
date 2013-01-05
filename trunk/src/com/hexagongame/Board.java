@@ -134,9 +134,34 @@ public class Board{
 		        xHexPos = xOrigin + hexCellPos[0];
 		        yHexPos = yOrigin + hexCellPos[1];
 	
-		        color = android.graphics.Color.WHITE;
+		        color = UiView.HEX_UNUSED_COLOR;
 
-		        hexagon = new Hexagon(xHexPos, yHexPos, color);
+		        //tell if one of the hexagons is touching an edge
+				boolean[] touches_edge = {false, false, false, false};
+				if (j >= -5)
+				{
+				  if (i == iLowerLimit || ((j == -3 || j == -2) && i == (iLowerLimit + 1)))
+				  {
+					  touches_edge[0] = true;
+				  }
+				  if (i == iUpperLimit || ((j == -3 || j == -2) && i == (iUpperLimit - 1)))
+				  {
+					  touches_edge[1] = true;
+				  }
+				}
+				if (j <= -5)
+				{
+					if (i == iLowerLimit || ((j == -7 || j == -8) && i == (iLowerLimit + 1)))
+					{
+						touches_edge[3] = true;
+					}
+					if (i == iUpperLimit || ((j == -7 || j == -8) && i == (iUpperLimit - 1)))
+					{
+						touches_edge[2] = true;
+					}
+				}
+				
+		        hexagon = new Hexagon(xHexPos, yHexPos, color, touches_edge);
 		        
 		        hexagonList.add(hexagon);
 	    	}
@@ -161,7 +186,7 @@ public class Board{
 
     	int color;
     	int iLowerLimit, iUpperLimit;
-    	
+
     	Hexagon hexagon;
 
     	for (int j = -1; j > -8; j--)
@@ -177,9 +202,26 @@ public class Board{
 		        xHexPos = xOrigin + hexCellPos[0];
 		        yHexPos = yOrigin + hexCellPos[1];	
 
-		        color = android.graphics.Color.WHITE;
+		        color = UiView.HEX_UNUSED_COLOR;
 		        
-		        hexagon = new Hexagon(xHexPos, yHexPos, color);
+		        //tell if one of the hexagons is touching an edge
+				boolean[] touches_edge = {false, false, false, false};
+				if (j == -1)
+				{
+					touches_edge[1] = true;
+				} else if (j == -7)
+				{
+					touches_edge[3] = true;
+				}
+				if (i == iLowerLimit)
+				{
+					touches_edge[0] = true;
+				} else if (i == iUpperLimit)
+				{
+					touches_edge[2] = true;
+				}
+
+		        hexagon = new Hexagon(xHexPos, yHexPos, color, touches_edge);
 		        
 		        hexagonList.add(hexagon);
 	    	}
@@ -263,7 +305,7 @@ public class Board{
 		float[] hexCellPos = {xRel, yRel};
 		return hexCellPos;
 	}
-	
+
 	public float getXpositionOfBoardOnCanvas()
 	{
 		return x0;

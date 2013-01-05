@@ -32,6 +32,12 @@ public class UiView extends View{
 	
 	private long playerTurnToastStartTime = 0;
 	
+	public static final int BLUE = android.graphics.Color.parseColor("#00DDFF");
+	
+	public static final int GREEN = android.graphics.Color.parseColor("#00FF00");
+	
+	public static final int HEX_UNUSED_COLOR = android.graphics.Color.parseColor("#E0E0E0");
+	
 	/**
 	 * Game mode
 	 * 0 = 2-player (default)
@@ -133,7 +139,7 @@ public class UiView extends View{
 			    				{
 				    				Toast toast = Toast.makeText(context, turnMessage, Toast.LENGTH_SHORT);
 				    				playerTurnToastStartTime = System.currentTimeMillis();
-				    				toast.show();		    					
+				    				toast.show();	    					
 			    				}
 			    					
 		    				} else if (x >= 0.45 * canvasWidth && x <= 0.55 * canvasWidth)
@@ -142,12 +148,12 @@ public class UiView extends View{
 		    					//undo button
 		    					if (lastChange != null)
 		    					{
-		    						lastChange.color = android.graphics.Color.WHITE;
+		    						lastChange.color = HEX_UNUSED_COLOR;
 		    						playerTurn = (playerTurn == 1) ? 0 : 1;
 		    						lastChange = null;
 		    						UiView.this.postInvalidate();
 		    					}
-		    				}  else if (x >= 0.7 * canvasWidth && x <= 0.8 * canvasWidth)
+		    				} else if (x >= 0.7 * canvasWidth && x <= 0.8 * canvasWidth)
 		    				{
 		    					Log.e("hex", "redo button clicked");
 
@@ -157,24 +163,23 @@ public class UiView extends View{
 		    			}
 		    				
 		    			//do nothing
-		    		} else if (hexagon.color == android.graphics.Color.WHITE) //hexagon is on board, but unused
+		    		} else if (hexagon.color == HEX_UNUSED_COLOR) //hexagon is on board, but unused
 		    		{
 		    			Log.e("hex", "hex is white");
 		    			if (playerTurn == 0)
 		    			{
-		    				hexagon.color = android.graphics.Color.BLUE;
+		    				hexagon.color = BLUE;
 		    				playerTurn = 1;
 		    				//save last change in case we need to undo it
 		    				lastChange = hexagon;
 		    			} else
 		    			{
-		    				hexagon.color = android.graphics.Color.GREEN;
+		    				hexagon.color = GREEN;
 		    				playerTurn = 0;
 		    				//save last change in case we need to undo it
 		    				lastChange = hexagon;
 		    			}
-		    			
-		    				
+	
 		    			UiView.this.postInvalidate();				
 		    		}
 		    		return true;
@@ -194,9 +199,9 @@ public class UiView extends View{
 				//just select the first hexagon that's not taken
 				for (Hexagon hexagon: board.hexagonList)
 				{
-					if (hexagon.color == android.graphics.Color.WHITE)
+					if (hexagon.color == HEX_UNUSED_COLOR)
 					{
-						hexagon.color = android.graphics.Color.BLUE;
+						hexagon.color = BLUE;
 						playerTurn = 1;
 						lastChange = hexagon;
 						break;
@@ -207,9 +212,9 @@ public class UiView extends View{
 				//just select the first hexagon that's not taken
 				for (Hexagon hexagon: board.hexagonList)
 				{
-					if (hexagon.color == android.graphics.Color.WHITE)
+					if (hexagon.color == HEX_UNUSED_COLOR)
 					{
-						hexagon.color = android.graphics.Color.GREEN;
+						hexagon.color = GREEN;
 						playerTurn = 0;
 						lastChange = hexagon;
 						break;
@@ -246,10 +251,10 @@ public class UiView extends View{
 		
 		if (playerTurn == 0)
 		{
-			paint.setColor(android.graphics.Color.BLUE);
+			paint.setColor(BLUE);
 		} else
 		{
-			paint.setColor(android.graphics.Color.GREEN);
+			paint.setColor(GREEN);
 		}
     	paint.setStyle(Paint.Style.FILL);
     	
@@ -306,14 +311,6 @@ public class UiView extends View{
 	
 	public void drawHexagon(Canvas canvas, Hexagon hex)
 	{
-		paint.setColor(hex.color);
-        paint.setStyle(Paint.Style.FILL);
-        
-		Path path = new Path();
-		
-		float x = hex.x - board.getWCell()/2.0f;
-		float y = hex.y - board.getHCell()/2.0f;
-		
 		float hexSide = board.getSmallHexSideLength();
 		
 		// vx, vy represents the vector of the first edge of the hexagon
@@ -322,16 +319,39 @@ public class UiView extends View{
 		final float co = (float)Math.cos(Math.PI/3);
 		final float si = (float)Math.sin(Math.PI/3);
 
-		path.moveTo( x,  y );
-		for( int i=0; i<6; ++i ){
-			x += vx;
-			y += vy;
-			path.lineTo( x, y );
-			// now rotate the edge vector by Pi/3
-			float vx_temp = co * vx - si * vy;
-			vy = si * vx + co * vy;
-			vx=vx_temp;
+		float x, y;
+		Path path;
+		
+		for (int j = 0; j < 2; j++)
+		{
+			if (j == 1)
+			{
+				paint.setColor(android.graphics.Color.BLACK);
+		    	paint.setStrokeWidth(1);
+		    	paint.setStyle(Paint.Style.STROKE);
+			} else
+			{
+				paint.setColor(hex.color);
+		        paint.setStyle(Paint.Style.FILL);
+			}
+			
+			x = hex.x - board.getWCell()/2.0f;
+			y = hex.y - board.getHCell()/2.0f;
+
+			path = new Path();
+			
+			path.moveTo( x,  y );
+			for( int i=0; i<6; ++i ){
+				x += vx;
+				y += vy;
+				path.lineTo( x, y );
+				// now rotate the edge vector by Pi/3
+				float vx_temp = co * vx - si * vy;
+				vy = si * vx + co * vy;
+				vx=vx_temp;
+			}
+			
+			canvas.drawPath(path, paint);
 		}
-		canvas.drawPath(path, paint);
 	}
 }
