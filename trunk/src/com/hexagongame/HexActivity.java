@@ -11,16 +11,7 @@ public class HexActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-    }
-    
-    @Override
-    public void onResume()
-    {
-  	  Log.v("hex", "called onResume");
-  	  
-  	  super.onResume();
-  	  
-  	  initializeLayout();
+    	  initializeLayout();
     }
     
     private void initializeLayout()
