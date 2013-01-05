@@ -1,13 +1,17 @@
 package com.hexagongame;
 
+import java.util.ArrayList;
+
 
 public class Hexagon {
 	
 	public int color;
 	
-	public float x, y;
+	final public float x, y;
 	
-	public boolean[] touches_edge = new boolean[4];
+	final public boolean[] touches_edge;
+	
+	final ArrayList<Hexagon> adjacent = new ArrayList<Hexagon>();
 	
 	public Hexagon(float x, float y, int color, boolean[] touches_edge)
 	{
