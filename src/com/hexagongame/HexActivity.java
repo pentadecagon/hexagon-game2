@@ -32,15 +32,5 @@ public class HexActivity extends Activity {
         uiView.gameMode = gameMode;
         uiView.phonePlayerId = phonePlayerId;
         uiView.boardShape = boardShape;
-        
-        if (boardShape == Board.BOARD_GEOMETRY_RECT)
-        {
-        	//rectangle
-        	uiView.setBackgroundResource(R.drawable.background_sq);
-        } else
-        {
-        	//hexagon
-        	uiView.setBackgroundResource(R.drawable.background);
-        }
     }
 }
