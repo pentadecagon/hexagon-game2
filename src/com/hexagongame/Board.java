@@ -1,7 +1,6 @@
 package com.hexagongame;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import android.util.Log;
 
@@ -69,6 +68,7 @@ public class Board{
 		calculatePositionOfBoardOnCanvas();
 		
 		setupListOfHexagons();
+		findAdjacentHexagons(hexagonList);
 	}
 	
 	private void setupListOfHexagons()
@@ -304,6 +304,20 @@ public class Board{
 		}
 		float[] hexCellPos = {xRel, yRel};
 		return hexCellPos;
+	}
+	static double sqr(double x ){
+		return x*x;
+	}
+	static void findAdjacentHexagons( ArrayList<Hexagon> a )
+	{
+		final double dmax = 3.1 * sqr( smallHexSideLength );
+		for( Hexagon u : a ){
+			for( Hexagon v : a ){
+				if( u != v && sqr( u.x-v.x ) + sqr( u.y - v.y ) < dmax ){
+					u.adjacent.add(v);
+				}
+			}
+		}
 	}
 
 	public float getXpositionOfBoardOnCanvas()
