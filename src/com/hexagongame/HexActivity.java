@@ -1,9 +1,8 @@
 package com.hexagongame;
 
 import android.app.Activity;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
+import android.widget.TextView;
 
 public class HexActivity extends Activity {
 
@@ -32,5 +31,8 @@ public class HexActivity extends Activity {
         uiView.gameMode = gameMode;
         uiView.phonePlayerId = phonePlayerId;
         uiView.boardShape = boardShape;
+        
+        TextView winnerNotification = (TextView) findViewById(R.id.winnertext);
+		uiView.setWinnerNotification(winnerNotification);
     }
 }

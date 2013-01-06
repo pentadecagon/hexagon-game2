@@ -3,17 +3,23 @@ package com.hexagongame;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.os.CountDownTimer;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class UiView extends View{
@@ -38,8 +44,16 @@ public class UiView extends View{
 	public static final int BLUE_BG = android.graphics.Color.parseColor("#0000A0");
 	public static final int GREEN_BG = android.graphics.Color.parseColor("#208020");
 	
+	public static final int BLUE_WINNER_ALT = android.graphics.Color.parseColor("#00FFFF");
+	public static final int GREEN_WINNER_ALT = android.graphics.Color.parseColor("#FFF380");
 	
 	public static final int HEX_UNUSED_COLOR = android.graphics.Color.parseColor("#E0E0E0");
+	
+	private boolean inWinnerMode = false;
+	private int winnerModeTickCount = 0;
+	private int winner = 0;
+	
+	private TextView winnerNotification = null;
 	
 	/**
 	 * Game mode
@@ -85,6 +99,11 @@ public class UiView extends View{
 		board = new Board(canvasHeight, canvasWidth, boardShape);
 
 	}
+	
+	public void setWinnerNotification(TextView winnerNotification)
+	{
+		this.winnerNotification = winnerNotification;
+	}
 
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh)
@@ -99,7 +118,6 @@ public class UiView extends View{
 	
 	@Override
 	protected void onDraw(Canvas canvas) {
-
 		//TODO: implement complete play-against-phone functionality
 		//here, the player is playing against the phone and the phone is blue (goes first), so we just
 		//select the first available hexagon
@@ -113,8 +131,18 @@ public class UiView extends View{
 					move.color = newcolor;
 					playerTurn = 1 - playerTurn;
 					history.add( move );
+					if (board.isWinner(1-playerTurn ))
+					{
+						inWinnerMode = true;
+						winner = 1-playerTurn;
+					}
 				}
 			}
+		}
+
+		if (inWinnerMode && winnerModeTickCount == 0)
+		{
+			showWinnerCongratulationsMessage(canvas);
 		}
 		
 		drawBackground(canvas);
@@ -124,7 +152,31 @@ public class UiView extends View{
 
     	for( Hexagon hex : board.hexagonList ){
     		drawHexagon(canvas, hex);
-    	}			
+    	}		
+    	
+    	if (inWinnerMode)
+		{
+    		winnerModeTickCount ++;
+    		countdownTimer.start();
+		}
+	}
+	
+	private CountDownTimer countdownTimer = new CountDownTimer(250, 250){
+
+        @Override
+        public void onTick(long miliseconds){}
+
+        @Override
+        public void onFinish(){
+        	invalidate();
+        }
+    };
+	
+	protected void showWinnerCongratulationsMessage(Canvas canvas)
+	{
+		//someone has won: congratulate the winner
+		winnerNotification.setText(((winner == 1) ? "Green" : "Blue") + " wins!");
+		winnerNotification.setVisibility(View.VISIBLE);		
 	}
 	
 	void undo(){
@@ -188,6 +240,13 @@ public class UiView extends View{
         if (event.getAction() != MotionEvent.ACTION_DOWN ){
         	return false;
         }
+        
+        //if someone has already won and we are just showing the "congratulations" screen, just show a dialog to restart the game
+        if (inWinnerMode)
+        {
+        	showRestartDialog();
+    		return true;
+        }
 
 		Log.d("hex", "ontouch x="+event.getX());
 	    Log.d("hex", "ontouch y="+event.getY());
@@ -210,7 +269,11 @@ public class UiView extends View{
 				hexagon.color = GREEN;
 				playerTurn = 0;
 			}
-			board.isWinner(1-playerTurn );
+			if (board.isWinner(1-playerTurn ))
+			{
+				inWinnerMode = true;
+				winner = 1-playerTurn;
+			}
 			//save last change in case we need to undo it
 			history.add( hexagon );
 
@@ -218,6 +281,34 @@ public class UiView extends View{
 		}
 		return true;
     };
+    
+    private void showRestartDialog()
+    {
+    	AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+    	TextView myMsg = new TextView(getContext());
+    	myMsg.setText("Restart?");
+    	myMsg.setGravity(Gravity.CENTER_HORIZONTAL);
+    	myMsg.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25.0f);
+    	myMsg.setPadding(15, 15, 15, 15);
+		builder.setView(myMsg)
+	       .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+	    	   public void onClick(DialogInterface dialog, int id) {
+	    		   //restart the game
+	    		   Activity ac = (Activity) UiView.this.getContext();
+				   Intent i = new Intent(ac, HexActivity.class);
+				   i.putExtra(ChooseBoardActivity.ID_GAME_MODE, String.valueOf(gameMode));
+				   i.putExtra(ChooseBoardActivity.ID_PHONE_PLAYER_ID, String.valueOf(phonePlayerId));
+				   i.putExtra(ChooseBoardActivity.ID_BOARD_VIEW, String.valueOf(boardShape));
+				   ac.startActivity(i);
+	    	   } 	    	
+	       })
+	       .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+	    		public void onClick(DialogInterface dialog, int id) {}
+	       });
+		
+		AlertDialog dialog = builder.create();
+		dialog.show();
+    }
     
     private void drawBackground(Canvas canvas)
     {
@@ -362,6 +453,7 @@ public class UiView extends View{
 
 		float x, y;
 		Path path;
+		int color;
 		
 		for (int j = 0; j < 2; j++)
 		{
@@ -372,7 +464,16 @@ public class UiView extends View{
 		    	paint.setStyle(Paint.Style.STROKE);
 			} else
 			{
-				paint.setColor(hex.color);
+				//if we are in "congratulations, winner" mode, every second tick we show the winner's rectangles in an alternative color
+				if (inWinnerMode && winnerModeTickCount % 2 == 0
+						&& ((winner == 1 && hex.color == GREEN) || (winner == 0 && hex.color == BLUE)))
+				{
+					color = (winner == 1) ? GREEN_WINNER_ALT : BLUE_WINNER_ALT;
+				} else
+				{
+					color = hex.color;
+				}
+				paint.setColor(color);
 		        paint.setStyle(Paint.Style.FILL);
 			}
 			
