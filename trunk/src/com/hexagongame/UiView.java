@@ -108,6 +108,11 @@ public class UiView extends View{
 			if (phonePlayerId == playerTurn ) 
 			{
 				final int newcolor = phonePlayerId == 1 ? GREEN : BLUE;
+				Hexagon move = board.analyzeAll();
+				move.color = newcolor;
+				playerTurn = 1 - playerTurn;
+				history.add( move );
+/*				
 				//just select the first hexagon that's not taken
 				for (Hexagon hexagon: board.hexagonList)
 				{
@@ -118,7 +123,7 @@ public class UiView extends View{
 						history.add( hexagon );
 						break;
 					}
-				}
+				}*/
 			}
 		}
 		
