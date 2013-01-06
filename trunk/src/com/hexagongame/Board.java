@@ -64,7 +64,7 @@ public class Board{
 		//calculate width of board
 		boardWidth = 0.8f * canvasWidth;
 		
-		Log.e("hex","calculated boardWidth="+boardWidth);
+		Log.d("hex","calculated boardWidth="+boardWidth);
 
 		//calculate the length of the side of one of the small hexagons that fills up the board
 		calculateSmallHexagonSideLength();
@@ -82,7 +82,7 @@ public class Board{
 	
 	private void setupListOfHexagons()
 	{
-		Log.e("hex","called setupListOfHexagons");
+		Log.d("hex","called setupListOfHexagons");
 		
 		hexagonList = new ArrayList<Hexagon>();
 		
@@ -98,7 +98,7 @@ public class Board{
 	
 	private void setupHexBoardListOfHexagons()
 	{
-		Log.e("hex","called setupHexBoardListOfHexagons");
+		Log.d("hex","called setupHexBoardListOfHexagons");
 		
 		//create a list of hexagons that will be used to populate the hexagonally-shaped board
     	float xOrigin = this.getXpositionOfBoardOnCanvas();
@@ -179,14 +179,14 @@ public class Board{
 	
 	private void setupRectBoardListOfHexagons()
 	{
-		Log.e("hex","called setupHexBoardListOfHexagons");
+		Log.d("hex","called setupHexBoardListOfHexagons");
 		
 		//create a list of hexagons that will be used to populate the rectangular board
     	float xOrigin = this.getXpositionOfBoardOnCanvas();
     	float yOrigin = this.getYpositionOfBoardOnCanvas();
     	
-    	Log.e("hex", "board.getXpositionOfBoardOnCanvas()="+xOrigin);
-    	Log.e("hex", "board.getYpositionOfBoardOnCanvas()="+yOrigin);
+    	Log.d("hex", "board.getXpositionOfBoardOnCanvas()="+xOrigin);
+    	Log.d("hex", "board.getYpositionOfBoardOnCanvas()="+yOrigin);
 
     	float xHexPos, yHexPos;
 
@@ -235,7 +235,7 @@ public class Board{
 	private void calculateSmallHexagonSideLength()
 	{
 		smallHexSideLength = boardWidth/ (14.0f * (float) Math.cos(Math.PI/6.0));
-		Log.e("hex","smallHexSideLength: "+smallHexSideLength);
+		Log.d("hex","smallHexSideLength: "+smallHexSideLength);
 	}
 	
 	private void calculateDimensionsOfGridCell()
@@ -260,7 +260,7 @@ public class Board{
 		
 		y0 = canvasHeight/2.0f - boardHeight/2.0f;	
 				
-		Log.e("hex","calculated position of board on canvas: x0="+x0+", y0="+y0);
+		Log.d("hex","calculated position of board on canvas: x0="+x0+", y0="+y0);
 	}
 	
 	Hexagon findHexagonFromPointOnCanvas(float x, float y){
@@ -360,7 +360,7 @@ public class Board{
 		}
 	}
 	
-	boolean isWinner( int p, int color )
+	boolean isWinner( int p )
 	{
 		HashSet<Hexagon> s1 = new HashSet<Hexagon>();
 		HashSet<Hexagon> s2 = new HashSet<Hexagon>();
