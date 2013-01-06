@@ -42,7 +42,14 @@ public class Board{
 	private static float wCell;
 
 	public ArrayList<Hexagon> hexagonList = null;
-
+	
+	/* 'outer' represents the four outer regions of the board.  The first index indicates the player (0 or 1),
+	 * the second index enumerates the both opposite regions of each player.  Those objects hold the set 
+	 * of adjacent hexagons for each outer region   */
+	
+	Hexagon outer[][] = {{ new Hexagon(0, 0, UiView.BLUE), new Hexagon(0, 0, UiView.BLUE)},
+								{new Hexagon(0, 0, UiView.GREEN), new Hexagon(0, 0, UiView.GREEN)}};
+	
 	public Board(float canvasHeight, float canvasWidth, int boardShape) {
 
 		this.canvasWidth = canvasWidth;
@@ -138,32 +145,31 @@ public class Board{
 	
 		        color = UiView.HEX_UNUSED_COLOR;
 
+		        hexagon = new Hexagon(xHexPos, yHexPos, color);
 		        //tell if one of the hexagons is touching an edge
-				boolean[] touches_edge = {false, false, false, false};
 				if (j >= -5)
 				{
 				  if (i == iLowerLimit || ((j == -3 || j == -2) && i == (iLowerLimit + 1)))
 				  {
-					  touches_edge[0] = true;
+					  outer[0][0].adjacent.add(hexagon);
 				  }
 				  if (i == iUpperLimit || ((j == -3 || j == -2) && i == (iUpperLimit - 1)))
 				  {
-					  touches_edge[1] = true;
+					  outer[1][0].adjacent.add(hexagon);
 				  }
 				}
 				if (j <= -5)
 				{
 					if (i == iLowerLimit || ((j == -7 || j == -8) && i == (iLowerLimit + 1)))
 					{
-						touches_edge[3] = true;
+						  outer[1][1].adjacent.add(hexagon);
 					}
 					if (i == iUpperLimit || ((j == -7 || j == -8) && i == (iUpperLimit - 1)))
 					{
-						touches_edge[2] = true;
+						  outer[0][1].adjacent.add(hexagon);
 					}
 				}
 				
-		        hexagon = new Hexagon(xHexPos, yHexPos, color, touches_edge);
 		        
 		        hexagonList.add(hexagon);
 	    	}
@@ -186,7 +192,6 @@ public class Board{
 
     	float[] hexCellPos;
 
-    	int color;
     	int iLowerLimit, iUpperLimit;
 
     	Hexagon hexagon;
@@ -204,26 +209,23 @@ public class Board{
 		        xHexPos = xOrigin + hexCellPos[0];
 		        yHexPos = yOrigin + hexCellPos[1];	
 
-		        color = UiView.HEX_UNUSED_COLOR;
-		        
+		        hexagon = new Hexagon(xHexPos, yHexPos, UiView.HEX_UNUSED_COLOR);
 		        //tell if one of the hexagons is touching an edge
-				boolean[] touches_edge = {false, false, false, false};
 				if (j == -1)
 				{
-					touches_edge[1] = true;
+					  outer[1][0].adjacent.add(hexagon);
 				} else if (j == -7)
 				{
-					touches_edge[3] = true;
+					  outer[1][1].adjacent.add(hexagon);
 				}
 				if (i == iLowerLimit)
 				{
-					touches_edge[0] = true;
+					  outer[0][0].adjacent.add(hexagon);
 				} else if (i == iUpperLimit)
 				{
-					touches_edge[2] = true;
+					  outer[0][1].adjacent.add(hexagon);
 				}
 
-		        hexagon = new Hexagon(xHexPos, yHexPos, color, touches_edge);
 		        
 		        hexagonList.add(hexagon);
 	    	}
@@ -362,14 +364,8 @@ public class Board{
 	{
 		HashSet<Hexagon> s1 = new HashSet<Hexagon>();
 		HashSet<Hexagon> s2 = new HashSet<Hexagon>();
-		for( Hexagon hex : hexagonList ){
-			if( hex.color == color ){
-				if( hex.touches_edge[p] )
-					addToSet( s1, hex );
-				if( hex.touches_edge[p+2])
-					addToSet( s2, hex );
-			}
-		}
+		addToSet( s1, outer[p][0] );
+		addToSet( s2, outer[p][1] );
 		s1.retainAll(s2 );
 		if( s1.size() > 0 ){
 			Log.i("hex", "WINNER!");
