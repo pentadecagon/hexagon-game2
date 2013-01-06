@@ -109,21 +109,11 @@ public class UiView extends View{
 			{
 				final int newcolor = phonePlayerId == 1 ? GREEN : BLUE;
 				Hexagon move = board.analyzeAll();
-				move.color = newcolor;
-				playerTurn = 1 - playerTurn;
-				history.add( move );
-/*				
-				//just select the first hexagon that's not taken
-				for (Hexagon hexagon: board.hexagonList)
-				{
-					if (hexagon.color == HEX_UNUSED_COLOR)
-					{
-						hexagon.color = newcolor;
-						playerTurn = 1 - playerTurn;
-						history.add( hexagon );
-						break;
-					}
-				}*/
+				if( move != null ){
+					move.color = newcolor;
+					playerTurn = 1 - playerTurn;
+					history.add( move );
+				}
 			}
 		}
 		
