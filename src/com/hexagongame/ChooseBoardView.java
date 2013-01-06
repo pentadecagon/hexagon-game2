@@ -26,7 +26,7 @@ public class ChooseBoardView extends View {
 			
 			public boolean onTouch(View v, MotionEvent event) {
 
-				Log.e("cbv", "ontouch x="+event.getX());
+				Log.d("cbv", "ontouch x="+event.getX());
 		    	
 				float canvasWidth = getWidth();
 

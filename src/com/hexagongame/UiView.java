@@ -27,13 +27,17 @@ public class UiView extends View{
 	
 	public int boardShape = Board.BOARD_GEOMETRY_HEX;
 	
+	
 	private ArrayList<Hexagon> history = new ArrayList<Hexagon>();
 
 	private long playerTurnToastStartTime = 0;
 	
-	public static final int BLUE = android.graphics.Color.parseColor("#00DDFF");
-	
+	public static final int BLUE = android.graphics.Color.parseColor("#1010FF");
 	public static final int GREEN = android.graphics.Color.parseColor("#00FF00");
+
+	public static final int BLUE_BG = android.graphics.Color.parseColor("#0000A0");
+	public static final int GREEN_BG = android.graphics.Color.parseColor("#208020");
+	
 	
 	public static final int HEX_UNUSED_COLOR = android.graphics.Color.parseColor("#E0E0E0");
 	
@@ -140,70 +144,68 @@ public class UiView extends View{
 		}
 	}
 	
+	private void tappedOutsideBoard( MotionEvent event){
+		//check if user has clicked on the nav
+		float canvasWidth = getWidth();
+		float canvasHeight = getHeight();
+		float x = (float) event.getX();
+		float y = (float) event.getY();
+		if (y > 0.9f * canvasHeight)
+		{
+			if (x > 0.2 * canvasWidth && x < 0.3 * canvasWidth)
+			{
+				//turn indicator: if user taps on the circle, show a message showing whose turn it is next
+				Context context = getContext();
+				String turnMessage = "";
+				if (playerTurn == 0)
+				{
+					turnMessage = "Blue's turn!";
+				} else
+				{
+					turnMessage = "Green's turn!";
+				}
+				//make sure toast is not triggered multiple times
+				if ((System.currentTimeMillis() - playerTurnToastStartTime) > 2000)
+				{
+    				Toast toast = Toast.makeText(context, turnMessage, Toast.LENGTH_SHORT);
+    				playerTurnToastStartTime = System.currentTimeMillis();
+    				toast.show();	    					
+				}
+					
+			} else if (x >= 0.45 * canvasWidth && x <= 0.55 * canvasWidth)
+			{
+				Log.d("hex", "undo button clicked");
+				undo();
+			} else if (x >= 0.7 * canvasWidth && x <= 0.8 * canvasWidth)
+			{
+				Log.d("hex", "redo button clicked");
+
+				Activity ac = (Activity) getContext();
+				ac.startActivity(new Intent(ac, ChooseBoardActivity.class));
+			}
+		}
+			
+		//do nothing
+	}
+	
 	@Override
     public boolean onTouchEvent(MotionEvent event) {
         if (event.getAction() != MotionEvent.ACTION_DOWN ){
         	return false;
         }
 
-		Log.e("hex", "ontouch x="+event.getX());
-	    Log.e("hex", "ontouch y="+event.getY());
+		Log.d("hex", "ontouch x="+event.getX());
+	    Log.d("hex", "ontouch y="+event.getY());
 	    	
-	    //prevent null pointer exceptions
-	    if (board == null)
-	    {
-	    	return false;
-	    }
-
 	    Hexagon hexagon = board.findHexagonFromPointOnCanvas((float) event.getX(), (float) event.getY());
 	    
 		if (hexagon == null) //hexagon is out of scope of board
 		{
-			Log.e("hex", "hex is out of scope of board");
-			//check if user has clicked on the nav
-			float canvasWidth = getWidth();
-			float canvasHeight = getHeight();
-			float x = (float) event.getX();
-			float y = (float) event.getY();
-			if (y > 0.9f * canvasHeight)
-			{
-				if (x > 0.2 * canvasWidth && x < 0.3 * canvasWidth)
-				{
-    				//turn indicator: if user taps on the circle, show a message showing whose turn it is next
-    				Context context = getContext();
-    				String turnMessage = "";
-    				if (playerTurn == 0)
-    				{
-    					turnMessage = "Blue's turn!";
-    				} else
-    				{
-    					turnMessage = "Green's turn!";
-    				}
-    				//make sure toast is not triggered multiple times
-    				if ((System.currentTimeMillis() - playerTurnToastStartTime) > 2000)
-    				{
-	    				Toast toast = Toast.makeText(context, turnMessage, Toast.LENGTH_SHORT);
-	    				playerTurnToastStartTime = System.currentTimeMillis();
-	    				toast.show();	    					
-    				}
-    					
-				} else if (x >= 0.45 * canvasWidth && x <= 0.55 * canvasWidth)
-				{
-					Log.e("hex", "undo button clicked");
-					undo();
-				} else if (x >= 0.7 * canvasWidth && x <= 0.8 * canvasWidth)
-				{
-					Log.e("hex", "redo button clicked");
-
-					Activity ac = (Activity) getContext();
-					ac.startActivity(new Intent(ac, ChooseBoardActivity.class));
-				}
-			}
-				
-			//do nothing
+			Log.d("hex", "hex is out of scope of board");
+			tappedOutsideBoard(event);
 		} else if (hexagon.color == HEX_UNUSED_COLOR) //hexagon is on board, but unused
 		{
-			Log.e("hex", "hex is white");
+			Log.d("hex", "hex is white");
 			if (playerTurn == 0)
 			{
 				hexagon.color = BLUE;
@@ -213,7 +215,7 @@ public class UiView extends View{
 				hexagon.color = GREEN;
 				playerTurn = 0;
 			}
-			board.isWinner(1-playerTurn,  hexagon.color );
+			board.isWinner(1-playerTurn );
 			//save last change in case we need to undo it
 			history.add( hexagon );
 
@@ -240,7 +242,7 @@ public class UiView extends View{
 
     	float padding = 0.02f * canvasHeight;
     	
-    	paint.setColor(android.graphics.Color.parseColor("#0000FF"));
+    	paint.setColor(BLUE_BG);
     	paint.setStyle(Paint.Style.FILL);
     	Path path = new Path();
     	path.moveTo(0.0f, 0.1f * canvasHeight);
@@ -252,7 +254,7 @@ public class UiView extends View{
     	path.lineTo(0.0f, 0.1f * canvasHeight);
     	canvas.drawPath(path, paint);
     	
-    	paint.setColor(android.graphics.Color.parseColor("#24D330"));
+    	paint.setColor(GREEN_BG);
     	paint.setStyle(Paint.Style.FILL);
     	path = new Path();
     	path.moveTo(0.5f * canvasWidth + padding, 0.1f * canvasHeight);
@@ -270,7 +272,7 @@ public class UiView extends View{
     	float canvasHeight = getHeight();
     	float canvasWidth = getWidth();
 	
-    	paint.setColor(android.graphics.Color.parseColor("#0000FF"));
+    	paint.setColor(BLUE_BG);
     	paint.setStyle(Paint.Style.FILL);
     	Path path = new Path();
     	path.moveTo(0.0f, 0.23f * canvasHeight);
@@ -280,7 +282,7 @@ public class UiView extends View{
     	path.lineTo(0.0f, 0.23f * canvasHeight);
     	canvas.drawPath(path, paint);
     	
-    	paint.setColor(android.graphics.Color.parseColor("#24D330"));
+    	paint.setColor(GREEN_BG);
     	paint.setStyle(Paint.Style.FILL);
     	path = new Path();
     	path.moveTo(0.0f, 0.19f * canvasHeight);
