@@ -419,9 +419,9 @@ public class Board{
 						erg2.put( next,  newval);
 					nextlevel.add(next);
 				}
-				erg.putAll(erg2);
-				lastlevel = nextlevel;
 			}
+			erg.putAll(erg2);
+			lastlevel = nextlevel;
 		}		
 		return erg;
 	}
