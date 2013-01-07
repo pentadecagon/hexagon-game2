@@ -54,19 +54,19 @@ public class ChooseBoardView extends View {
 
 	protected void drawNavHexagon(Canvas canvas) {
 		float canvasWidth = getWidth();
-
+		final float ybase=canvas.getHeight() * 0.5f; // 0.25f * canvasWidth
 		float hexSide, x0, y0, lineWidth;
 		if (boardShape == Board.BOARD_GEOMETRY_HEX)
 		{
 			hexSide = 0.07f * canvasWidth;
 			x0 = 0.25f * canvasWidth - hexSide * (float) Math.cos(Math.PI/6.0);
-			y0 = 0.25f * canvasWidth - hexSide * 0.5f;
+			y0 = ybase - hexSide * 0.5f;
 			lineWidth = 10;
 		} else
 		{
 			hexSide = 0.05f * canvasWidth;
 			x0 = 0.25f * canvasWidth - hexSide * (float) Math.cos(Math.PI/6.0);
-			y0 = 0.25f * canvasWidth - hexSide * 0.5f;
+			y0 = ybase - hexSide * 0.5f;
 			lineWidth = 2;
 		}
 
@@ -122,17 +122,18 @@ public class ChooseBoardView extends View {
 		float canvasWidth = getWidth();
 
 		float squareWidth, x0, y0, lineWidth;
+		final float ybase=canvas.getHeight() * 0.5f; // 0.25f * canvasWidth
 		if (boardShape == Board.BOARD_GEOMETRY_RECT)
 		{
 			squareWidth = 0.1f * canvasWidth;
 			x0 = 0.65f * canvasWidth - squareWidth/2.0f;
-			y0 = 0.25f * canvasWidth - squareWidth/2.0f;
+			y0 = ybase - squareWidth/2.0f;
 			lineWidth = 10;	
 		} else
 		{
 			squareWidth = 0.1f * canvasWidth;
 			x0 = 0.65f * canvasWidth - squareWidth/2.0f;
-			y0 = 0.25f * canvasWidth - squareWidth/2.0f;		
+			y0 = ybase - squareWidth/2.0f;		
 			lineWidth = 2;
 		}
 
