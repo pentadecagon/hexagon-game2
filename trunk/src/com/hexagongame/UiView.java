@@ -25,6 +25,8 @@ import android.widget.Toast;
 public class UiView extends View{
 
 	private Board board = null;
+	
+	private DrawBoardHelper drawBoardHelper;
 
 	//the paint object used by the canvas
 	private Paint paint;
@@ -96,7 +98,8 @@ public class UiView extends View{
 		float canvasWidth = getWidth();
     	float canvasHeight = getHeight();
     	
-		board = new Board(canvasHeight, canvasWidth, boardShape);
+		board = new Board(boardShape);
+		drawBoardHelper = new DrawBoardHelper(canvasHeight, canvasWidth, board);
 
 	}
 	
@@ -153,7 +156,7 @@ public class UiView extends View{
     	for( Hexagon hex : board.hexagonList ){
     		drawHexagon(canvas, hex);
     	}		
-    	
+
     	if (inWinnerMode)
 		{
     		winnerModeTickCount ++;
@@ -229,6 +232,7 @@ public class UiView extends View{
 
 				Activity ac = (Activity) getContext();
 				ac.startActivity(new Intent(ac, ChooseBoardActivity.class));
+				ac.finish();
 			}
 		}
 			
@@ -251,7 +255,7 @@ public class UiView extends View{
 		Log.d("hex", "ontouch x="+event.getX());
 	    Log.d("hex", "ontouch y="+event.getY());
 	    	
-	    Hexagon hexagon = board.findHexagonFromPointOnCanvas((float) event.getX(), (float) event.getY());
+	    Hexagon hexagon = drawBoardHelper.findHexagonFromPointOnCanvas((float) event.getX(), (float) event.getY());
 	    
 		if (hexagon == null) //hexagon is out of scope of board
 		{
@@ -300,6 +304,7 @@ public class UiView extends View{
 				   i.putExtra(ChooseBoardActivity.ID_PHONE_PLAYER_ID, String.valueOf(phonePlayerId));
 				   i.putExtra(ChooseBoardActivity.ID_BOARD_VIEW, String.valueOf(boardShape));
 				   ac.startActivity(i);
+				   ac.finish();
 	    	   } 	    	
 	       })
 	       .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -443,7 +448,7 @@ public class UiView extends View{
 	
 	public void drawHexagon(Canvas canvas, Hexagon hex)
 	{
-		float hexSide = board.getSmallHexSideLength();
+		float hexSide = drawBoardHelper.getSmallHexSideLength();
 		
 		// vx, vy represents the vector of the first edge of the hexagon
 		float vx = hexSide * (float) Math.cos(Math.PI/6.0);
@@ -477,8 +482,9 @@ public class UiView extends View{
 		        paint.setStyle(Paint.Style.FILL);
 			}
 			
-			x = hex.x - board.getWCell()/2.0f;
-			y = hex.y - board.getHCell()/2.0f;
+			float[] coords = drawBoardHelper.findPositionOfCenterOfHexagonalCell(hex.i, hex.j);
+			x = coords[0] - drawBoardHelper.getWCell()/2.0f;
+			y = coords[1] - drawBoardHelper.getHCell()/2.0f;
 
 			path = new Path();
 			

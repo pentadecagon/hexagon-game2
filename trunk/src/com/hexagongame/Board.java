@@ -18,29 +18,6 @@ public class Board{
 	//constant giving shape of board: hexagonal, square etc
 	public int boardShape = BOARD_GEOMETRY_HEX;
 
-	//width of canvas
-	private static float canvasWidth;
-
-	//height of canvas
-	private static float canvasHeight;
-		
-	//width of board
-	private static float boardWidth;
-
-	//x0, x-position of the top-left corner of the hexagon relative to the canvas
-	private static float x0;
-	
-	//y0, y-position of the top-left corner of the hexagon relative to the canvas
-	private static float y0;	
-	
-	private static float smallHexSideLength;
-	
-	//height of the rectangular grid cell
-	private static float hCell;
-	
-	//width of the rectangular grid cell
-	private static float wCell;
-
 	public ArrayList<Hexagon> hexagonList = null;
 	
 	/* 'outer' represents the four outer regions of the board.  The first index indicates the player (0 or 1),
@@ -50,10 +27,8 @@ public class Board{
 	Hexagon outer[][] = {{ new Hexagon(0, 0, UiView.BLUE), new Hexagon(0, 0, UiView.BLUE)},
 								{new Hexagon(0, 0, UiView.GREEN), new Hexagon(0, 0, UiView.GREEN)}};
 	
-	public Board(float canvasHeight, float canvasWidth, int boardShape) {
+	public Board(int boardShape) {
 
-		this.canvasWidth = canvasWidth;
-		this.canvasHeight = canvasHeight;
 		this.boardShape = boardShape;
 
 		initialize();
@@ -61,21 +36,6 @@ public class Board{
 
 	private void initialize()
 	{
-		//calculate width of board
-		boardWidth = 0.8f * canvasWidth;
-		
-		Log.d("hex","calculated boardWidth="+boardWidth);
-
-		//calculate the length of the side of one of the small hexagons that fills up the board
-		calculateSmallHexagonSideLength();
-		
-		//calculate height and width of one grid cell
-		calculateDimensionsOfGridCell();
-		
-		//calculate (x0, y0) position of the board (position of the top-left point of the hexagon)
-		//relative to the canvas
-		calculatePositionOfBoardOnCanvas();
-		
 		setupListOfHexagons();
 		findAdjacentHexagons(hexagonList);
 	}
@@ -99,17 +59,6 @@ public class Board{
 	private void setupHexBoardListOfHexagons()
 	{
 		Log.d("hex","called setupHexBoardListOfHexagons");
-		
-		//create a list of hexagons that will be used to populate the hexagonally-shaped board
-    	float xOrigin = this.getXpositionOfBoardOnCanvas();
-    	float yOrigin = this.getYpositionOfBoardOnCanvas();
-    	
-    	//Log.e("hex", "board.getXpositionOfBoardOnCanvas()="+xOrigin);
-    	//Log.e("hex", "board.getYpositionOfBoardOnCanvas()="+yOrigin);
-
-    	float xHexPos, yHexPos;
-
-    	float[] hexCellPos;
 
     	int color;
     	int iLowerLimit, iUpperLimit;
@@ -134,18 +83,9 @@ public class Board{
     		}
 	    	for (int i = iLowerLimit; i < (iUpperLimit + 1); i++)
 	    	{
-	    		//Log.e("hex", "setupHexBoardListOfHexagons: finding position of cell: "+i+", "+j);
-	    		
-	        	hexCellPos = this.findPositionOfCenterOfHexagonalCell(i, j);
-	        	
-	        	//Log.e("hex", "setupHexBoardListOfHexagons: found position of cell: "+hexCellPos[0]+", "+hexCellPos[1]);
-
-		        xHexPos = xOrigin + hexCellPos[0];
-		        yHexPos = yOrigin + hexCellPos[1];
-	
 		        color = UiView.HEX_UNUSED_COLOR;
 
-		        hexagon = new Hexagon(xHexPos, yHexPos, color);
+		        hexagon = new Hexagon(i, j, color);
 		        //tell if one of the hexagons is touching an edge
 				if (j >= -5)
 				{
@@ -169,8 +109,7 @@ public class Board{
 						  outer[0][1].adjacent.add(hexagon);
 					}
 				}
-				
-		        
+
 		        hexagonList.add(hexagon);
 	    	}
     	}
@@ -180,17 +119,6 @@ public class Board{
 	private void setupRectBoardListOfHexagons()
 	{
 		Log.d("hex","called setupHexBoardListOfHexagons");
-		
-		//create a list of hexagons that will be used to populate the rectangular board
-    	float xOrigin = this.getXpositionOfBoardOnCanvas();
-    	float yOrigin = this.getYpositionOfBoardOnCanvas();
-    	
-    	Log.d("hex", "board.getXpositionOfBoardOnCanvas()="+xOrigin);
-    	Log.d("hex", "board.getYpositionOfBoardOnCanvas()="+yOrigin);
-
-    	float xHexPos, yHexPos;
-
-    	float[] hexCellPos;
 
     	int iLowerLimit, iUpperLimit;
 
@@ -203,13 +131,8 @@ public class Board{
 			iUpperLimit = 6;
 			
 	    	for (int i = iLowerLimit; i < (iUpperLimit + 1); i++)
-	    	{	
-	        	hexCellPos = this.findPositionOfCenterOfHexagonalCell(i, j);
-
-		        xHexPos = xOrigin + hexCellPos[0];
-		        yHexPos = yOrigin + hexCellPos[1];	
-
-		        hexagon = new Hexagon(xHexPos, yHexPos, UiView.HEX_UNUSED_COLOR);
+	    	{
+		        hexagon = new Hexagon(i, j, UiView.HEX_UNUSED_COLOR);
 		        //tell if one of the hexagons is touching an edge
 				if (j == -1)
 				{
@@ -232,123 +155,37 @@ public class Board{
     	}
 	}
 
-	private void calculateSmallHexagonSideLength()
-	{
-		smallHexSideLength = boardWidth/ (14.0f * (float) Math.cos(Math.PI/6.0));
-		Log.d("hex","smallHexSideLength: "+smallHexSideLength);
-	}
-	
-	private void calculateDimensionsOfGridCell()
-	{
-		wCell = 2.0f * smallHexSideLength * (float) Math.cos((Math.PI/ 6.0));
-		hCell = smallHexSideLength * (1.0f + (float) Math.cos((Math.PI/ 3.0)));
-	}
-	
-	private void calculatePositionOfBoardOnCanvas()
-	{
-		
-		x0 = 0.1f * canvasWidth;
-		
-		float boardHeight;
-		if (this.boardShape == Board.BOARD_GEOMETRY_RECT)
-		{
-			boardHeight = hCell * 7.0f - smallHexSideLength * (float) Math.sin((Math.PI/ 6.0));
-		} else
-		{
-			boardHeight = hCell * 9.0f - smallHexSideLength * (float) Math.sin((Math.PI/ 6.0));
-		}
-		
-		y0 = canvasHeight/2.0f - boardHeight/2.0f;	
-				
-		Log.d("hex","calculated position of board on canvas: x0="+x0+", y0="+y0);
-	}
-	
-	Hexagon findHexagonFromPointOnCanvas(float x, float y){
-	    Hexagon besthex = null;
-	    float besthex_dist = smallHexSideLength*smallHexSideLength;
-	    for( Hexagon hex: hexagonList ){
-	       float dhex =  (hex.x-x)*(hex.x-x)+(hex.y-y)*(hex.y-y);
-	       if( dhex < besthex_dist){
-	           besthex = hex;
-	           besthex_dist = dhex;
-	       }
-	    }
-	    return besthex;
-	}
-
-	public float[] findPositionOfTopLeftOfHexagonalCell(int hexGridCoordX, int hexGridCoordY)
-	{
-		//find the position of the top-left of the hexagon relative to the (0, 0) position of the board
-		float yRel = hCell * (-(float) hexGridCoordY - 1.0f);
-		float xRel;
-		//check if this is an even or odd row in the grid
-		if (hexGridCoordY % 2 == 0)
-		{
-			xRel = wCell * ((float) hexGridCoordX - 0.5f);
-		} else
-		{
-			xRel = wCell * (float) hexGridCoordX;
-		}
-		float[] hexCellPos = {xRel, yRel};
-		return hexCellPos;
-	}
-	
-	public float[] findPositionOfCenterOfHexagonalCell(int hexGridCoordX, int hexGridCoordY)
-	{
-		//find the position of the top-left of the hexagon relative to the (0, 0) position of the board
-		float yRel = hCell * (-(float) hexGridCoordY - 0.5f);
-		float xRel;
-		//check if this is an even or odd row in the grid
-		if (hexGridCoordY % 2 == 0)
-		{
-			xRel = wCell * (float) hexGridCoordX;
-		} else
-		{
-			xRel = wCell * ((float) hexGridCoordX + 0.5f);
-		}
-		float[] hexCellPos = {xRel, yRel};
-		return hexCellPos;
-	}
-	static double sqr(double x ){
-		return x*x;
-	}
 	static void findAdjacentHexagons( ArrayList<Hexagon> a )
 	{
-		final double dmax = 3.1 * sqr( smallHexSideLength );
+		boolean isAdjacent;
 		for( Hexagon u : a ){
 			for( Hexagon v : a ){
-				if( u != v && sqr( u.x-v.x ) + sqr( u.y - v.y ) < dmax ){
-					u.adjacent.add(v);
+				if( u != v ){					
+					if (v.j == u.j) // if hexagons are on same row
+					{
+						isAdjacent = Math.abs(v.i - u.i) == 1;
+					} else if (Math.abs(v.j - u.j) == 1) //if hexagons are on adjacent rows
+					{
+						if (v.j % 2 == 0) //if hexagons are on a row with an even value of j
+						{
+							isAdjacent = (v.i - u.i) > -1 && (v.i - u.i) < 2;
+						} else //if hexagons are on a row with an odd value of j
+						{
+							isAdjacent = (v.i - u.i) > -2 && (v.i - u.i) < 1;
+						}
+					} else {
+						isAdjacent = false;
+					}
+					
+					if (isAdjacent)
+					{
+						u.adjacent.add(v);
+					}
 				}
 			}
 		}
 	}
 
-	public float getXpositionOfBoardOnCanvas()
-	{
-		return x0;
-	}
-	
-	public float getYpositionOfBoardOnCanvas()
-	{
-		return y0;
-	}
-	
-	public float getSmallHexSideLength()
-	{
-		return smallHexSideLength;
-	}
-	
-	public float getHCell()
-	{
-		return hCell;		
-	}
-	
-	public float getWCell()
-	{
-		return wCell;
-	}
-	
 	static void addToSetSameColor( HashSet<Hexagon> s, Hexagon h ){
 		if( s.contains(h))
 			return;
