@@ -6,15 +6,15 @@ import java.util.ArrayList;
 public class Hexagon {
 	
 	public int color;
-	
-	final public float x, y;
+
+	final public int i, j;
 	
 	final ArrayList<Hexagon> adjacent = new ArrayList<Hexagon>();
 	
-	public Hexagon(float x, float y, int color)
+	public Hexagon(int i, int j, int color)
 	{
-		this.x = x;
-		this.y = y;
+		this.i = i;
+		this.j = j;
 		this.color = color;
 	}
 }

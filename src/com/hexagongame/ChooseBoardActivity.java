@@ -88,6 +88,7 @@ public class ChooseBoardActivity extends Activity {
 				  i.putExtra(ID_PHONE_PLAYER_ID, String.valueOf(phonePlayerId));
 				  i.putExtra(ID_BOARD_VIEW, String.valueOf(chooseBoardView.boardShape));
 				  ac.startActivity(i);
+				  ac.finish();
 			  }
 		  });
     }
