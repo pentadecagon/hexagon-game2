@@ -156,4 +156,14 @@ public class DrawBoardHelper {
 	{
 		return wCell;
 	}
+	
+	public float getCanvasWidth()
+	{
+		return canvasWidth;
+	}
+	
+	public float getCanvasHeight()
+	{
+		return canvasHeight;
+	}
 }
