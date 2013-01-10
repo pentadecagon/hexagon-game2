@@ -1,34 +1,45 @@
 package com.hexagongame;
 
+import java.util.ArrayList;
+
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.os.CountDownTimer;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class UiView extends View{
 
-	private Board board;
+	private Board board = null;
 	
-	public DrawBoardHelper drawBoardHelper;
+	private DrawBoardHelper drawBoardHelper;
 
 	//the paint object used by the canvas
 	private Paint paint;
 
-	private int playerTurn;
-	private boolean inWinnerMode;
-	private int winnerModeTickCount;
-	private int winner;
-
-	private int historyLength;
+	private int playerTurn = 0;
 	
-	private TextView winnerNotification;
+	public int boardShape = Board.BOARD_GEOMETRY_HEX;
+	
+	
+	private ArrayList<Hexagon> history = new ArrayList<Hexagon>();
 
+	private long playerTurnToastStartTime = 0;
+	
 	public static final int BLUE = android.graphics.Color.parseColor("#1010FF");
 	public static final int GREEN = android.graphics.Color.parseColor("#00FF00");
 
@@ -40,32 +51,56 @@ public class UiView extends View{
 	
 	public static final int HEX_UNUSED_COLOR = android.graphics.Color.parseColor("#E0E0E0");
 	
+	private boolean inWinnerMode = false;
+	private int winnerModeTickCount = 0;
+	private int winner = 0;
+	
+	private TextView winnerNotification = null;
+	
+	/**
+	 * Game mode
+	 * 0 = 2-player (default)
+	 * 1 = play against phone
+	 */
+	public int gameMode = 0;
+	
+	/**
+	 * Phone player ID
+	 * only used if gameMode = 1 (play against phone)
+	 * 0 = player goes first
+	 * 1 = phone goes first
+	 */
+	public int phonePlayerId = 0;
+	
 	public UiView(Context context, AttributeSet attrs) {
 		
 		super(context, attrs);
 
 		paint = new Paint();
+
+		viewInit();
 	}
 	
-	@Override
-	protected void onSizeChanged(int w, int h, int oldw, int oldh)
+	public void viewInit()
 	{
-		//unfortunately, we have to do this here rather than in the constructor because the getHeight and getWidth
-		//functions do not work there
-		if (drawBoardHelper == null)
-		{
-			setupBoardHelper();
-		}
-	}
+		playerTurn = 0;
 
-	private void setupBoardHelper()
+		//show introductory message
+    	Context context = getContext();
+		Toast toast = Toast.makeText(context, "First player to make a path from one side to the other wins. Blue goes first.", Toast.LENGTH_SHORT);
+		toast.show();
+	}
+	
+	private void setupBoard()
 	{
 		//note: we have to call this method from within onDraw, rather than from within the constructor, because otherwise
 		//the getHeight and getWidth methods just return 0
 		float canvasWidth = getWidth();
     	float canvasHeight = getHeight();
-
+    	
+		board = new Board(boardShape);
 		drawBoardHelper = new DrawBoardHelper(canvasHeight, canvasWidth, board);
+
 	}
 	
 	public void setWinnerNotification(TextView winnerNotification)
@@ -73,24 +108,42 @@ public class UiView extends View{
 		this.winnerNotification = winnerNotification;
 	}
 
-	protected void setBoard(Board board)
+	@Override
+	protected void onSizeChanged(int w, int h, int oldw, int oldh)
 	{
-		this.board = board;
-	}
-	
-	protected void updateParams(int playerTurn, boolean inWinnerMode, int winner, int winnerModeTickCount, int historyLength)
-	{
-		this.playerTurn = playerTurn;
-		this.inWinnerMode = inWinnerMode;
-		this.winner = winner;
-		this.winnerModeTickCount = winnerModeTickCount;
-		this.historyLength = historyLength;
+		//unfortunately, we have to do this here rather than in the constructor because the getHeight and getWidth
+		//functions do not work there
+		if (board == null)
+		{
+			setupBoard();
+		}
 	}
 	
 	@Override
 	protected void onDraw(Canvas canvas) {
+		//TODO: implement complete play-against-phone functionality
+		//here, the player is playing against the phone and the phone is blue (goes first), so we just
+		//select the first available hexagon
+		if (gameMode == 1)
+		{
+			if (phonePlayerId == playerTurn ) 
+			{
+				final int newcolor = phonePlayerId == 1 ? GREEN : BLUE;
+				Hexagon move = board.analyzeAll();
+				if( move != null ){
+					move.color = newcolor;
+					playerTurn = 1 - playerTurn;
+					history.add( move );
+					if (board.isWinner(1-playerTurn ))
+					{
+						inWinnerMode = true;
+						winner = 1-playerTurn;
+					}
+				}
+			}
+		}
 
-		if (inWinnerMode && winnerNotification.getVisibility() != View.VISIBLE)
+		if (inWinnerMode && winnerModeTickCount == 0)
 		{
 			showWinnerCongratulationsMessage(canvas);
 		}
@@ -102,17 +155,165 @@ public class UiView extends View{
 
     	for( Hexagon hex : board.hexagonList ){
     		drawHexagon(canvas, hex);
-    	}
+    	}		
+
+    	if (inWinnerMode)
+		{
+    		winnerModeTickCount ++;
+    		countdownTimer.start();
+		}
 	}
 	
+	private CountDownTimer countdownTimer = new CountDownTimer(250, 250){
 
+        @Override
+        public void onTick(long miliseconds){}
+
+        @Override
+        public void onFinish(){
+        	invalidate();
+        }
+    };
+	
 	protected void showWinnerCongratulationsMessage(Canvas canvas)
 	{
 		//someone has won: congratulate the winner
 		winnerNotification.setText(((winner == 1) ? "Green" : "Blue") + " wins!");
 		winnerNotification.setVisibility(View.VISIBLE);		
 	}
+	
+	void undo(){
+		for( int i=0; i<gameMode+1; ++i ){ // need to undo twice when playi8ng against the computer
+			if ( history.size() > 0 )
+			{
+				Hexagon lastChange = history.remove(history.size()-1);
+				lastChange.color = HEX_UNUSED_COLOR;
+				playerTurn = 1-playerTurn;
+				invalidate();
+			}
+		}
+	}
+	
+	private void tappedOutsideBoard( MotionEvent event){
+		//check if user has clicked on the nav
+		float canvasWidth = getWidth();
+		float canvasHeight = getHeight();
+		float x = (float) event.getX();
+		float y = (float) event.getY();
+		if (y > 0.9f * canvasHeight)
+		{
+			if (x > 0.2 * canvasWidth && x < 0.3 * canvasWidth)
+			{
+				//turn indicator: if user taps on the circle, show a message showing whose turn it is next
+				Context context = getContext();
+				String turnMessage = "";
+				if (playerTurn == 0)
+				{
+					turnMessage = "Blue's turn!";
+				} else
+				{
+					turnMessage = "Green's turn!";
+				}
+				//make sure toast is not triggered multiple times
+				if ((System.currentTimeMillis() - playerTurnToastStartTime) > 2000)
+				{
+    				Toast toast = Toast.makeText(context, turnMessage, Toast.LENGTH_SHORT);
+    				playerTurnToastStartTime = System.currentTimeMillis();
+    				toast.show();	    					
+				}
+					
+			} else if (x >= 0.45 * canvasWidth && x <= 0.55 * canvasWidth)
+			{
+				Log.d("hex", "undo button clicked");
+				undo();
+			} else if (x >= 0.7 * canvasWidth && x <= 0.8 * canvasWidth)
+			{
+				Log.d("hex", "redo button clicked");
 
+				Activity ac = (Activity) getContext();
+				ac.startActivity(new Intent(ac, ChooseBoardActivity.class));
+				ac.finish();
+			}
+		}
+			
+		//do nothing
+	}
+	
+	@Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (event.getAction() != MotionEvent.ACTION_DOWN ){
+        	return false;
+        }
+        
+        //if someone has already won and we are just showing the "congratulations" screen, just show a dialog to restart the game
+        if (inWinnerMode)
+        {
+        	showRestartDialog();
+    		return true;
+        }
+
+		Log.d("hex", "ontouch x="+event.getX());
+	    Log.d("hex", "ontouch y="+event.getY());
+	    	
+	    Hexagon hexagon = drawBoardHelper.findHexagonFromPointOnCanvas((float) event.getX(), (float) event.getY());
+	    
+		if (hexagon == null) //hexagon is out of scope of board
+		{
+			Log.d("hex", "hex is out of scope of board");
+			tappedOutsideBoard(event);
+		} else if (hexagon.color == HEX_UNUSED_COLOR) //hexagon is on board, but unused
+		{
+			Log.d("hex", "hex is white");
+			if (playerTurn == 0)
+			{
+				hexagon.color = BLUE;
+				playerTurn = 1;
+			} else
+			{
+				hexagon.color = GREEN;
+				playerTurn = 0;
+			}
+			if (board.isWinner(1-playerTurn ))
+			{
+				inWinnerMode = true;
+				winner = 1-playerTurn;
+			}
+			//save last change in case we need to undo it
+			history.add( hexagon );
+
+			invalidate();			
+		}
+		return true;
+    };
+    
+    private void showRestartDialog()
+    {
+    	AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+    	TextView myMsg = new TextView(getContext());
+    	myMsg.setText("Restart?");
+    	myMsg.setGravity(Gravity.CENTER_HORIZONTAL);
+    	myMsg.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25.0f);
+    	myMsg.setPadding(15, 15, 15, 15);
+		builder.setView(myMsg)
+	       .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+	    	   public void onClick(DialogInterface dialog, int id) {
+	    		   //restart the game
+	    		   Activity ac = (Activity) UiView.this.getContext();
+				   Intent i = new Intent(ac, HexActivity.class);
+				   i.putExtra(ChooseBoardActivity.ID_GAME_MODE, String.valueOf(gameMode));
+				   i.putExtra(ChooseBoardActivity.ID_PHONE_PLAYER_ID, String.valueOf(phonePlayerId));
+				   i.putExtra(ChooseBoardActivity.ID_BOARD_VIEW, String.valueOf(boardShape));
+				   ac.startActivity(i);
+				   ac.finish();
+	    	   } 	    	
+	       })
+	       .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+	    		public void onClick(DialogInterface dialog, int id) {}
+	       });
+		
+		AlertDialog dialog = builder.create();
+		dialog.show();
+    }
     
     private void drawBackground(Canvas canvas)
     {
@@ -217,7 +418,7 @@ public class UiView extends View{
 		float canvasHeight = getHeight();
 
 		Bitmap bmp;
-		if ( historyLength > 0 )
+		if ( history.size() > 0 )
 		{
 			bmp = BitmapFactory.decodeResource(getResources(), R.drawable.undo);
 		} else {
@@ -243,7 +444,8 @@ public class UiView extends View{
 
 		canvas.drawBitmap(bmp, cx, cy, paint);
 	}
-		
+	
+	
 	public void drawHexagon(Canvas canvas, Hexagon hex)
 	{
 		float hexSide = drawBoardHelper.getSmallHexSideLength();
@@ -300,18 +502,4 @@ public class UiView extends View{
 			canvas.drawPath(path, paint);
 		}
 	}
-	
-    public boolean onTouchEvent(MotionEvent event) {
-        if (event.getAction() != MotionEvent.ACTION_DOWN ){
-        	return false;
-        }
-
-		float x = (float) event.getX();
-		float y = (float) event.getY();
-		
-		HexActivity ac = (HexActivity) getContext();
-		ac.handleOnTouch(x, y);
-        
-        return true;
-    }
 }
