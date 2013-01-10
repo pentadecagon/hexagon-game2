@@ -4,7 +4,7 @@ import android.util.Log;
 
 public class DrawBoardHelper {
 
-	public Board board = null;
+	final public Board board;
 	
 	//x0, x-position of the top-left corner of the hexagon relative to the canvas
 	private static float x0;
@@ -22,22 +22,22 @@ public class DrawBoardHelper {
 	public DrawBoardHelper(float canvasHeight, float canvasWidth, Board board)
 	{
 		this.board = board;
-		wCell = 2.0f * smallHexSideLength * (float) Math.cos((Math.PI/ 6.0));
-		hCell = smallHexSideLength * 1.5f;
+		int imin=10000;
 		int imax=-10000;
 		int jmax=-10000;
 		int jmin=10000;
 		for( Hexagon hex : board.hexagonList ){
+			imin = Math.min(imin, hex.i );
 			imax = Math.max(imax, hex.i );
 			jmax = Math.max(jmax,  hex.j );
 			jmin = Math.min(jmin,  hex.j );
 		}
 		
-		wCell = canvasWidth / (imax+2);
+		wCell = canvasWidth / (imax-imin+2);
 		smallHexSideLength = wCell / (float)Math.sqrt(3.0);
 		hCell = smallHexSideLength * 1.5f;
 		
-		x0 = wCell * 0.5f;
+		x0 = wCell * 0.5f;  // we want half a hexagon space to the right and the left of the board
 		
 		float jmid = (jmax+jmin) * 0.5f; // this should be placed at canvasHeight/2
 		
