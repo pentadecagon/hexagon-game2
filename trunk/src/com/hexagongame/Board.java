@@ -59,130 +59,56 @@ public class Board{
 	private void setupHexBoardListOfHexagons()
 	{
 		Log.d("hex","called setupHexBoardListOfHexagons");
-
-    	int color;
-    	int iLowerLimit, iUpperLimit;
-    	
-    	Hexagon hexagon;
-
-    	for (int j = -1; j > -10; j--)
-    	{
-    		//corners of hexagonal board
-    		if (j == -1 || j == -9)
-    		{
-    			iLowerLimit = 3;
-    			iUpperLimit = 3;
-    		} else if (j == -2 || j == -8)
-    		{
-    			iLowerLimit = 2;
-    			iUpperLimit = 5;
-    		} else
-    		{
-    			iLowerLimit = (j % 2 == 0) ? 1 : 0;
-    			iUpperLimit = 6;
-    		}
-	    	for (int i = iLowerLimit; i < (iUpperLimit + 1); i++)
-	    	{
-		        color = UiView.HEX_UNUSED_COLOR;
-
-		        hexagon = new Hexagon(i, j, color);
-		        //tell if one of the hexagons is touching an edge
-				if (j >= -5)
-				{
-				  if (i == iLowerLimit || ((j == -3 || j == -2) && i == (iLowerLimit + 1)))
-				  {
-					  outer[0][0].adjacent.add(hexagon);
-				  }
-				  if (i == iUpperLimit || ((j == -3 || j == -2) && i == (iUpperLimit - 1)))
-				  {
-					  outer[1][0].adjacent.add(hexagon);
-				  }
+		final int r=3;
+		for( int i=-r; i<=r; ++i )  for( int k=-r; k<=r; ++k )
+			if( Math.abs(i+k) <= r ){
+				Hexagon hex = new Hexagon( i+k*0.5f, k, UiView.HEX_UNUSED_COLOR );
+				if( Math.abs(i) == r || Math.abs(k) == r || Math.abs( i+k ) == r ){ // its at the edge
+					final int x = 2*i+k; 
+					if( x>=0 && k>=0 )
+						outer[0][0].adjacent.add(hex);
+					if( x>=0 && k<=0 )
+						outer[1][0].adjacent.add(hex);
+					if( x<=0 && k>=0 )
+						outer[1][1].adjacent.add(hex);
+					if( x<=0 && k<=0 )
+						outer[0][1].adjacent.add(hex);
 				}
-				if (j <= -5)
-				{
-					if (i == iLowerLimit || ((j == -7 || j == -8) && i == (iLowerLimit + 1)))
-					{
-						  outer[1][1].adjacent.add(hexagon);
-					}
-					if (i == iUpperLimit || ((j == -7 || j == -8) && i == (iUpperLimit - 1)))
-					{
-						  outer[0][1].adjacent.add(hexagon);
-					}
-				}
-
-		        hexagonList.add(hexagon);
-	    	}
-    	}
-		
+		        hexagonList.add(hex);
+			}
 	}
 	
 	private void setupRectBoardListOfHexagons()
 	{
-		Log.d("hex","called setupHexBoardListOfHexagons");
+		final int ymax=4;
+		final int xmax=4;
 
-    	int iLowerLimit, iUpperLimit;
-
-    	Hexagon hexagon;
-
-    	for (int j = -1; j > -8; j--)
-    	{
-    		//corners of hexagonal board
-    		iLowerLimit = (j % 2 == 0) ? 1 : 0;
-			iUpperLimit = 6;
-			
-	    	for (int i = iLowerLimit; i < (iUpperLimit + 1); i++)
-	    	{
-		        hexagon = new Hexagon(i, j, UiView.HEX_UNUSED_COLOR);
-		        //tell if one of the hexagons is touching an edge
-				if (j == -1)
-				{
-					  outer[1][0].adjacent.add(hexagon);
-				} else if (j == -7)
-				{
-					  outer[1][1].adjacent.add(hexagon);
-				}
-				if (i == iLowerLimit)
-				{
-					  outer[0][0].adjacent.add(hexagon);
-				} else if (i == iUpperLimit)
-				{
-					  outer[0][1].adjacent.add(hexagon);
-				}
-
-		        
-		        hexagonList.add(hexagon);
-	    	}
-    	}
+		for( int yi=0; yi<=ymax; ++yi )
+			for( float xi = (yi%2) * 0.5f; xi<=xmax; ++xi ){
+				final Hexagon hex = new Hexagon( xi, yi, UiView.HEX_UNUSED_COLOR );
+				hexagonList.add(hex);
+				if( yi==0 )
+					outer[1][0].adjacent.add(hex);
+				if( yi == ymax )
+					outer[1][1].adjacent.add(hex);
+				if( xi<1 )
+					outer[0][0].adjacent.add(hex);
+				if( xi>xmax-1 )
+					outer[0][1].adjacent.add(hex);
+			}
 	}
 
 	static void findAdjacentHexagons( ArrayList<Hexagon> a )
 	{
-		boolean isAdjacent;
-		for( Hexagon u : a ){
-			for( Hexagon v : a ){
-				if( u != v ){					
-					if (v.j == u.j) // if hexagons are on same row
-					{
-						isAdjacent = Math.abs(v.i - u.i) == 1;
-					} else if (Math.abs(v.j - u.j) == 1) //if hexagons are on adjacent rows
-					{
-						if (v.j % 2 == 0) //if hexagons are on a row with an even value of j
-						{
-							isAdjacent = (v.i - u.i) > -1 && (v.i - u.i) < 2;
-						} else //if hexagons are on a row with an odd value of j
-						{
-							isAdjacent = (v.i - u.i) > -2 && (v.i - u.i) < 1;
-						}
-					} else {
-						isAdjacent = false;
-					}
-					
-					if (isAdjacent)
-					{
-						u.adjacent.add(v);
-					}
+		for( Hexagon p : a ){ for( Hexagon q : a ){
+			if( p != q ){
+				final float dx = p.xi-q.xi;
+				final float dy = p.yi-q.yi;
+				if( dx*dx+dy*dy < 1.5 ){
+					p.adjacent.add(q);
 				}
-			}
+			}}
+			Log.i("hex", "adjacent: " + p.adjacent.size() );
 		}
 	}
 

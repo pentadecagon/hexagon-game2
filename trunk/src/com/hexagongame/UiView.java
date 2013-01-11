@@ -482,7 +482,7 @@ public class UiView extends View{
 		        paint.setStyle(Paint.Style.FILL);
 			}
 			
-			float[] coords = drawBoardHelper.findPositionOfCenterOfHexagonalCell(hex.i, hex.j);
+			float[] coords = drawBoardHelper.findPositionOfCenterOfHexagonalCell(hex.xi, hex.yi);
 			x = coords[0] - drawBoardHelper.getWCell()/2.0f;
 			y = coords[1] - drawBoardHelper.getHCell()/2.0f;
 
