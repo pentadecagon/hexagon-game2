@@ -22,40 +22,33 @@ public class DrawBoardHelper {
 	public DrawBoardHelper(float canvasHeight, float canvasWidth, Board board)
 	{
 		this.board = board;
-		int imin=10000;
-		int imax=-10000;
-		int jmax=-10000;
-		int jmin=10000;
+		float xmin=100000;
+		float xmax=-100000;
+		float ymin=100000;
+		float ymax=-100000;
 		for( Hexagon hex : board.hexagonList ){
-			imin = Math.min(imin, hex.i );
-			imax = Math.max(imax, hex.i );
-			jmax = Math.max(jmax,  hex.j );
-			jmin = Math.min(jmin,  hex.j );
+			xmin = Math.min(xmin, hex.xi );
+			xmax = Math.max(xmax, hex.xi );
+			ymin = Math.min(ymin,  hex.yi );
+			ymax = Math.max(ymax,  hex.yi );
 		}
 		
-		wCell = canvasWidth / (imax-imin+2);
+		wCell = canvasWidth / ( xmax-xmin+2);
 		smallHexSideLength = wCell / (float)Math.sqrt(3.0);
 		hCell = smallHexSideLength * 1.5f;
 		
-		x0 = wCell * 0.5f;  // we want half a hexagon space to the right and the left of the board
+		x0 = wCell * (1-xmin); 
+		final float ymid = (ymax+ymin) * 0.5f; // this should be placed at canvasHeight/2
 		
-		float jmid = (jmax+jmin) * 0.5f; // this should be placed at canvasHeight/2
-		
-		y0 = canvasHeight * 0.5f - jmid * hCell + 0.25f * smallHexSideLength;
+		y0 = canvasHeight * 0.5f - ymid * hCell + 0.25f * smallHexSideLength;
 		Log.d("hex","calculated position of board on canvas: x0="+x0+", y0="+y0);
 	}
 	
-	
-	public float[] findPositionOfCenterOfHexagonalCell(int hexGridCoordX, int hexGridCoordY)
+	public float[] findPositionOfCenterOfHexagonalCell( float xi, float yi )
 	{
-		//find the position of the top-left of the hexagon relative to the (0, 0) position of the board
-		float x = x0 + wCell * (hexGridCoordX + (Math.abs(hexGridCoordY) % 2) * 0.5f);
-		float y = y0 + hCell * hexGridCoordY;
-
-		float[] hexCellPos = {x, y};
+		float[] hexCellPos = {x0 + wCell * xi, y0+hCell*yi };
 		return hexCellPos; 
 	}
-	
 	
 	Hexagon findHexagonFromPointOnCanvas(float x, float y){
 	    Hexagon besthex = null;
@@ -63,7 +56,7 @@ public class DrawBoardHelper {
 	    float hexX, hexY;
 	    float besthex_dist = smallHexSideLength*smallHexSideLength;
 	    for( Hexagon hex: board.hexagonList ){
-	       coords = findPositionOfCenterOfHexagonalCell(hex.i, hex.j);
+	       coords = findPositionOfCenterOfHexagonalCell(hex.xi, hex.yi);
 	       hexX = coords[0];
 	       hexY = coords[1];
 	       float dhex =  (hexX-x)*(hexX-x)+(hexY-y)*(hexY-y);
