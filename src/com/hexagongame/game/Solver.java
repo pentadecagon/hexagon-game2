@@ -7,10 +7,10 @@ public class Solver {
 
 	private final float _lengthFactor;
 	
-	Solver( float f ){
+	public Solver( float f ){
 		_lengthFactor = f;
 	}
-	Solver(){
+	public Solver(){
 		_lengthFactor = 4.0f;
 	}
 	
