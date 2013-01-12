@@ -1,5 +1,8 @@
 package com.hexagongame;
 
+import com.hexagongame.game.Board;
+import com.hexagongame.game.Hexagon;
+
 import android.util.Log;
 
 public class DrawBoardHelper {

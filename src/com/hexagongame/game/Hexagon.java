@@ -1,4 +1,4 @@
-package com.hexagongame;
+package com.hexagongame.game;
 
 import java.util.ArrayList;
 
@@ -14,7 +14,7 @@ public class Hexagon {
 	
 	final ArrayList<Hexagon> adjacent = new ArrayList<Hexagon>();
 	
-	boolean isEmpty(){
+	public boolean isEmpty(){
 		return owner==OWNER_EMPTY;
 	}
 	

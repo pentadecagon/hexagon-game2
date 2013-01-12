@@ -2,6 +2,10 @@ package com.hexagongame;
 
 import java.util.ArrayList;
 
+import com.hexagongame.game.Board;
+import com.hexagongame.game.Hexagon;
+import com.hexagongame.game.Solver;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
