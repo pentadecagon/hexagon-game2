@@ -21,8 +21,6 @@ public class ChooseBoardActivity extends Activity {
 	
 	public final static String ID_PHONE_PLAYER_ID = "com.hexagongame._ID_PHONE_PLAYER_ID";
 	
-	public final static String ID_BOARD_VIEW = "com.hexagongame._ID_BOARD_VIEW";
-	
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -86,7 +84,6 @@ public class ChooseBoardActivity extends Activity {
 				  Intent i = new Intent(ac, HexActivity.class);
 				  i.putExtra(ID_GAME_MODE, String.valueOf(gameMode));
 				  i.putExtra(ID_PHONE_PLAYER_ID, String.valueOf(phonePlayerId));
-				  i.putExtra(ID_BOARD_VIEW, String.valueOf(chooseBoardView.boardShape));
 				  ac.startActivity(i);
 				  ac.finish();
 			  }

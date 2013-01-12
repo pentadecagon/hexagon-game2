@@ -14,7 +14,7 @@ public class ChooseBoardView extends View {
 	//the paint object used by the canvas
 	private Paint paint;
 	
-	public int boardShape = 0;
+	public static int boardShape = 1;
 	
 	public ChooseBoardView(Context context, AttributeSet attrs) {
 		
