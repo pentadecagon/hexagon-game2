@@ -91,17 +91,18 @@ public class Board{
 				Hexagon hex = new Hexagon( i+k*0.5f, k, UiView.HEX_UNUSED_COLOR );
 				if( Math.abs(i) == r || Math.abs(k) == r || Math.abs( i+k ) == r ){ // its at the edge
 					final int x = 2*i+k; 
-					if( x>=0 && k>=0 )
+					if( x>=1 && k>=0 )
 						outer[0][0].adjacent.add(hex);
-					if( x>=0 && k<=0 )
+					if( x>=-1 && k<=0 )
 						outer[1][0].adjacent.add(hex);
-					if( x<=0 && k>=0 )
+					if( x<=1 && k>=0 )
 						outer[1][1].adjacent.add(hex);
-					if( x<=0 && k<=0 )
+					if( x<=-1 && k<=0 )
 						outer[0][1].adjacent.add(hex);
 				}
 		        hexagonList.add(hex);
 			}
+		Log.i("hex", "out size: 0: " + outer[0][0].adjacent.size()+" "+outer[0][1].adjacent.size() + " 1: " + outer[1][0].adjacent.size() + " " + outer[1][1].adjacent.size() );
 	}
 	
 	private void setupRectBoardListOfHexagons()
