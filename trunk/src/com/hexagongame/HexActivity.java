@@ -23,14 +23,10 @@ public class HexActivity extends Activity {
         String phonePlayerIdStr = getIntent().getStringExtra(ChooseBoardActivity.ID_PHONE_PLAYER_ID);
         int phonePlayerId = (phonePlayerIdStr != null) ? Integer.valueOf(phonePlayerIdStr) : 0;
         
-        String boardShapeStr = getIntent().getStringExtra(ChooseBoardActivity.ID_BOARD_VIEW);
-        int boardShape = (boardShapeStr != null) ? Integer.valueOf(boardShapeStr) : 0;
-        
         UiView uiView = (UiView) findViewById(R.id.boardview);
 
         uiView.gameMode = gameMode;
         uiView.phonePlayerId = phonePlayerId;
-        uiView.boardShape = boardShape;
         
         TextView winnerNotification = (TextView) findViewById(R.id.winnertext);
 		uiView.setWinnerNotification(winnerNotification);

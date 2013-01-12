@@ -32,9 +32,6 @@ public class UiView extends View{
 	//the paint object used by the canvas
 	private Paint paint;
 
-	public int boardShape = Board.BOARD_GEOMETRY_HEX;
-	
-	
 	private long playerTurnToastStartTime = 0;
 	
 	public static final int BLUE = android.graphics.Color.parseColor("#1010FF");
@@ -74,30 +71,9 @@ public class UiView extends View{
 		super(context, attrs);
 
 		paint = new Paint();
-
-		viewInit();
+		board = new Board( ChooseBoardView.boardShape );
 	}
-	
-	public void viewInit()
-	{
-		//show introductory message
-    	Context context = getContext();
-		Toast toast = Toast.makeText(context, "First player to make a path from one side to the other wins. Blue goes first.", Toast.LENGTH_SHORT);
-		toast.show();
-	}
-	
-	private void setupBoard()
-	{
-		//note: we have to call this method from within onDraw, rather than from within the constructor, because otherwise
-		//the getHeight and getWidth methods just return 0
-		float canvasWidth = getWidth();
-    	float canvasHeight = getHeight();
-    	
-		board = new Board(boardShape);
-		drawBoardHelper = new DrawBoardHelper(canvasHeight, canvasWidth, board);
-
-	}
-	
+			
 	public void setWinnerNotification(TextView winnerNotification)
 	{
 		this.winnerNotification = winnerNotification;
@@ -106,12 +82,9 @@ public class UiView extends View{
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh)
 	{
-		//unfortunately, we have to do this here rather than in the constructor because the getHeight and getWidth
-		//functions do not work there
-		if (board == null)
-		{
-			setupBoard();
-		}
+		float canvasWidth = getWidth();
+    	float canvasHeight = getHeight();
+		drawBoardHelper = new DrawBoardHelper(canvasHeight, canvasWidth, board);
 	}
 	
 	@Override
@@ -280,7 +253,6 @@ public class UiView extends View{
 				   Intent i = new Intent(ac, HexActivity.class);
 				   i.putExtra(ChooseBoardActivity.ID_GAME_MODE, String.valueOf(gameMode));
 				   i.putExtra(ChooseBoardActivity.ID_PHONE_PLAYER_ID, String.valueOf(phonePlayerId));
-				   i.putExtra(ChooseBoardActivity.ID_BOARD_VIEW, String.valueOf(boardShape));
 				   ac.startActivity(i);
 				   ac.finish();
 	    	   } 	    	
