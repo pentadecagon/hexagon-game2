@@ -32,13 +32,9 @@ public class UiView extends View{
 	//the paint object used by the canvas
 	private Paint paint;
 
-	private int playerTurn = 0;
-	
 	public int boardShape = Board.BOARD_GEOMETRY_HEX;
 	
 	
-	private ArrayList<Hexagon> history = new ArrayList<Hexagon>();
-
 	private long playerTurnToastStartTime = 0;
 	
 	public static final int BLUE = android.graphics.Color.parseColor("#1010FF");
@@ -84,8 +80,6 @@ public class UiView extends View{
 	
 	public void viewInit()
 	{
-		playerTurn = 0;
-
 		//show introductory message
     	Context context = getContext();
 		Toast toast = Toast.makeText(context, "First player to make a path from one side to the other wins. Blue goes first.", Toast.LENGTH_SHORT);
@@ -127,18 +121,16 @@ public class UiView extends View{
 		//select the first available hexagon
 		if (gameMode == 1)
 		{
-			if (phonePlayerId == playerTurn ) 
+			if (phonePlayerId == board.getPlayerId() ) 
 			{
 				final int newcolor = phonePlayerId == 1 ? GREEN : BLUE;
 				Hexagon move = solver.bestMove(board);
 				if( move != null ){
-					move.color = newcolor;
-					playerTurn = 1 - playerTurn;
-					history.add( move );
-					if (board.isWinner(1-playerTurn ))
+					board.doMove( move,  newcolor );
+					if (board.isWinner(1-board.getPlayerId() ))
 					{
 						inWinnerMode = true;
-						winner = 1-playerTurn;
+						winner = 1-board.getPlayerId();
 					}
 				}
 			}
@@ -185,14 +177,9 @@ public class UiView extends View{
 	
 	void undo(){
 		for( int i=0; i<gameMode+1; ++i ){ // need to undo twice when playi8ng against the computer
-			if ( history.size() > 0 )
-			{
-				Hexagon lastChange = history.remove(history.size()-1);
-				lastChange.color = HEX_UNUSED_COLOR;
-				playerTurn = 1-playerTurn;
-				invalidate();
-			}
+			board.undo();
 		}
+		invalidate();
 	}
 	
 	private void tappedOutsideBoard( MotionEvent event){
@@ -208,7 +195,7 @@ public class UiView extends View{
 				//turn indicator: if user taps on the circle, show a message showing whose turn it is next
 				Context context = getContext();
 				String turnMessage = "";
-				if (playerTurn == 0)
+				if (board.getPlayerId() == 0)
 				{
 					turnMessage = "Blue's turn!";
 				} else
@@ -265,23 +252,13 @@ public class UiView extends View{
 		} else if (hexagon.color == HEX_UNUSED_COLOR) //hexagon is on board, but unused
 		{
 			Log.d("hex", "hex is white");
-			if (playerTurn == 0)
-			{
-				hexagon.color = BLUE;
-				playerTurn = 1;
-			} else
-			{
-				hexagon.color = GREEN;
-				playerTurn = 0;
-			}
-			if (board.isWinner(1-playerTurn ))
+			final int player = board.getPlayerId();
+			board.doMove( hexagon,  player==0 ? BLUE : GREEN );
+			if (board.isWinner( player ))
 			{
 				inWinnerMode = true;
-				winner = 1-playerTurn;
+				winner = player;
 			}
-			//save last change in case we need to undo it
-			history.add( hexagon );
-
 			invalidate();			
 		}
 		return true;
@@ -398,7 +375,7 @@ public class UiView extends View{
 		float canvasWidth = getWidth();
 		float canvasHeight = getHeight();
 		
-		if (playerTurn == 0)
+		if (board.getPlayerId() == 0)
 		{
 			paint.setColor(BLUE);
 		} else
@@ -419,7 +396,7 @@ public class UiView extends View{
 		float canvasHeight = getHeight();
 
 		Bitmap bmp;
-		if ( history.size() > 0 )
+		if ( board.haveHistory() )
 		{
 			bmp = BitmapFactory.decodeResource(getResources(), R.drawable.undo);
 		} else {

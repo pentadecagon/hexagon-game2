@@ -1,7 +1,6 @@
 package com.hexagongame;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 
 import android.util.Log;
@@ -19,7 +18,10 @@ public class Board{
 	public int boardShape = BOARD_GEOMETRY_HEX;
 
 	public ArrayList<Hexagon> hexagonList = null;
-	
+
+	private int playerTurn = 0;	
+	private ArrayList<Hexagon> history = new ArrayList<Hexagon>();
+
 	/* 'outer' represents the four outer regions of the board.  The first index indicates the player (0 or 1),
 	 * the second index enumerates the both opposite regions of each player.  Those objects hold the set 
 	 * of adjacent hexagons for each outer region   */
@@ -34,6 +36,30 @@ public class Board{
 		initialize();
 	}
 
+	int getPlayerId(){
+		return playerTurn;
+	}
+	
+	synchronized void undo(){
+		if ( history.size() > 0 )
+		{
+			Hexagon lastChange = history.remove(history.size()-1);
+			lastChange.color = UiView.HEX_UNUSED_COLOR;
+			playerTurn = 1-playerTurn;
+		}
+	}	
+	
+	synchronized boolean haveHistory(){
+		return history.size() > 0;
+	}
+	
+	synchronized void doMove( Hexagon move, int newcolor )
+	{
+		move.color = newcolor;
+		playerTurn = 1 - playerTurn;
+		history.add( move );
+	}
+	
 	private void initialize()
 	{
 		setupListOfHexagons();
