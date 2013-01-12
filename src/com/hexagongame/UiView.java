@@ -25,6 +25,7 @@ import android.widget.Toast;
 public class UiView extends View{
 
 	private Board board = null;
+	Solver solver = new Solver();
 	
 	private DrawBoardHelper drawBoardHelper;
 
@@ -129,7 +130,7 @@ public class UiView extends View{
 			if (phonePlayerId == playerTurn ) 
 			{
 				final int newcolor = phonePlayerId == 1 ? GREEN : BLUE;
-				Hexagon move = board.analyzeAll();
+				Hexagon move = solver.bestMove(board);
 				if( move != null ){
 					move.color = newcolor;
 					playerTurn = 1 - playerTurn;
