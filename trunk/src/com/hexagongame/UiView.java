@@ -309,14 +309,14 @@ public class UiView extends View{
     	float canvasHeight = getHeight();
     	float canvasWidth = getWidth();
 
-    	float padding = 0.02f * canvasHeight;
+    	float padding = 0.01f * canvasHeight;
     	
     	paint.setColor(BLUE_BG);
     	paint.setStyle(Paint.Style.FILL);
     	Path path = new Path();
     	path.moveTo(0.0f, 0.1f * canvasHeight);
-    	path.lineTo(0.5f * canvasWidth - padding, 0.1f * canvasHeight);
-    	path.lineTo(0.5f * canvasWidth + padding, 0.9f * canvasHeight);
+    	path.lineTo(0.4f * canvasWidth - padding, 0.1f * canvasHeight);
+    	path.lineTo(0.6f * canvasWidth + padding, 0.9f * canvasHeight);
     	path.lineTo(canvasWidth, 0.9f * canvasHeight);
     	path.lineTo(canvasWidth, 0.5f * canvasHeight + padding);
     	path.lineTo(0.0f, 0.5f * canvasHeight - padding);
@@ -331,8 +331,8 @@ public class UiView extends View{
     	path.lineTo(canvasWidth, 0.5f * canvasHeight - padding);
     	path.lineTo(0.0f, 0.5f * canvasHeight + padding);
     	path.lineTo(0.0f, 0.9f * canvasHeight);
-    	path.lineTo(0.5f * canvasWidth - padding, 0.9f * canvasHeight);
-    	path.lineTo(0.5f * canvasWidth + padding, 0.1f * canvasHeight);
+    	path.lineTo(0.6f * canvasWidth - padding, 0.9f * canvasHeight);
+    	path.lineTo(0.4f * canvasWidth + padding, 0.1f * canvasHeight);
     	canvas.drawPath(path, paint);
     }
     
