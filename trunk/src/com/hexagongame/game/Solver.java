@@ -1,4 +1,4 @@
-package com.hexagongame;
+package com.hexagongame.game;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -80,7 +80,7 @@ public class Solver {
 		return erg;
 	} // end analyze
 
-	Hexagon bestMove( Board board ){
+	public Hexagon bestMove( Board board ){
 		HashMap<Hexagon, Double> v1 = analyze(board, 0);
 		HashMap<Hexagon, Double> v2 = analyze(board, 1);
 		Hexagon besthex = null;

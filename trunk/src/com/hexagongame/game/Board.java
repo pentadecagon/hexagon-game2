@@ -1,4 +1,4 @@
-package com.hexagongame;
+package com.hexagongame.game;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -36,11 +36,11 @@ public class Board{
 		initialize();
 	}
 
-	int getPlayerId(){
+	public int getPlayerId(){
 		return playerTurn;
 	}
 	
-	synchronized void undo(){
+	public synchronized void undo(){
 		if ( history.size() > 0 )
 		{
 			Hexagon lastChange = history.remove(history.size()-1);
@@ -49,11 +49,11 @@ public class Board{
 		}
 	}	
 	
-	synchronized boolean haveHistory(){
+	public synchronized boolean haveHistory(){
 		return history.size() > 0;
 	}
 	
-	synchronized void doMove( Hexagon move )
+	public synchronized void doMove( Hexagon move )
 	{
 		move.owner = playerTurn;
 		playerTurn = 1 - playerTurn;
@@ -150,7 +150,7 @@ public class Board{
 		}
 	}
 	
-	boolean isWinner( int p )
+	public boolean isWinner( int p )
 	{
 		HashSet<Hexagon> s1 = new HashSet<Hexagon>();
 		HashSet<Hexagon> s2 = new HashSet<Hexagon>();
