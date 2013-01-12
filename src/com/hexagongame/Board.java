@@ -26,8 +26,8 @@ public class Board{
 	 * the second index enumerates the both opposite regions of each player.  Those objects hold the set 
 	 * of adjacent hexagons for each outer region   */
 	
-	Hexagon outer[][] = {{ new Hexagon(0, 0, UiView.BLUE), new Hexagon(0, 0, UiView.BLUE)},
-								{new Hexagon(0, 0, UiView.GREEN), new Hexagon(0, 0, UiView.GREEN)}};
+	Hexagon outer[][] = {{ new Hexagon(0, 0, Hexagon.OWNER_FIRST), new Hexagon(0, 0, Hexagon.OWNER_FIRST)},
+								{new Hexagon(0, 0, Hexagon.OWNER_SECOND), new Hexagon(0, 0, Hexagon.OWNER_SECOND)}};
 	
 	public Board(int boardShape) {
 
@@ -44,7 +44,7 @@ public class Board{
 		if ( history.size() > 0 )
 		{
 			Hexagon lastChange = history.remove(history.size()-1);
-			lastChange.color = UiView.HEX_UNUSED_COLOR;
+			lastChange.owner = Hexagon.OWNER_EMPTY;
 			playerTurn = 1-playerTurn;
 		}
 	}	
@@ -53,9 +53,9 @@ public class Board{
 		return history.size() > 0;
 	}
 	
-	synchronized void doMove( Hexagon move, int newcolor )
+	synchronized void doMove( Hexagon move )
 	{
-		move.color = newcolor;
+		move.owner = playerTurn;
 		playerTurn = 1 - playerTurn;
 		history.add( move );
 	}
@@ -88,7 +88,7 @@ public class Board{
 		final int r=3;
 		for( int i=-r; i<=r; ++i )  for( int k=-r; k<=r; ++k )
 			if( Math.abs(i+k) <= r ){
-				Hexagon hex = new Hexagon( i+k*0.5f, k, UiView.HEX_UNUSED_COLOR );
+				Hexagon hex = new Hexagon( i+k*0.5f, k, Hexagon.OWNER_EMPTY );
 				if( Math.abs(i) == r || Math.abs(k) == r || Math.abs( i+k ) == r ){ // its at the edge
 					final int x = 2*i+k; 
 					if( x>=1 && k>=0 )
@@ -112,7 +112,7 @@ public class Board{
 
 		for( int yi=0; yi<=ymax; ++yi )
 			for( float xi = (yi%2) * 0.5f; xi<=xmax; ++xi ){
-				final Hexagon hex = new Hexagon( xi, yi, UiView.HEX_UNUSED_COLOR );
+				final Hexagon hex = new Hexagon( xi, yi, Hexagon.OWNER_EMPTY );
 				hexagonList.add(hex);
 				if( yi==0 )
 					outer[1][0].adjacent.add(hex);
@@ -145,7 +145,7 @@ public class Board{
 		
 		s.add(h);
 		for( Hexagon u : h.adjacent ){
-			if( u.color == h.color )
+			if( u.owner == h.owner )
 				addToSetSameColor( s, u );
 		}
 	}
@@ -164,6 +164,5 @@ public class Board{
 			return false;
 		}
 	}
-	
 }
 
