@@ -34,16 +34,21 @@ public class UiView extends View{
 
 	private long playerTurnToastStartTime = 0;
 	
-	public static final int BLUE = android.graphics.Color.parseColor("#1010FF");
-	public static final int GREEN = android.graphics.Color.parseColor("#00FF00");
-
 	public static final int BLUE_BG = android.graphics.Color.parseColor("#0000A0");
 	public static final int GREEN_BG = android.graphics.Color.parseColor("#208020");
 	
-	public static final int BLUE_WINNER_ALT = android.graphics.Color.parseColor("#00FFFF");
-	public static final int GREEN_WINNER_ALT = android.graphics.Color.parseColor("#FFF380");
+	int HEX_COLORS_HIGHLIGHT[] = {
+			android.graphics.Color.parseColor("#00FFFF"), // Blue
+			android.graphics.Color.parseColor("#FFF380")  // Green
+	};
 	
 	public static final int HEX_UNUSED_COLOR = android.graphics.Color.parseColor("#E0E0E0");
+
+	int HEX_COLORS[] = {
+			android.graphics.Color.parseColor("#1010FF"), // Blue
+			android.graphics.Color.parseColor("#00FF00"), // Green
+			android.graphics.Color.parseColor("#E0E0E0") // empty
+	};
 	
 	private boolean inWinnerMode = false;
 	private int winnerModeTickCount = 0;
@@ -96,10 +101,9 @@ public class UiView extends View{
 		{
 			if (phonePlayerId == board.getPlayerId() ) 
 			{
-				final int newcolor = phonePlayerId == 1 ? GREEN : BLUE;
 				Hexagon move = solver.bestMove(board);
 				if( move != null ){
-					board.doMove( move,  newcolor );
+					board.doMove( move );
 					if (board.isWinner(1-board.getPlayerId() ))
 					{
 						inWinnerMode = true;
@@ -222,11 +226,11 @@ public class UiView extends View{
 		{
 			Log.d("hex", "hex is out of scope of board");
 			tappedOutsideBoard(event);
-		} else if (hexagon.color == HEX_UNUSED_COLOR) //hexagon is on board, but unused
+		} else if (hexagon.isEmpty() ) //hexagon is on board, but unused
 		{
 			Log.d("hex", "hex is white");
 			final int player = board.getPlayerId();
-			board.doMove( hexagon,  player==0 ? BLUE : GREEN );
+			board.doMove( hexagon );
 			if (board.isWinner( player ))
 			{
 				inWinnerMode = true;
@@ -347,13 +351,7 @@ public class UiView extends View{
 		float canvasWidth = getWidth();
 		float canvasHeight = getHeight();
 		
-		if (board.getPlayerId() == 0)
-		{
-			paint.setColor(BLUE);
-		} else
-		{
-			paint.setColor(GREEN);
-		}
+		paint.setColor( HEX_COLORS[board.getPlayerId()] );
     	paint.setStyle(Paint.Style.FILL);
     	
     	float cx = 0.25f * canvasWidth;
@@ -421,12 +419,12 @@ public class UiView extends View{
 			{
 				//if we are in "congratulations, winner" mode, every second tick we show the winner's rectangles in an alternative color
 				if (inWinnerMode && winnerModeTickCount % 2 == 0
-						&& ((winner == 1 && hex.color == GREEN) || (winner == 0 && hex.color == BLUE)))
+						&& winner == hex.owner )
 				{
-					color = (winner == 1) ? GREEN_WINNER_ALT : BLUE_WINNER_ALT;
+					color = HEX_COLORS_HIGHLIGHT[winner];
 				} else
 				{
-					color = hex.color;
+					color = HEX_COLORS[hex.owner];
 				}
 				paint.setColor(color);
 		        paint.setStyle(Paint.Style.FILL);

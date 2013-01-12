@@ -5,11 +5,11 @@ import java.util.HashSet;
 
 public class Solver {
 	
-	static HashSet<Hexagon> allNeighbors( Hexagon a, int color )
+	static HashSet<Hexagon> allNeighbors( Hexagon a, int owner )
 	{
 		HashSet<Hexagon> scol = new HashSet<Hexagon>();
 		for( Hexagon hex : a.adjacent ){
-			if( hex.color == color ){
+			if( hex.owner == owner ){
 				Board.addToSetSameColor(scol, hex );
 			}
 		}
@@ -18,7 +18,7 @@ public class Solver {
 		HashSet<Hexagon> erg = new HashSet<Hexagon>();
 		for( Hexagon hex : scol ){
 			for( Hexagon u : hex.adjacent ){
-				if( u.color == UiView.HEX_UNUSED_COLOR ){
+				if( u.isEmpty() ){
 					erg.add(u);
 				}
 			}
@@ -58,14 +58,14 @@ public class Solver {
 	
 	HashMap<Hexagon, Double> analyze( Board board,  int p ){
 		final HashSet<Hexagon> swhite[] = new HashSet[2];
-		final int thiscolor = board.outer[p][0].color;
+		final int thiscolor = board.outer[p][0].owner;
 		for( int i=0; i<2; ++i ){
 			final HashSet<Hexagon> sblue= new HashSet<Hexagon>();
 			Board.addToSetSameColor( sblue, board.outer[p][i] );
 			swhite[i]= new HashSet<Hexagon>();
 			for( Hexagon hb : sblue ){
 				for( Hexagon hex: hb.adjacent ){
-					if( hex.color == UiView.HEX_UNUSED_COLOR )
+					if( hex.isEmpty() )
 						swhite[i].add(hex);
 				}
 			}
