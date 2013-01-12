@@ -4,6 +4,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class Solver {
+
+	private final float _lengthFactor;
+	
+	Solver( float f ){
+		_lengthFactor = f;
+	}
+	Solver(){
+		_lengthFactor = 4.0f;
+	}
 	
 	static HashSet<Hexagon> allNeighbors( Hexagon a, int owner )
 	{
@@ -26,7 +35,7 @@ public class Solver {
 		return erg;
 	}
 			
-	static HashMap<Hexagon, Double>	pathValue( HashSet<Hexagon> a, HashSet<Hexagon> a_opp, int color ){
+	HashMap<Hexagon, Double>	pathValue( HashSet<Hexagon> a, HashSet<Hexagon> a_opp, int color ){
 		HashMap<Hexagon, Double> erg = new HashMap<Hexagon, Double>();
 		HashSet<Hexagon> lastlevel = new HashSet<Hexagon>();
 		for( Hexagon hex : a ){
@@ -38,7 +47,7 @@ public class Solver {
 			HashSet<Hexagon> nextlevel = new HashSet<Hexagon>();
 			lastlevel.removeAll(a_opp);
 			for( Hexagon hex : lastlevel ){
-				double newval = erg.get(hex) / 4.0;
+				double newval = erg.get(hex) / _lengthFactor;
 				for( Hexagon next : allNeighbors(hex, color )){
 					if( erg.containsKey(next))
 						continue;
