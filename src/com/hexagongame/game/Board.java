@@ -3,7 +3,7 @@ package com.hexagongame.game;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import android.util.Log;
+//import android.util.Log;
 
 
 public class Board{
@@ -68,8 +68,6 @@ public class Board{
 	
 	private void setupListOfHexagons()
 	{
-		Log.d("hex","called setupListOfHexagons");
-		
 		hexagonList = new ArrayList<Hexagon>();
 		
 		//construct the list of hexagons that will make up the board
@@ -84,7 +82,6 @@ public class Board{
 	
 	private void setupHexBoardListOfHexagons()
 	{
-		Log.d("hex","called setupHexBoardListOfHexagons");
 		final int r=3;
 		for( int i=-r; i<=r; ++i )  for( int k=-r; k<=r; ++k )
 			if( Math.abs(i+k) <= r ){
@@ -102,13 +99,13 @@ public class Board{
 				}
 		        hexagonList.add(hex);
 			}
-		Log.i("hex", "out size: 0: " + outer[0][0].adjacent.size()+" "+outer[0][1].adjacent.size() + " 1: " + outer[1][0].adjacent.size() + " " + outer[1][1].adjacent.size() );
+//		Log.i("hex", "out size: 0: " + outer[0][0].adjacent.size()+" "+outer[0][1].adjacent.size() + " 1: " + outer[1][0].adjacent.size() + " " + outer[1][1].adjacent.size() );
 	}
 	
 	private void setupRectBoardListOfHexagons()
 	{
-		final int ymax=4;
-		final int xmax=4;
+		final int ymax=6;
+		final int xmax=6;
 
 		for( int yi=0; yi<=ymax; ++yi )
 			for( float xi = (yi%2) * 0.5f; xi<=xmax; ++xi ){
@@ -135,7 +132,7 @@ public class Board{
 					p.adjacent.add(q);
 				}
 			}}
-			Log.i("hex", "adjacent: " + p.adjacent.size() );
+//			Log.i("hex", "adjacent: " + p.adjacent.size() );
 		}
 	}
 
@@ -158,7 +155,7 @@ public class Board{
 		addToSetSameColor( s2, outer[p][1] );
 		s1.retainAll(s2 );
 		if( s1.size() > 0 ){
-			Log.i("hex", "WINNER!");
+//			Log.i("hex", "WINNER!");
 			return true;
 		} else {
 			return false;
