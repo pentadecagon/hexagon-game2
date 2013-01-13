@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import com.hexagongame.game.Board;
 import com.hexagongame.game.Hexagon;
-import com.hexagongame.game.Solver;
+import com.hexagongame.game.Solver1;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -29,7 +29,7 @@ import android.widget.Toast;
 public class UiView extends View{
 
 	private Board board = null;
-	Solver solver = new Solver();
+	Solver1 solver = new Solver1();
 	
 	private DrawBoardHelper drawBoardHelper;
 
