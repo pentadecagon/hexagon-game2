@@ -197,14 +197,7 @@ public class UiView extends View{
 				undo();
 			} else if (x >= 0.7 * canvasWidth && x <= 0.8 * canvasWidth)
 			{
-				Log.d("hex", "redo button clicked");
-
-				Activity ac = (Activity) getContext();
-				Intent i = new Intent(ac, ChooseBoardActivity.class);
-				i.putExtra(ChooseBoardActivity.ID_GAME_MODE, String.valueOf(gameMode));
-				i.putExtra(ChooseBoardActivity.ID_PHONE_PLAYER_ID, String.valueOf(phonePlayerId));
-				ac.startActivity(i);
-				ac.finish();
+				doRedoButtonOnClick();
 			}
 		}
 			
@@ -220,7 +213,7 @@ public class UiView extends View{
         //if someone has already won and we are just showing the "congratulations" screen, just show a dialog to restart the game
         if (inWinnerMode)
         {
-        	showRestartDialog();
+        	doWinnerModeOnTouch(event);
     		return true;
         }
 
@@ -248,32 +241,33 @@ public class UiView extends View{
 		return true;
     };
     
-    private void showRestartDialog()
+    private void doWinnerModeOnTouch(MotionEvent event)
     {
-    	AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-    	TextView myMsg = new TextView(getContext());
-    	myMsg.setText("Restart?");
-    	myMsg.setGravity(Gravity.CENTER_HORIZONTAL);
-    	myMsg.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25.0f);
-    	myMsg.setPadding(15, 15, 15, 15);
-		builder.setView(myMsg)
-	       .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-	    	   public void onClick(DialogInterface dialog, int id) {
-	    		   //restart the game
-	    		   Activity ac = (Activity) UiView.this.getContext();
-				   Intent i = new Intent(ac, HexActivity.class);
-				   i.putExtra(ChooseBoardActivity.ID_GAME_MODE, String.valueOf(gameMode));
-				   i.putExtra(ChooseBoardActivity.ID_PHONE_PLAYER_ID, String.valueOf(phonePlayerId));
-				   ac.startActivity(i);
-				   ac.finish();
-	    	   } 	    	
-	       })
-	       .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-	    		public void onClick(DialogInterface dialog, int id) {}
-	       });
-		
-		AlertDialog dialog = builder.create();
-		dialog.show();
+		float canvasWidth = getWidth();
+		float canvasHeight = getHeight();
+		float x = (float) event.getX();
+		float y = (float) event.getY();
+    	if ((y > 0.9f * canvasHeight) && (x >= 0.7 * canvasWidth && x <= 0.8 * canvasWidth))
+		{
+    		//only redo button is still active in winner mode
+			doRedoButtonOnClick();
+		} else
+		{
+			//do nothing: rest of screen is deactivated
+		}
+    }
+    
+    //handle a click on the redo button, which takes the user to the preferences screen
+    private void doRedoButtonOnClick()
+    {
+		Log.d("hex", "redo button clicked");
+
+		Activity ac = (Activity) getContext();
+		Intent i = new Intent(ac, ChooseBoardActivity.class);
+		i.putExtra(ChooseBoardActivity.ID_GAME_MODE, String.valueOf(gameMode));
+		i.putExtra(ChooseBoardActivity.ID_PHONE_PLAYER_ID, String.valueOf(phonePlayerId));
+		ac.startActivity(i);
+		ac.finish();
     }
     
     private void drawBackground(Canvas canvas)
