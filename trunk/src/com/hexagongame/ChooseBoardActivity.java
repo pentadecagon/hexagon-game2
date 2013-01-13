@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 public class ChooseBoardActivity extends Activity {
@@ -42,7 +43,7 @@ public class ChooseBoardActivity extends Activity {
     	setContentView(R.layout.chooseboard);
     	
     	chooseBoardView = (ChooseBoardView) findViewById(R.id.chooseboardview);
-    	
+
 		//add listeners
 		RadioGroup gameModeRadioGroup = (RadioGroup) findViewById(R.id.game_mode);
 		gameModeRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -88,5 +89,47 @@ public class ChooseBoardActivity extends Activity {
 				  ac.finish();
 			  }
 		  });
+		
+		//populate the form based on initial values passed to the activity
+		populateForm();
     }
+    
+    //populate the form based on initial values passed to the activity
+    private void populateForm()
+    {        
+    	String gameModeStr = getIntent().getStringExtra(ChooseBoardActivity.ID_GAME_MODE);
+        gameMode = (gameModeStr != null) ? Integer.valueOf(gameModeStr) : 0;
+        
+        RadioButton person = (RadioButton) findViewById(R.id.person);
+        RadioButton phone = (RadioButton) findViewById(R.id.phone);
+       
+        //set game Mode radio button
+        switch(gameMode)
+        {
+        	case 0:
+        		person.performClick();
+        		break;
+        	case 1:
+        		phone.performClick();
+        		break;
+        }
+
+        String phonePlayerIdStr = getIntent().getStringExtra(ChooseBoardActivity.ID_PHONE_PLAYER_ID);
+        phonePlayerId = (phonePlayerIdStr != null) ? Integer.valueOf(phonePlayerIdStr) : 0;   
+        
+        RadioButton blue = (RadioButton) findViewById(R.id.blue);
+        RadioButton green = (RadioButton) findViewById(R.id.green);
+        
+        //set phone ID radio button
+        switch(phonePlayerId)
+        {
+        	case 0:
+        		blue.performClick();
+        		break;
+        	case 1:
+        		green.performClick();
+        		break;
+        }
+    }
+
 }

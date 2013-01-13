@@ -200,7 +200,10 @@ public class UiView extends View{
 				Log.d("hex", "redo button clicked");
 
 				Activity ac = (Activity) getContext();
-				ac.startActivity(new Intent(ac, ChooseBoardActivity.class));
+				Intent i = new Intent(ac, ChooseBoardActivity.class);
+				i.putExtra(ChooseBoardActivity.ID_GAME_MODE, String.valueOf(gameMode));
+				i.putExtra(ChooseBoardActivity.ID_PHONE_PLAYER_ID, String.valueOf(phonePlayerId));
+				ac.startActivity(i);
 				ac.finish();
 			}
 		}
