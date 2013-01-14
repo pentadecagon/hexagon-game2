@@ -17,23 +17,31 @@ public class Board{
 	//constant giving shape of board: hexagonal, square etc
 	public int boardShape = BOARD_GEOMETRY_HEX;
 
-	public ArrayList<Hexagon> hexagonList = null;
+	public final ArrayList<Hexagon> hexagonList = new ArrayList<Hexagon>();
 
 	private int playerTurn = 0;	
-	private ArrayList<Hexagon> history = new ArrayList<Hexagon>();
+	public ArrayList<Hexagon> history = new ArrayList<Hexagon>();
 
 	/* 'outer' represents the four outer regions of the board.  The first index indicates the player (0 or 1),
 	 * the second index enumerates the both opposite regions of each player.  Those objects hold the set 
 	 * of adjacent hexagons for each outer region   */
 	
-	Hexagon outer[][] = {{ new Hexagon(0, 0, Hexagon.OWNER_FIRST), new Hexagon(0, 0, Hexagon.OWNER_FIRST)},
-								{new Hexagon(0, 0, Hexagon.OWNER_SECOND), new Hexagon(0, 0, Hexagon.OWNER_SECOND)}};
+	Hexagon outer[][] = {{ new Hexagon(0, 0, Hexagon.OWNER_FIRST, -1), new Hexagon(0, 0, Hexagon.OWNER_FIRST, -2)},
+								{new Hexagon(0, 0, Hexagon.OWNER_SECOND, -3), new Hexagon(0, 0, Hexagon.OWNER_SECOND, -4)}};
 	
 	public Board(int boardShape) {
 
 		this.boardShape = boardShape;
-
-		initialize();
+		
+		//construct the list of hexagons that will make up the board
+		if (boardShape == Board.BOARD_GEOMETRY_RECT)
+		{
+			setupRectBoardListOfHexagons();
+		} else
+		{
+			setupHexBoardListOfHexagons();
+		}
+		findAdjacentHexagons(hexagonList);
 	}
 
 	public int getPlayerId(){
@@ -59,33 +67,14 @@ public class Board{
 		playerTurn = 1 - playerTurn;
 		history.add( move );
 	}
-	
-	private void initialize()
-	{
-		setupListOfHexagons();
-		findAdjacentHexagons(hexagonList);
-	}
-	
-	private void setupListOfHexagons()
-	{
-		hexagonList = new ArrayList<Hexagon>();
 		
-		//construct the list of hexagons that will make up the board
-		if (boardShape == Board.BOARD_GEOMETRY_RECT)
-		{
-			setupRectBoardListOfHexagons();
-		} else
-		{
-			setupHexBoardListOfHexagons();
-		}
-	}
-	
 	private void setupHexBoardListOfHexagons()
 	{
 		final int r=3;
+		int id = 0;
 		for( int i=-r; i<=r; ++i )  for( int k=-r; k<=r; ++k )
 			if( Math.abs(i+k) <= r ){
-				Hexagon hex = new Hexagon( i+k*0.5f, k, Hexagon.OWNER_EMPTY );
+				Hexagon hex = new Hexagon( i+k*0.5f, k, Hexagon.OWNER_EMPTY, id++ );
 				if( Math.abs(i) == r || Math.abs(k) == r || Math.abs( i+k ) == r ){ // its at the edge
 					final int x = 2*i+k; 
 					if( x>=1 && k>=0 )
@@ -106,10 +95,10 @@ public class Board{
 	{
 		final int ymax=6;
 		final int xmax=6;
-
+		int id = 0;
 		for( int yi=0; yi<=ymax; ++yi )
 			for( float xi = (yi%2) * 0.5f; xi<=xmax; ++xi ){
-				final Hexagon hex = new Hexagon( xi, yi, Hexagon.OWNER_EMPTY );
+				final Hexagon hex = new Hexagon( xi, yi, Hexagon.OWNER_EMPTY, id++ );
 				hexagonList.add(hex);
 				if( yi==0 )
 					outer[1][0].adjacent.add(hex);

@@ -407,8 +407,8 @@ public class UiView extends View{
 
 		float x, y;
 		Path path;
-		int color;
 		
+		final float[] coords = drawBoardHelper.findPositionOfCenterOfHexagonalCell(hex.xi, hex.yi);
 		for (int j = 0; j < 2; j++)
 		{
 			if (j == 1)
@@ -418,6 +418,7 @@ public class UiView extends View{
 		    	paint.setStyle(Paint.Style.STROKE);
 			} else
 			{
+				int color;
 				//if we are in "congratulations, winner" mode, every second tick we show the winner's rectangles in an alternative color
 				if (inWinnerMode && winnerModeTickCount % 2 == 0
 						&& winner == hex.owner )
@@ -431,7 +432,6 @@ public class UiView extends View{
 		        paint.setStyle(Paint.Style.FILL);
 			}
 			
-			float[] coords = drawBoardHelper.findPositionOfCenterOfHexagonalCell(hex.xi, hex.yi);
 			x = coords[0] - drawBoardHelper.getWCell()/2.0f;
 			y = coords[1] - drawBoardHelper.getHCell()/2.0f;
 
@@ -450,5 +450,7 @@ public class UiView extends View{
 			
 			canvas.drawPath(path, paint);
 		}
+        paint.setStyle(Paint.Style.FILL);
+		canvas.drawText( ""+hex.id, coords[0], coords[1], paint);
 	}
 }
