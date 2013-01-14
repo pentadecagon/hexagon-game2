@@ -1,15 +1,7 @@
 package com.hexagongame;
 
-import java.util.ArrayList;
-
-import com.hexagongame.game.Board;
-import com.hexagongame.game.Hexagon;
-import com.hexagongame.game.Solver1;
-
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -19,17 +11,19 @@ import android.graphics.Path;
 import android.os.CountDownTimer;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.hexagongame.game.Board;
+import com.hexagongame.game.Hexagon;
+import com.hexagongame.game.Solver2;
+
 public class UiView extends View{
 
 	private Board board = null;
-	Solver1 solver = new Solver1();
+	Solver2 solver = new Solver2( 3.5, 200 );
 	
 	private DrawBoardHelper drawBoardHelper;
 
