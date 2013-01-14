@@ -1,7 +1,9 @@
 package com.hexagongame.game;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 public class Solver3 implements Solver {
 
@@ -34,29 +36,66 @@ public class Solver3 implements Solver {
 		}
 		return erg;
 	}
-			
-	HashMap<Hexagon, Double>	pathValue( HashSet<Hexagon> a, HashSet<Hexagon> a_opp, int color ){
-		HashMap<Hexagon, Double> erg = new HashMap<Hexagon, Double>();
-		HashSet<Hexagon> lastlevel = new HashSet<Hexagon>();
+	
+	static void updateMap( HashMap<Hexagon, Double>map, Hexagon a, double b ){
+		if( map.containsKey(a)){
+			map.put( a, map.get(a) + b );
+		} else {
+			map.put( a,  b );
+		}
+	}
+	static void updateMap( HashMap<Hexagon, List<HexPair> > map, Hexagon a, HexPair b ){
+		if( ! map.containsKey(a)){
+			map.put( a,  new ArrayList<HexPair>() );
+		}
+		map.get(a).add(b);
+	}
+	static class HexPair {
+		HexPair( Hexagon h0, double d0 ){
+			hex=h0;
+			d=d0;
+		}
+		final Hexagon hex;
+		final double d;
+	}
+	HashMap<Hexagon, Double>	pathValue( Hexagon outer, HashSet<Hexagon> a, HashSet<Hexagon> a_opp, int color ){
+		final HashMap<Hexagon, Double> erg = new HashMap<Hexagon, Double>();
+		HashMap<Hexagon, List<HexPair>> lastlevel = new HashMap<Hexagon, List<HexPair>>();
 		for( Hexagon hex : a ){
 			erg.put(hex,  1.0 );
-			lastlevel.add(hex);
+			updateMap( lastlevel, hex, new HexPair( outer, 1.0 ) );
 		}
 		while (lastlevel.size() > 0){
-			HashMap<Hexagon, Double> erg2 = new HashMap<Hexagon, Double>();
-			HashSet<Hexagon> nextlevel = new HashSet<Hexagon>();
-			lastlevel.removeAll(a_opp);
-			for( Hexagon hex : lastlevel ){
-				double newval = erg.get(hex) / _lengthFactor;
-				for( Hexagon next : allNeighbors(hex, color )){
-					if( erg.containsKey(next))
-						continue;
-				
-					if( erg2.containsKey(next))
-						erg2.put( next, erg2.get(next)+newval );
-					else
-						erg2.put( next,  newval);
-					nextlevel.add(next);
+			final HashMap<Hexagon, Double> erg2 = new HashMap<Hexagon, Double>();
+			final HashMap<Hexagon, List<HexPair>> nextlevel = new HashMap<Hexagon, List<HexPair>>();
+			for( Hexagon hex : lastlevel.keySet() ) if( ! a_opp.contains(hex)){
+				for( Hexagon next : allNeighbors(hex, color )) if( ! erg.containsKey(next)){
+					double oldval = 0;
+					for( HexPair hp : lastlevel.get(hex)){
+						if( ! hp.hex.adjacent.contains(next)){
+							oldval += hp.d;
+						}
+					}
+/*					if( oldval != erg.get(hex)){
+						double u = erg.get(hex);
+						new HexPair( null, 1/0+u );
+					} */
+					double newval = oldval / _lengthFactor;
+					updateMap( erg2, next, newval );
+					updateMap( nextlevel, next, new HexPair( hex, newval ));
+				}
+			}
+			for( Hexagon hex : nextlevel.keySet() ) if( ! a_opp.contains(hex)){
+				for( Hexagon next : hex.adjacent) if( nextlevel.containsKey(next)){
+					double oldval = 0;
+					for( HexPair hp : nextlevel.get(hex)){  // we walk hp -> hex -> next
+						if( hp.hex != next && ! hp.hex.adjacent.contains(next)){
+							oldval += hp.d;
+						}
+					}
+					double newval = oldval / _lengthFactor;
+					updateMap( erg2, next, newval );
+					updateMap( nextlevel, next, new HexPair( hex, newval ));
 				}
 			}
 			erg.putAll(erg2);
@@ -79,8 +118,8 @@ public class Solver3 implements Solver {
 				}
 			}
 		}
-		HashMap<Hexagon, Double> v1 = pathValue( swhite[0], swhite[1], thiscolor ); 
-		HashMap<Hexagon, Double> v2 = pathValue( swhite[1], swhite[0], thiscolor );
+		HashMap<Hexagon, Double> v1 = pathValue( board.outer[p][0], swhite[0], swhite[1], thiscolor ); 
+		HashMap<Hexagon, Double> v2 = pathValue( board.outer[p][1], swhite[1], swhite[0], thiscolor );
 		HashMap<Hexagon, Double> erg = new HashMap<Hexagon, Double>();		
 		for( Hexagon hex : v1.keySet() ) if( v2.containsKey(hex)){
 			double val = v1.get(hex) * v2.get(hex);
