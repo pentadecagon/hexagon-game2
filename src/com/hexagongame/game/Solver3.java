@@ -89,7 +89,7 @@ public class Solver3 implements Solver {
 				for( Hexagon next : hex.adjacent) if( nextlevel.containsKey(next)){
 					double oldval = 0;
 					for( HexPair hp : nextlevel.get(hex)){  // we walk hp -> hex -> next
-						if( hp.hex != next && ! hp.hex.adjacent.contains(next)){
+						if( ! nextlevel.containsKey(hp.hex) && ! hp.hex.adjacent.contains(next)){
 							oldval += hp.d;
 						}
 					}
