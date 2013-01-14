@@ -9,7 +9,7 @@ public class Hexagon {
 	public final static int OWNER_EMPTY = 2;
 	
 	public int owner; 
-
+	final public int id;
 	final public float xi, yi;
 	
 	final ArrayList<Hexagon> adjacent = new ArrayList<Hexagon>();
@@ -18,10 +18,11 @@ public class Hexagon {
 		return owner==OWNER_EMPTY;
 	}
 	
-	public Hexagon(float u, float v, int owner)
+	public Hexagon(float u, float v, int owner, int id)
 	{
 		this.xi = u;
 		this.yi = v;
 		this.owner = owner;
+		this.id = id;
 	}
 }
