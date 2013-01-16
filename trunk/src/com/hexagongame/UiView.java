@@ -18,12 +18,13 @@ import android.widget.Toast;
 
 import com.hexagongame.game.Board;
 import com.hexagongame.game.Hexagon;
-import com.hexagongame.game.Solver2;
+import com.hexagongame.game.Solver;
+import com.hexagongame.game.Solver1;
 
 public class UiView extends View{
 
 	private Board board = null;
-	Solver2 solver = new Solver2( 3.5, 200 );
+	Solver solver = new Solver1(4);
 	
 	private DrawBoardHelper drawBoardHelper;
 
