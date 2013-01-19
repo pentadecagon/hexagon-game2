@@ -1,5 +1,7 @@
 package com.hexagongame;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -20,6 +22,7 @@ import com.hexagongame.game.Board;
 import com.hexagongame.game.Hexagon;
 import com.hexagongame.game.Solver;
 import com.hexagongame.game.Solver1;
+
 
 public class UiView extends View{
 
@@ -70,6 +73,13 @@ public class UiView extends View{
 	 */
 	public int phonePlayerId = 0;
 	
+	//when phone is calculating next move
+	AtomicBoolean phoneIsThinking = new AtomicBoolean(false);
+	
+	//thread in which phone's next move is calculated in "play against phone" mode
+	Thread phoneMoveThread = null;
+	  
+	
 	public UiView(Context context, AttributeSet attrs) {
 		
 		super(context, attrs);
@@ -89,28 +99,15 @@ public class UiView extends View{
 		float canvasWidth = getWidth();
     	float canvasHeight = getHeight();
 		drawBoardHelper = new DrawBoardHelper(canvasHeight, canvasWidth, board);
+		//if we are in "play against phone" mode and the phone has to go first, calculate the phone's first move
+		if (gameMode == 1)
+		{
+			doPhoneMove();
+		}
 	}
 	
 	@Override
 	protected void onDraw(Canvas canvas) {
-		//TODO: implement complete play-against-phone functionality
-		//here, the player is playing against the phone and the phone is blue (goes first), so we just
-		//select the first available hexagon
-		if (gameMode == 1)
-		{
-			if (phonePlayerId == board.getPlayerId() ) 
-			{
-				Hexagon move = solver.bestMove(board);
-				if( move != null ){
-					board.doMove( move );
-					if (board.isWinner(1-board.getPlayerId() ))
-					{
-						inWinnerMode = true;
-						winner = 1-board.getPlayerId();
-					}
-				}
-			}
-		}
 
 		if (inWinnerMode && winnerModeTickCount == 0)
 		{
@@ -132,6 +129,44 @@ public class UiView extends View{
     		countdownTimer.start();
 		}
 	}
+	
+	  /**
+	   * Runnable with which the phone will calculate its next move (in "play against phone" mode) in a separate thread.
+	   */
+	  
+	  private Runnable doPhoneMoveTask = new Runnable()
+	  {
+
+		  /**
+		   * Calculate the phone's next move in "play against phone" mode.
+		   * 
+		   */
+		  
+		  public void run()
+		  {
+			  //set a flag showing that the phone is planning its next move
+			  phoneIsThinking.set(true);
+			  Hexagon move = solver.bestMove(board);
+			  if( move != null ){
+				  board.doMove( move );
+				  if (board.isWinner(1-board.getPlayerId() ))
+				  {
+					  inWinnerMode = true;
+					  winner = 1-board.getPlayerId();
+				  }
+			  }
+			  //set a flag showing that the phone has finished planning its next move
+			  phoneIsThinking.set(false);
+			  //update the view
+			  HexActivity ac = (HexActivity) UiView.this.getContext();
+			  ac.runOnUiThread(new Runnable(){
+				  public void run()
+				  {
+					  UiView.this.invalidate();
+				  }
+			  });
+		  }
+	  };
 	
 	private CountDownTimer countdownTimer = new CountDownTimer(250, 250){
 
@@ -205,6 +240,12 @@ public class UiView extends View{
         	return false;
         }
         
+        //if we are in "play against phone" mode and the phone is calculating its next move, board is deactivated
+        if (phoneIsThinking.get())
+        {
+        	return false;
+        }
+        
         //if someone has already won and we are just showing the "congratulations" screen, just show a dialog to restart the game
         if (inWinnerMode)
         {
@@ -230,11 +271,32 @@ public class UiView extends View{
 			{
 				inWinnerMode = true;
 				winner = player;
-			}
-			invalidate();			
+				//update the view
+				invalidate();
+			} else if (gameMode == 1)
+			{
+				//if it's phone's turn, do phone's move
+				doPhoneMove();
+			} else {
+				//update the view
+				invalidate();
+			}					
 		}
 		return true;
     };
+    
+    private void doPhoneMove()
+    {
+		//if it's phone's turn, do phone's move
+		if (phoneMoveThread != null)
+		{
+			phoneMoveThread.interrupt();
+			phoneMoveThread = null;
+		}
+		
+		phoneMoveThread = new Thread(doPhoneMoveTask);
+		phoneMoveThread.start();    	
+    }
     
     private void doWinnerModeOnTouch(MotionEvent event)
     {
