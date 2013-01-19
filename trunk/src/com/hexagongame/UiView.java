@@ -100,7 +100,7 @@ public class UiView extends View{
     	float canvasHeight = getHeight();
 		drawBoardHelper = new DrawBoardHelper(canvasHeight, canvasWidth, board);
 		//if we are in "play against phone" mode and the phone has to go first, calculate the phone's first move
-		if (gameMode == 1)
+		if (gameMode == 1 && phonePlayerId == 0)
 		{
 			doPhoneMove();
 		}
@@ -187,6 +187,11 @@ public class UiView extends View{
 	}
 	
 	void undo(){
+		//if we're in winner mode, revert it
+		if (inWinnerMode)
+		{
+			inWinnerMode = false;
+		}
 		for( int i=0; i<gameMode+1; ++i ){ // need to undo twice when playi8ng against the computer
 			board.undo();
 		}
@@ -223,10 +228,11 @@ public class UiView extends View{
 					
 			} else if (x >= 0.45 * canvasWidth && x <= 0.55 * canvasWidth)
 			{
-				Log.d("hex", "undo button clicked");
+				//undo button clicked
 				undo();
 			} else if (x >= 0.7 * canvasWidth && x <= 0.8 * canvasWidth)
 			{
+				//redo button clicked
 				doRedoButtonOnClick();
 			}
 		}
@@ -304,9 +310,13 @@ public class UiView extends View{
 		float canvasHeight = getHeight();
 		float x = (float) event.getX();
 		float y = (float) event.getY();
-    	if ((y > 0.9f * canvasHeight) && (x >= 0.7 * canvasWidth && x <= 0.8 * canvasWidth))
+		if (x >= 0.45 * canvasWidth && x <= 0.55 * canvasWidth)
 		{
-    		//only redo button is still active in winner mode
+			//undo button is still active in winner mode
+			undo();
+		} else if ((y > 0.9f * canvasHeight) && (x >= 0.7 * canvasWidth && x <= 0.8 * canvasWidth))
+		{
+    		//redo button is still active in winner mode
 			doRedoButtonOnClick();
 		} else
 		{
