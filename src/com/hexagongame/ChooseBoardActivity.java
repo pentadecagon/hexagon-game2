@@ -15,9 +15,7 @@ public class ChooseBoardActivity extends Activity {
 	private int gameMode = 0;
 	
 	private int phonePlayerId = 0;
-	
-	private ChooseBoardView chooseBoardView = null;
-	
+
 	public final static String ID_GAME_MODE = "com.hexagongame._ID_GAME_MODE";
 	
 	public final static String ID_PHONE_PLAYER_ID = "com.hexagongame._ID_PHONE_PLAYER_ID";
@@ -26,23 +24,13 @@ public class ChooseBoardActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        initializeLayout();
     }
-    
-    @Override
-    public void onResume()
-    {
-  	  Log.v("hex", "called ChooseBoardActivity.onResume");
-  	  
-  	  super.onResume();
-  	  
-  	  initializeLayout();
-    }
-    
+
     private void initializeLayout()
     {
     	setContentView(R.layout.chooseboard);
-    	
-    	chooseBoardView = (ChooseBoardView) findViewById(R.id.chooseboardview);
 
 		//add listeners
 		RadioGroup gameModeRadioGroup = (RadioGroup) findViewById(R.id.game_mode);
