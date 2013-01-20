@@ -1,6 +1,5 @@
 package com.hexagongame;
 
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.app.Activity;
 import android.content.Context;
@@ -73,9 +72,6 @@ public class UiView extends View{
 	 */
 	public int phonePlayerId = 0;
 	
-	//when phone is calculating next move
-	AtomicBoolean phoneIsThinking = new AtomicBoolean(false);
-	
 	//thread in which phone's next move is calculated in "play against phone" mode
 	Thread phoneMoveThread = null;
 	  
@@ -144,8 +140,6 @@ public class UiView extends View{
 		  
 		  public void run()
 		  {
-			  //set a flag showing that the phone is planning its next move
-			  phoneIsThinking.set(true);
 			  Hexagon move = solver.bestMove(board);
 			  if( move != null ){
 				  board.doMove( move );
@@ -154,17 +148,12 @@ public class UiView extends View{
 					  inWinnerMode = true;
 					  winner = 1-board.getPlayerId();
 				  }
+			  } else {
+				  Log.e("hex", "move is null");
 			  }
-			  //set a flag showing that the phone has finished planning its next move
-			  phoneIsThinking.set(false);
 			  //update the view
-			  HexActivity ac = (HexActivity) UiView.this.getContext();
-			  ac.runOnUiThread(new Runnable(){
-				  public void run()
-				  {
-					  UiView.this.invalidate();
-				  }
-			  });
+			  postInvalidate();
+			  phoneMoveThread = null;
 		  }
 	  };
 	
@@ -191,6 +180,7 @@ public class UiView extends View{
 		if (inWinnerMode)
 		{
 			inWinnerMode = false;
+			winnerNotification.setVisibility(View.INVISIBLE);		
 		}
 		for( int i=0; i<gameMode+1; ++i ){ // need to undo twice when playi8ng against the computer
 			board.undo();
@@ -232,8 +222,8 @@ public class UiView extends View{
 				undo();
 			} else if (x >= 0.7 * canvasWidth && x <= 0.8 * canvasWidth)
 			{
-				//redo button clicked
-				doRedoButtonOnClick();
+				//restart button clicked
+				doRestartButtonOnClick();
 			}
 		}
 			
@@ -247,17 +237,11 @@ public class UiView extends View{
         }
         
         //if we are in "play against phone" mode and the phone is calculating its next move, board is deactivated
-        if (phoneIsThinking.get())
+        if ( phoneMoveThread != null )
         {
         	return false;
         }
-        
-        //if someone has already won and we are just showing the "congratulations" screen, just show a dialog to restart the game
-        if (inWinnerMode)
-        {
-        	doWinnerModeOnTouch(event);
-    		return true;
-        }
+        	    	
 
 		Log.d("hex", "ontouch x="+event.getX());
 	    Log.d("hex", "ontouch y="+event.getY());
@@ -268,7 +252,7 @@ public class UiView extends View{
 		{
 			Log.d("hex", "hex is out of scope of board");
 			tappedOutsideBoard(event);
-		} else if (hexagon.isEmpty() ) //hexagon is on board, but unused
+		} else if (hexagon.isEmpty() && ! inWinnerMode ) //hexagon is on board, but unused
 		{
 			Log.d("hex", "hex is white");
 			final int player = board.getPlayerId();
@@ -296,6 +280,7 @@ public class UiView extends View{
 		//if it's phone's turn, do phone's move
 		if (phoneMoveThread != null)
 		{
+			Log.e("hex", "phone move is running unexpectedly");
 			phoneMoveThread.interrupt();
 			phoneMoveThread = null;
 		}
@@ -304,30 +289,10 @@ public class UiView extends View{
 		phoneMoveThread.start();    	
     }
     
-    private void doWinnerModeOnTouch(MotionEvent event)
+    //handle a click on the restart button, which takes the user to the preferences screen
+    private void doRestartButtonOnClick()
     {
-		float canvasWidth = getWidth();
-		float canvasHeight = getHeight();
-		float x = (float) event.getX();
-		float y = (float) event.getY();
-		if (x >= 0.45 * canvasWidth && x <= 0.55 * canvasWidth)
-		{
-			//undo button is still active in winner mode
-			undo();
-		} else if ((y > 0.9f * canvasHeight) && (x >= 0.7 * canvasWidth && x <= 0.8 * canvasWidth))
-		{
-    		//redo button is still active in winner mode
-			doRedoButtonOnClick();
-		} else
-		{
-			//do nothing: rest of screen is deactivated
-		}
-    }
-    
-    //handle a click on the redo button, which takes the user to the preferences screen
-    private void doRedoButtonOnClick()
-    {
-		Log.d("hex", "redo button clicked");
+		Log.d("hex", "restart button clicked");
 
 		Activity ac = (Activity) getContext();
 		Intent i = new Intent(ac, ChooseBoardActivity.class);
@@ -410,7 +375,7 @@ public class UiView extends View{
 	{
 		drawTurnIndicator(canvas);
 		drawUndoIcon(canvas);
-		drawRefreshIcon(canvas);
+		drawRestartIcon(canvas);
 	}
 	
 	private void drawTurnIndicator(Canvas canvas)
@@ -447,7 +412,7 @@ public class UiView extends View{
 		canvas.drawBitmap(bmp, cx, cy, paint);
 	}
 	
-	public void drawRefreshIcon(Canvas canvas)
+	public void drawRestartIcon(Canvas canvas)
 	{
 		//indicate whose turn it is next
 		float canvasWidth = getWidth();
