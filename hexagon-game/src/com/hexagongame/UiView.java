@@ -294,12 +294,11 @@ public class UiView extends View{
     {
 		Log.d("hex", "restart button clicked");
 
+		//as we are in "singleInstance" mode, this will go to the existing instance of the "ChooseBoardActivity" mode,
+		//so we don't have to tell it the preferences: it will remember the existing ones
 		Activity ac = (Activity) getContext();
 		Intent i = new Intent(ac, ChooseBoardActivity.class);
-		i.putExtra(ChooseBoardActivity.ID_GAME_MODE, String.valueOf(gameMode));
-		i.putExtra(ChooseBoardActivity.ID_PHONE_PLAYER_ID, String.valueOf(phonePlayerId));
 		ac.startActivity(i);
-		ac.finish();
     }
     
     private void drawBackground(Canvas canvas)
