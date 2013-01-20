@@ -12,14 +12,16 @@
         <activity
             android:name="com.hexagongame.HexActivity"
             android:label="@string/app_name"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+             android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ChooseBoardActivity"></activity>
+        <activity android:name=".ChooseBoardActivity"
+            android:launchMode="singleInstance"></activity>
     </application>
 
 </manifest>

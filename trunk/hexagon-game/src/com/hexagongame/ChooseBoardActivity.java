@@ -86,10 +86,10 @@ public class ChooseBoardActivity extends Activity implements OnSeekBarChangeList
 			  {
 				  Activity ac = ChooseBoardActivity.this;
 				  Intent i = new Intent(ac, HexActivity.class);
+				  i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 				  i.putExtra(ID_GAME_MODE, String.valueOf(gameMode));
 				  i.putExtra(ID_PHONE_PLAYER_ID, String.valueOf(phonePlayerId));
 				  ac.startActivity(i);
-				  ac.finish();
 			  }
 		  });
 		
@@ -124,10 +124,7 @@ public class ChooseBoardActivity extends Activity implements OnSeekBarChangeList
     
     //populate the form based on initial values passed to the activity
     private void populateForm()
-    {        
-    	String gameModeStr = getIntent().getStringExtra(ChooseBoardActivity.ID_GAME_MODE);
-        gameMode = (gameModeStr != null) ? Integer.valueOf(gameModeStr) : 0;
-        
+    {
         RadioButton person = (RadioButton) findViewById(R.id.person);
         RadioButton phone = (RadioButton) findViewById(R.id.phone);
        
@@ -142,9 +139,6 @@ public class ChooseBoardActivity extends Activity implements OnSeekBarChangeList
         		break;
         }
 
-        String phonePlayerIdStr = getIntent().getStringExtra(ChooseBoardActivity.ID_PHONE_PLAYER_ID);
-        phonePlayerId = (phonePlayerIdStr != null) ? Integer.valueOf(phonePlayerIdStr) : 0;   
-        
         RadioButton blue = (RadioButton) findViewById(R.id.blue);
         RadioButton green = (RadioButton) findViewById(R.id.green);
         
