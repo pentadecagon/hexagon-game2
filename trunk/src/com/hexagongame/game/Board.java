@@ -16,6 +16,9 @@ public class Board{
 
 	//constant giving shape of board: hexagonal, square etc
 	public int boardShape = BOARD_GEOMETRY_HEX;
+	
+	//default board size
+	public int boardSize = 1;
 
 	public final ArrayList<Hexagon> hexagonList = new ArrayList<Hexagon>();
 
@@ -29,9 +32,10 @@ public class Board{
 	Hexagon outer[][] = {{ new Hexagon(0, 0, Hexagon.OWNER_FIRST, -1), new Hexagon(0, 0, Hexagon.OWNER_FIRST, -2)},
 								{new Hexagon(0, 0, Hexagon.OWNER_SECOND, -3), new Hexagon(0, 0, Hexagon.OWNER_SECOND, -4)}};
 	
-	public Board(int boardShape) {
+	public Board(int boardShape, int boardSize) {
 
 		this.boardShape = boardShape;
+		this.boardSize = boardSize;
 		
 		//construct the list of hexagons that will make up the board
 		if (boardShape == Board.BOARD_GEOMETRY_RECT)
@@ -70,7 +74,7 @@ public class Board{
 		
 	private void setupHexBoardListOfHexagons()
 	{
-		final int r=3;
+		int r=2+boardSize;
 		int id = 0;
 		for( int i=-r; i<=r; ++i )  for( int k=-r; k<=r; ++k )
 			if( Math.abs(i+k) <= r ){
@@ -93,8 +97,8 @@ public class Board{
 	
 	private void setupRectBoardListOfHexagons()
 	{
-		final int ymax=6;
-		final int xmax=6;
+		final int ymax = 4 + 2 * boardSize;
+		final int xmax = 4 + 2 * boardSize;
 		int id = 0;
 		for( int yi=0; yi<=ymax; ++yi )
 			for( float xi = (yi%2) * 0.5f; xi<=xmax; ++xi ){

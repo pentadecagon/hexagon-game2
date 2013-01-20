@@ -8,8 +8,8 @@
   <LinearLayout
       android:orientation="horizontal"
       android:layout_width="fill_parent"
-      android:layout_height="fill_parent"
-      android:layout_weight="1">
+      android:layout_height="wrap_content"
+      android:layout_weight="6">
 	<TextView android:text="Board shape"
 	    android:layout_width="100dp"
 	    android:paddingLeft="16dp"
@@ -21,12 +21,56 @@
 	  android:layout_height="fill_parent"
 	  />
   </LinearLayout>
+
+  <LinearLayout
+      android:orientation="horizontal"
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:layout_weight="1">
+		<TextView android:text="Board size"
+	    android:id="@+id/textViewBoardSize"
+	    android:layout_width="100dp"
+	    android:paddingLeft="16dp"
+	    android:paddingTop="5dp"
+  		android:layout_height="wrap_content"/>	
+  </LinearLayout>
+  
+  <LinearLayout
+      android:orientation="horizontal"
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:layout_weight="3">
+    <RelativeLayout android:id="@+id/relativeLayout1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:paddingLeft="70dp"
+        android:paddingRight="70dp"
+        android:paddingTop="20dp">
+        <SeekBar android:id="@+id/seekBar1"
+            android:max="2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"           
+            android:layout_alignParentLeft="true"
+			android:layout_alignParentTop="true">
+        </SeekBar>
+        <TextView
+            android:text="smallest"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:id="@+id/textViewProgress"
+            android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:layout_centerInParent="true"
+			android:paddingTop="35dp">
+        </TextView>        	
+    </RelativeLayout>
+   </LinearLayout>
 	
   <LinearLayout
       android:orientation="horizontal"
       android:layout_width="fill_parent"
-      android:layout_height="fill_parent"
-      android:layout_weight="1">
+      android:layout_height="wrap_content"
+      android:layout_weight="5">
 	<TextView android:text="Mode"
 	  android:layout_width="100dp"
 	  android:paddingLeft="16dp"
@@ -47,8 +91,8 @@
       android:visibility="gone"
       android:orientation="horizontal"
       android:layout_width="fill_parent"
-      android:layout_height="fill_parent"
-      android:layout_weight="1">
+      android:layout_height="wrap_content"
+      android:layout_weight="5">
 	<TextView android:text="Player order"
 	  android:layout_width="100dp"
 	  android:paddingLeft="16dp"
@@ -66,8 +110,8 @@
   <LinearLayout
       android:orientation="horizontal"
       android:layout_width="fill_parent"
-      android:layout_height="fill_parent"
-      android:layout_weight="1">
+      android:layout_height="wrap_content"
+      android:layout_weight="5">
 	<RelativeLayout 
     android:layout_width="fill_parent" 
     android:layout_height="fill_parent">
@@ -81,5 +125,5 @@
         android:textColor="#ffffff"
         android:background="@drawable/chooseboard_button" />
   	</RelativeLayout>
-  </LinearLayout>      
+  </LinearLayout>
 </LinearLayout>
