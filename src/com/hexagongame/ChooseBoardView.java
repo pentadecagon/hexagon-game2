@@ -18,6 +18,8 @@ public class ChooseBoardView extends View {
 	
 	public static int boardShape = 1;
 	
+	public static int boardSize = 1;
+	
 	public ChooseBoardView(Context context, AttributeSet attrs) {
 		
 		super(context, attrs);
@@ -60,7 +62,7 @@ public class ChooseBoardView extends View {
 		float hexSide, x0, y0, lineWidth;
 		if (boardShape == Board.BOARD_GEOMETRY_HEX)
 		{
-			hexSide = 0.07f * canvasWidth;
+			hexSide = (0.06f + 0.02f * boardSize) * canvasWidth; //hexSide = 0.07f * canvasWidth;
 			x0 = 0.25f * canvasWidth - hexSide * (float) Math.cos(Math.PI/6.0);
 			y0 = ybase - hexSide * 0.5f;
 			lineWidth = 10;
@@ -109,14 +111,13 @@ public class ChooseBoardView extends View {
 		xNext = x0;
 		yNext = y0;
 		
-		if (boardShape == Board.BOARD_GEOMETRY_HEX)
-		{
-			path.lineTo(xNext, yNext - 0.07f * hexSide);
-		} else
-		{
-			path.lineTo(xNext, yNext);
-		}
-    	
+		path.lineTo(xNext, yNext);
+		
+		xNext = xNext + hexSide * (float) Math.cos(Math.PI/6.0);
+		yNext = yNext - hexSide * (float) Math.sin(Math.PI/6.0);
+		
+		path.lineTo(xNext, yNext);
+
     	canvas.drawPath(path, paint);
 	}
 	
@@ -127,7 +128,7 @@ public class ChooseBoardView extends View {
 		final float ybase=canvas.getHeight() * 0.5f; // 0.25f * canvasWidth
 		if (boardShape == Board.BOARD_GEOMETRY_RECT)
 		{
-			squareWidth = 0.1f * canvasWidth;
+			squareWidth = (0.085f + 0.025f * boardSize)* canvasWidth; //squareWidth = 0.1f * canvasWidth;
 			x0 = 0.65f * canvasWidth - squareWidth/2.0f;
 			y0 = ybase - squareWidth/2.0f;
 			lineWidth = 10;	
@@ -148,13 +149,8 @@ public class ChooseBoardView extends View {
     	path.lineTo(x0 + squareWidth, y0);
     	path.lineTo(x0 + squareWidth, y0 + squareWidth);
     	path.lineTo(x0, y0 + squareWidth);
-    	if (boardShape == Board.BOARD_GEOMETRY_RECT)
-		{
-    		path.lineTo(x0, y0 - 0.07f * squareWidth);
-		} else
-		{
-			path.lineTo(x0, y0);
-		}
+    	path.lineTo(x0, y0);
+    	path.lineTo(x0 + squareWidth, y0);
     	
     	canvas.drawPath(path, paint);
 	}

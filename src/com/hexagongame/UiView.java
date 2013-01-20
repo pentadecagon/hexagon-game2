@@ -85,7 +85,7 @@ public class UiView extends View{
 		super(context, attrs);
 
 		paint = new Paint();
-		board = new Board( ChooseBoardView.boardShape );
+		board = new Board( ChooseBoardView.boardShape, ChooseBoardView.boardSize );
 	}
 			
 	public void setWinnerNotification(TextView winnerNotification)
