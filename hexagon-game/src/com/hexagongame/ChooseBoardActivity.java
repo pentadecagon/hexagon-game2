@@ -28,7 +28,7 @@ public class ChooseBoardActivity extends Activity implements OnSeekBarChangeList
 	private TextView textProgress;
 	
 	//display the labels for the bar that the user can move to change the board size
-	private String[] sizeBarLabels = {"small", "medium", "big"};
+	private String[] sizeBarLabels = {"1", "2", "3"};
 	
 	private ChooseBoardView chooseBoardView;
 	
