@@ -10,10 +10,12 @@ import com.hexagongame.game.Hexagon.HexSet;
 
 public class Solver6 implements Solver {
 
-	private final float _lengthFactor;
+	private final double _ilengthFactor;
+	final int depth0;
 	
-	public Solver6( float f ){
-		_lengthFactor = f;
+	public Solver6( double f, int d0 ){
+		_ilengthFactor = 1.0/f;
+		depth0 = d0;
 	}
 	
 	static HexSet allNeighbors( Hexagon a, int owner )
@@ -53,7 +55,7 @@ public class Solver6 implements Solver {
 			HashSet<Hexagon> nextlevel = new HashSet<Hexagon>();
 			lastlevel.removeAll(a_opp);
 			for( Hexagon hex : lastlevel ){
-				double newval = erg.get(hex) / _lengthFactor;
+				double newval = erg.get(hex) * _ilengthFactor;
 				for( Hexagon next : allNeighbors(hex, color )){
 					if( erg.containsKey(next))
 						continue;
@@ -104,7 +106,6 @@ public class Solver6 implements Solver {
 		}
 	}
 	
-	final static int depth0=4;
 	
 	final HashMap<ArrayList<Integer>, ArrayList<ValHex> > cache = new HashMap<ArrayList<Integer>, ArrayList<ValHex> >(); 
 	
