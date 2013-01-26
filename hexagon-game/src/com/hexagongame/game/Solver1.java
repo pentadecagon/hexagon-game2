@@ -95,7 +95,7 @@ public class Solver1 implements Solver {
 		Hexagon besthex = null;
 		double bestval = 0;
 		for( Hexagon hex : v1.keySet() ) if( v2.containsKey(hex)){
-			double val = (v1.get(hex) + v2.get(hex)) * (1.0+hex.xi*1e-10 + hex.yi*1e-11);
+			double val = (v1.get(hex) + v2.get(hex)) * (1.0+hex.xid*1e-13);
 			
 			if( val > bestval ){
 				bestval = val;

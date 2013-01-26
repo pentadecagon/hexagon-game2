@@ -21,12 +21,19 @@ import com.hexagongame.game.Board;
 import com.hexagongame.game.Hexagon;
 import com.hexagongame.game.Solver;
 import com.hexagongame.game.Solver1;
+import com.hexagongame.game.Solver6;
 
 
 public class UiView extends View{
 
 	private Board board = null;
-	Solver solver = new Solver1(4);
+
+/* board2 is a "shadow", a copy of the normal board, except it's used by the solver to try different positions. 
+ * The Solver cannot use the normal "board" here, because then we would see on the display
+ * whatever the solver is considering at the moment */
+	
+	private Board board2 = null;
+	Solver solver;
 	
 	private DrawBoardHelper drawBoardHelper;
 
@@ -82,6 +89,8 @@ public class UiView extends View{
 
 		paint = new Paint();
 		board = new Board( ChooseBoardView.boardShape, ChooseBoardView.boardSize );
+		board2 = new Board( ChooseBoardView.boardShape, ChooseBoardView.boardSize );
+		solver = new Solver6(4);		
 	}
 			
 	public void setWinnerNotification(TextView winnerNotification)
@@ -140,14 +149,14 @@ public class UiView extends View{
 		  
 		  public void run()
 		  {
-			  Hexagon move = solver.bestMove(board);
+			  Hexagon move = solver.bestMove(board2);
 			  if( move != null ){
-				  board.doMove( move );
-				  if (board.isWinner(1-board.getPlayerId() ))
-				  {
+				  board2.doMove(move);
+				  if( board.doMove( move ) ){
 					  inWinnerMode = true;
 					  winner = 1-board.getPlayerId();
 				  }
+				  
 			  } else {
 				  Log.e("hex", "move is null");
 			  }
@@ -182,8 +191,9 @@ public class UiView extends View{
 			inWinnerMode = false;
 			winnerNotification.setVisibility(View.INVISIBLE);		
 		}
-		for( int i=0; i<gameMode+1; ++i ){ // need to undo twice when playi8ng against the computer
+		for( int i=0; i<gameMode+1; ++i ){ // need to undo twice when playing against the computer
 			board.undo();
+			board2.undo();
 		}
 		invalidate();
 	}
@@ -256,21 +266,17 @@ public class UiView extends View{
 		{
 			Log.d("hex", "hex is white");
 			final int player = board.getPlayerId();
-			board.doMove( hexagon );
-			if (board.isWinner( player ))
+			board2.doMove( hexagon );
+			if( board.doMove( hexagon ) )
 			{
 				inWinnerMode = true;
 				winner = player;
-				//update the view
-				invalidate();
 			} else if (gameMode == 1)
 			{
 				//if it's phone's turn, do phone's move
 				doPhoneMove();
-			} else {
-				//update the view
-				invalidate();
-			}					
+			} 
+			invalidate();
 		}
 		return true;
     };
@@ -482,6 +488,6 @@ public class UiView extends View{
 			canvas.drawPath(path, paint);
 		}
         paint.setStyle(Paint.Style.FILL);
-		canvas.drawText( ""+hex.id, coords[0], coords[1], paint);
+		canvas.drawText( ""+hex.xid, coords[0], coords[1], paint);
 	}
 }

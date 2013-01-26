@@ -3,6 +3,8 @@ package com.hexagongame.game;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import com.hexagongame.game.Hexagon.HexSet;
+
 //import android.util.Log;
 
 
@@ -20,10 +22,10 @@ public class Board{
 	//default board size
 	public int boardSize = 1;
 
-	public final ArrayList<Hexagon> hexagonList = new ArrayList<Hexagon>();
+	public final ArrayList<Hexagon> hexagonList=  new ArrayList<Hexagon>();
 
 	private int playerTurn = 0;	
-	public ArrayList<Hexagon> history = new ArrayList<Hexagon>();
+	public final ArrayList<Hexagon> history = new ArrayList<Hexagon>();
 
 	/* 'outer' represents the four outer regions of the board.  The first index indicates the player (0 or 1),
 	 * the second index enumerates the both opposite regions of each player.  Those objects hold the set 
@@ -31,9 +33,8 @@ public class Board{
 	
 	Hexagon outer[][] = {{ new Hexagon(0, 0, Hexagon.OWNER_FIRST, -1), new Hexagon(0, 0, Hexagon.OWNER_FIRST, -2)},
 								{new Hexagon(0, 0, Hexagon.OWNER_SECOND, -3), new Hexagon(0, 0, Hexagon.OWNER_SECOND, -4)}};
-	
+		
 	public Board(int boardShape, int boardSize) {
-
 		this.boardShape = boardShape;
 		this.boardSize = boardSize;
 		
@@ -46,6 +47,7 @@ public class Board{
 			setupHexBoardListOfHexagons();
 		}
 		findAdjacentHexagons(hexagonList);
+		findNeighbors(hexagonList);
 	}
 
 	public int getPlayerId(){
@@ -56,8 +58,10 @@ public class Board{
 		if ( history.size() > 0 )
 		{
 			Hexagon lastChange = history.remove(history.size()-1);
+			undoNeighbors(lastChange);
 			lastChange.owner = Hexagon.OWNER_EMPTY;
 			playerTurn = 1-playerTurn;
+//			consistency();
 		}
 	}	
 	
@@ -65,11 +69,59 @@ public class Board{
 		return history.size() > 0;
 	}
 	
-	public synchronized void doMove( Hexagon move )
+	void xassert( boolean b ){
+		if( ! b ){
+			int ii = 1/0;
+		}
+	}
+	
+	void consistency(){
+		for( int n=0; n<2; ++n ){
+			for( Hexagon h : hexagonList ) if( h.isEmpty()){
+				for( Hexagon h1 : h.neighbors[n]){
+					xassert( h1.isEmpty());
+					xassert( h1.neighbors[n].contains(h));
+					xassert( h1 != h );
+				}
+			}
+		}
+	}
+	
+	private void updateNeighbors( Hexagon hex )
 	{
+		final int n = hex.owner;
+		final HexSet myNeighbors = hex.neighbors[n];
+		for( Hexagon h1: myNeighbors ){
+			h1.push(n);
+			h1.neighbors[n].addAll(myNeighbors);
+			h1.neighbors[n].remove(h1);
+		}
+		for( int i=0; i<2; ++i ) for( Hexagon h1: hex.neighbors[i] ){
+			h1.neighbors[i].remove(hex);
+		}
+//		consistency();
+	}
+	
+	private void undoNeighbors( Hexagon hex )
+	{
+		final int n = hex.owner;
+		final HexSet myNeighbors = hex.neighbors[n];
+		for( Hexagon h1: myNeighbors ){
+			h1.pop(n);
+		}		
+		for( Hexagon h1: hex.neighbors[1-n] ){
+			h1.neighbors[1-n].add(hex);
+		}
+	}
+	
+	public synchronized boolean doMove( Hexagon move )
+	{
+		move=hexagonList.get(move.xid);
 		move.owner = playerTurn;
 		playerTurn = 1 - playerTurn;
 		history.add( move );
+		updateNeighbors(move);
+		return isWinner( 1-playerTurn );
 	}
 		
 	private void setupHexBoardListOfHexagons()
@@ -115,6 +167,14 @@ public class Board{
 			}
 	}
 
+	static void findNeighbors( ArrayList<Hexagon> a )
+	{
+		for( Hexagon p : a ){ 
+			p.neighbors[0] = new HexSet( p.adjacent );
+			p.neighbors[1] = new HexSet( p.adjacent );
+		}
+	}
+	
 	static void findAdjacentHexagons( ArrayList<Hexagon> a )
 	{
 		for( Hexagon p : a ){ for( Hexagon q : a ){
@@ -140,7 +200,7 @@ public class Board{
 		}
 	}
 	
-	public boolean isWinner( int p )
+	private boolean isWinner( int p )
 	{
 		HashSet<Hexagon> s1 = new HashSet<Hexagon>();
 		HashSet<Hexagon> s2 = new HashSet<Hexagon>();
@@ -153,6 +213,17 @@ public class Board{
 		} else {
 			return false;
 		}
+	}
+
+	public ArrayList<Integer> getHashKey() {
+		ArrayList<Integer> a = new ArrayList<Integer>();
+		for( Hexagon h : hexagonList ){
+			if( h.owner == 0 )
+				a.add(h.xid);
+			else if( h.owner == 1 )
+				a.add(-h.xid-1);
+		}
+		return a;
 	}
 }
 
