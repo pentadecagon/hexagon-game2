@@ -1,6 +1,8 @@
 package com.hexagongame.game;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 
 
 public class Hexagon {
@@ -9,10 +11,15 @@ public class Hexagon {
 	public final static int OWNER_EMPTY = 2;
 	
 	public int owner; 
-	final public int id;
+	final public int xid;
 	final public float xi, yi;
 	
 	final ArrayList<Hexagon> adjacent = new ArrayList<Hexagon>();
+	final HexSet[] neighbors = new HexSet[2];
+	static class HexSet extends HashSet<Hexagon>{
+		HexSet( Collection<?extends Hexagon> c ) { super(c); }
+		HexSet(){ super(); }
+	}
 	
 	public boolean isEmpty(){
 		return owner==OWNER_EMPTY;
@@ -23,6 +30,16 @@ public class Hexagon {
 		this.xi = u;
 		this.yi = v;
 		this.owner = owner;
-		this.id = id;
+		this.xid = id;
+	}
+
+	final ArrayList<HexSet> stack = new ArrayList<HexSet>();
+	
+	public void push(int n) {
+		stack.add( new HexSet(neighbors[n]));
+	}
+	
+	public void pop(int n){
+		neighbors[n] = stack.remove(stack.size()-1);
 	}
 }

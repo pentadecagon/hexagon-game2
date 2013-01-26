@@ -76,16 +76,12 @@ public class Solver3 implements Solver {
 							oldval += hp.d;
 						}
 					}
-/*					if( oldval != erg.get(hex)){
-						double u = erg.get(hex);
-						new HexPair( null, 1/0+u );
-					} */
 					double newval = oldval / _lengthFactor;
 					updateMap( erg2, next, newval );
 					updateMap( nextlevel, next, new HexPair( hex, newval ));
 				}
 			}
-			for( Hexagon hex : nextlevel.keySet() ) if( ! a_opp.contains(hex)){
+/*			for( Hexagon hex : nextlevel.keySet() ) if( ! a_opp.contains(hex)){
 				for( Hexagon next : hex.adjacent) if( nextlevel.containsKey(next)){
 					double oldval = 0;
 					for( HexPair hp : nextlevel.get(hex)){  // we walk hp -> hex -> next
@@ -97,7 +93,7 @@ public class Solver3 implements Solver {
 					updateMap( erg2, next, newval );
 					updateMap( nextlevel, next, new HexPair( hex, newval ));
 				}
-			}
+			} */
 			erg.putAll(erg2);
 			lastlevel = nextlevel;
 		}		
