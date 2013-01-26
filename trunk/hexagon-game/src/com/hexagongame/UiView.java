@@ -90,7 +90,7 @@ public class UiView extends View{
 		paint = new Paint();
 		board = new Board( ChooseBoardView.boardShape, ChooseBoardView.boardSize );
 		board2 = new Board( ChooseBoardView.boardShape, ChooseBoardView.boardSize );
-		solver = new Solver6(4);		
+		solver = new Solver6(4.0, 3);		
 	}
 			
 	public void setWinnerNotification(TextView winnerNotification)
