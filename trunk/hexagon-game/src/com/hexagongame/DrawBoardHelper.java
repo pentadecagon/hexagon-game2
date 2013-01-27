@@ -10,17 +10,17 @@ public class DrawBoardHelper {
 	final public Board board;
 	
 	//x0, x-position of the top-left corner of the hexagon relative to the canvas
-	private static float x0;
+	private int x0;
 	
 	//y0, y-position of the top-left corner of the hexagon relative to the canvas
-	private static float y0;	
+	private int y0;	
 	
-	private static float smallHexSideLength;
+	private int smallHexSideLength;
 	
 	// vertical distance of cell rows 
-	private static float dyCell;
+	private int dyCell;
 	//width of the hexagonal grid cell
-	private static float wCell;
+	private int wCell;
 	
 	public DrawBoardHelper(float canvasHeight, float canvasWidth, Board board)
 	{
@@ -36,14 +36,14 @@ public class DrawBoardHelper {
 			ymax = Math.max(ymax,  hex.yi );
 		}
 		
-		wCell = canvasWidth / ( xmax-xmin+2);
-		smallHexSideLength = wCell / (float)Math.sqrt(3.0);
-		dyCell = smallHexSideLength * 1.5f;
+		wCell = (int)(canvasWidth / ( xmax-xmin+2) / 2 + 0.5) * 2; // must be even
+		smallHexSideLength = (int)Math.round(wCell / Math.sqrt(3.0));
+		dyCell = smallHexSideLength * 3 /2;
 		
-		x0 = wCell * (1-xmin); 
+		x0 = (int)(wCell * (1-xmin)); 
 		final float ymid = (ymax+ymin) * 0.5f; // this should be placed at canvasHeight/2
 		
-		y0 = canvasHeight * 0.5f - ymid * dyCell;
+		y0 = (int)(canvasHeight * 0.5 - ymid * dyCell+0.5);
 		Log.d("hex","calculated position of board on canvas: x0="+x0+", y0="+y0);
 	}
 	
