@@ -3,8 +3,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical"
-    android:id="@+id/container"
-    android:background="#000000">
+    android:id="@+id/container">
  
 <com.hexagongame.UiView
   android:id="@+id/boardview"
