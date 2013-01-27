@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.LightingColorFilter;
 import android.graphics.Matrix;
@@ -18,6 +17,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,6 +57,8 @@ public class UiView extends View{
 	private int winner = 0;
 	
 	private TextView winnerNotification = null;
+	
+	private LinearLayout phoneThinkingNotification = null;
 	
 	/**
 	 * Game mode
@@ -101,6 +103,12 @@ public class UiView extends View{
 		this.winnerNotification = winnerNotification;
 	}
 
+	
+	protected void setPhoneThinkingNotification(LinearLayout phoneThinkingNotification)
+	{
+		this.phoneThinkingNotification = phoneThinkingNotification;
+	}
+	
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh)
 	{		
@@ -171,6 +179,12 @@ public class UiView extends View{
 		  
 		  public void run()
 		  {
+			  HexActivity ac = (HexActivity) UiView.this.getContext();
+			  //show "phone is thinking" message
+			  ac.runOnUiThread(new Runnable(){ public void run() {
+				  phoneThinkingNotification.setVisibility(View.VISIBLE);
+			  }});
+			  
 			  Hexagon move = solver.bestMove(board2);
 			  if( move != null ){
 				  board2.doMove(move);
@@ -182,6 +196,12 @@ public class UiView extends View{
 			  } else {
 				  Log.e("hex", "move is null");
 			  }
+			  
+			  //hide "phone is thinking" message
+			  ac.runOnUiThread(new Runnable(){ public void run() {
+				  phoneThinkingNotification.setVisibility(View.GONE);
+			  }});
+			  
 			  //update the view
 			  postInvalidate();
 			  phoneMoveThread = null;
@@ -205,7 +225,7 @@ public class UiView extends View{
 		winnerNotification.setText(((winner == 1) ? "Green" : "Blue") + " wins!");
 		winnerNotification.setVisibility(View.VISIBLE);		
 	}
-	
+
 	void undo(){
 		//if we're in winner mode, revert it
 		if (inWinnerMode)

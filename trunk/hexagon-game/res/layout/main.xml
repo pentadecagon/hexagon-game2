@@ -22,5 +22,29 @@
 		  android:layout_marginBottom="70dip"
 		  android:visibility="gone"
           android:background="@drawable/winner_message" />
-
+      
+      <LinearLayout
+        android:id="@+id/phonethinkingtext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="55dip"
+        android:background="@drawable/phonethinking_message"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_vertical|center_horizontal"
+        android:visibility="gone">        
+        <ProgressBar
+			style="?android:attr/progressBarStyle"
+        	android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        </ProgressBar>
+      	<TextView
+          	android:layout_width="wrap_content"
+          	android:layout_height="wrap_content"
+          	android:textColor="#ffffff"
+          	android:textSize="18sp"
+		  	android:text="Phone is thinking..." 
+          />
+  </LinearLayout>
+ 
 </RelativeLayout>

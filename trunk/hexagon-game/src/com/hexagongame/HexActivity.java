@@ -2,6 +2,7 @@ package com.hexagongame;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class HexActivity extends Activity {
@@ -28,8 +29,13 @@ public class HexActivity extends Activity {
         uiView.gameMode = gameMode;
         uiView.phonePlayerId = phonePlayerId;
         
+        //add a text view for the "congratulations, you have won" message, which will be hidden initially
         TextView winnerNotification = (TextView) findViewById(R.id.winnertext);
 		uiView.setWinnerNotification(winnerNotification);
+		
+		//add a view for the "phone is thinking" message (for "play-against-phone" mode), which will be hidden initially
+		LinearLayout phoneThinkingNotification = (LinearLayout) findViewById(R.id.phonethinkingtext);
+		uiView.setPhoneThinkingNotification(phoneThinkingNotification);
 		
 		if (ChooseBoardView.boardShape == 1)
 		{
