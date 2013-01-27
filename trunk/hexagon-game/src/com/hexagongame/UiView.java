@@ -23,6 +23,7 @@ import com.hexagongame.game.Hexagon;
 import com.hexagongame.game.Solver;
 import com.hexagongame.game.Solver1;
 import com.hexagongame.game.Solver6;
+import com.hexagongame.game.Solver7;
 
 
 public class UiView extends View{
@@ -168,7 +169,7 @@ public class UiView extends View{
 				  board2.doMove(move);
 				  if( board.doMove( move ) ){
 					  inWinnerMode = true;
-					  winner = 1-board.getPlayerId();
+					  winner = board.getPlayerId();
 				  }
 				  
 			  } else {
