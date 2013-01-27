@@ -7,6 +7,9 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.LightingColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
@@ -21,9 +24,7 @@ import android.widget.Toast;
 import com.hexagongame.game.Board;
 import com.hexagongame.game.Hexagon;
 import com.hexagongame.game.Solver;
-import com.hexagongame.game.Solver1;
 import com.hexagongame.game.Solver6;
-import com.hexagongame.game.Solver7;
 
 
 public class UiView extends View{
@@ -79,6 +80,12 @@ public class UiView extends View{
 	
 	Bitmap[] TILES_HIGHLIGHT = new Bitmap[2];
 	
+	 //for highlighting the currently touched hexagon: -1 means no hexagon is touched
+	public int hexSelected = -1;
+	
+	//filter for highlighting a hexagon
+	ColorFilter highlightFilter = new LightingColorFilter(android.graphics.Color.parseColor("#FFBF00"), 1);
+
 	public UiView(Context context, AttributeSet attrs) {
 		
 		super(context, attrs);
@@ -257,42 +264,63 @@ public class UiView extends View{
 	
 	@Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (event.getAction() != MotionEvent.ACTION_DOWN ){
-        	return false;
-        }
-        
         //if we are in "play against phone" mode and the phone is calculating its next move, board is deactivated
         if ( phoneMoveThread != null )
         {
         	return false;
         }
         	    	
-
 		Log.d("hex", "ontouch x="+event.getX());
 	    Log.d("hex", "ontouch y="+event.getY());
 	    	
 	    Hexagon hexagon = drawBoardHelper.findHexagonFromPointOnCanvas((float) event.getX(), (float) event.getY());
 	    
-		if (hexagon == null) //hexagon is out of scope of board
-		{
-			Log.d("hex", "hex is out of scope of board");
-			tappedOutsideBoard(event);
-		} else if (hexagon.isEmpty() && ! inWinnerMode ) //hexagon is on board, but unused
-		{
-			Log.d("hex", "hex is white");
-			final int player = board.getPlayerId();
-			board2.doMove( hexagon );
-			if( board.doMove( hexagon ) )
-			{
-				inWinnerMode = true;
-				winner = player;
-			} else if (gameMode == 1)
-			{
-				//if it's phone's turn, do phone's move
-				doPhoneMove();
-			} 
-			invalidate();
-		}
+	    //handle different actions
+	    switch (event.getAction())
+	    {
+	    	case MotionEvent.ACTION_DOWN:
+	    		//just highlight the hexagon the user has touched if appropriate
+	    		hexSelected = (hexagon == null || inWinnerMode) ? -1 : hexagon.xid; //for highlighting the currently touched hexagon
+	    		invalidate();
+	    		break;
+	    	case MotionEvent.ACTION_MOVE:
+	    		//if user moves to touch a different hexagon, highlight this one    		
+	    		int hexSelectedNew = (hexagon == null || inWinnerMode) ? -1 : hexagon.xid;
+	    		if (hexSelectedNew != hexSelected) //for highlighting the currently touched hexagon
+	    		{	    	
+	    			Log.d("hex", "onTouch ACTION_MOVE: hex id = "+hexSelectedNew);
+	    			hexSelected = hexSelectedNew;
+	    			invalidate();
+	    		}
+	    		break;
+	    	case MotionEvent.ACTION_UP:
+	    		hexSelected = -1; //for highlighting the currently touched hexagon: : -1 means no hexagon is touched
+	    		//respond to user's touch on the screen
+	    		if (hexagon == null) //hexagon is out of scope of board
+	    		{
+	    			Log.d("hex", "hex is out of scope of board");
+	    			tappedOutsideBoard(event);
+	    		} else if (hexagon.isEmpty() && ! inWinnerMode ) //hexagon is on board, but unused
+	    		{
+	    			Log.d("hex", "hex is white");
+	    			final int player = board.getPlayerId();
+	    			board2.doMove( hexagon );
+	    			if( board.doMove( hexagon ) )
+	    			{
+	    				inWinnerMode = true;
+	    				winner = player;
+	    			} else if (gameMode == 1)
+	    			{
+	    				//if it's phone's turn, do phone's move
+	    				doPhoneMove();
+	    			} 
+	    			invalidate();
+	    		}
+	    		break;
+	    	default:
+	    		return false;
+	    }
+	    
 		return true;
     };
     
@@ -424,6 +452,16 @@ public class UiView extends View{
 		{
 			bmp = TILES[hex.owner];
 		}
+		
+		//if this hexagon is currently highlighted, add an effect
+		if (hex.xid == hexSelected && hex.isEmpty())
+		{
+			paint.setColorFilter(highlightFilter);
+		} else
+		{
+			paint.setColorFilter(null);
+		}
+		
 		canvas.drawBitmap(bmp, coords[0] - drawBoardHelper.getWCell()/2.0f + hexBorderWidth * drawBoardHelper.getWCell(),coords[1] - drawBoardHelper.getHCell()/2.0f - drawBoardHelper.getSmallHexSideLength() * co + hexBorderWidth * drawBoardHelper.getWCell()/si, paint);
 		paint.setStrokeWidth(1);
 		canvas.drawText( ""+hex.xid, coords[0], coords[1], paint);
