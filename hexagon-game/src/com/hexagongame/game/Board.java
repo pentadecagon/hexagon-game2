@@ -24,7 +24,13 @@ public class Board{
 
 	public final ArrayList<Hexagon> hexagonList=  new ArrayList<Hexagon>();
 
-	private int playerTurn = 0;	
+	// _player that must do the next move
+	private int _player = 0;	
+	
+	/* _hasWinner indicates if we have a winner.
+		If _hasWinner is true, no move must be done 
+		and _player indicates who won. */
+	private boolean _hasWinner = false;
 	public final ArrayList<Hexagon> history = new ArrayList<Hexagon>();
 
 	/* 'outer' represents the four outer regions of the board.  The first index indicates the player (0 or 1),
@@ -47,20 +53,25 @@ public class Board{
 			setupHexBoardListOfHexagons();
 		}
 		findAdjacentHexagons(hexagonList);
-		findNeighbors(hexagonList);
+		findNeighbors();
 	}
 
 	public int getPlayerId(){
-		return playerTurn;
+		return _player;
 	}
 	
 	public synchronized void undo(){
 		if ( history.size() > 0 )
 		{
 			Hexagon lastChange = history.remove(history.size()-1);
+			if( _hasWinner ){
+				lastChange.owner = Hexagon.OWNER_EMPTY;
+				_hasWinner=false;
+				return;
+			}
 			undoNeighbors(lastChange);
 			lastChange.owner = Hexagon.OWNER_EMPTY;
-			playerTurn = 1-playerTurn;
+			_player = 1-_player;
 //			consistency();
 		}
 	}	
@@ -69,7 +80,7 @@ public class Board{
 		return history.size() > 0;
 	}
 	
-	void xassert( boolean b ){
+	static void xassert( boolean b ){
 		if( ! b ){
 			int ii = 1/0;
 		}
@@ -79,7 +90,7 @@ public class Board{
 		for( int n=0; n<2; ++n ){
 			for( Hexagon h : hexagonList ) if( h.isEmpty()){
 				for( Hexagon h1 : h.neighbors[n]){
-					xassert( h1.isEmpty());
+					xassert( h1.isEmpty() || h1.xid<0 );
 					xassert( h1.neighbors[n].contains(h));
 					xassert( h1 != h );
 				}
@@ -91,11 +102,29 @@ public class Board{
 	{
 		final int n = hex.owner;
 		final HexSet myNeighbors = hex.neighbors[n];
-		for( Hexagon h1: myNeighbors ){
-			h1.push(n);
-			h1.neighbors[n].addAll(myNeighbors);
-			h1.neighbors[n].remove(h1);
-		}
+/*		Hexagon edge = null;
+		for( int k=0; k<2; ++k )
+			if( myNeighbors.contains(outer[n][k]) )
+				edge = outer[n][k];
+		
+		if( edge != null ){
+			for( Hexagon h1: myNeighbors ){
+				h1.push(n);
+				 if( h1 != edge ){
+					 h1.neighbors[n].removeAll(myNeighbors);
+					 h1.neighbors[n].add( edge );
+				 } else {
+						h1.neighbors[n].addAll(myNeighbors);
+						h1.neighbors[n].remove(h1);
+				 }
+			}
+		} else {  */
+			for( Hexagon h1: myNeighbors ){
+				h1.push(n);
+				h1.neighbors[n].addAll(myNeighbors);
+				h1.neighbors[n].remove(h1);
+			}
+//		}
 		for( int i=0; i<2; ++i ) for( Hexagon h1: hex.neighbors[i] ){
 			h1.neighbors[i].remove(hex);
 		}
@@ -116,12 +145,17 @@ public class Board{
 	
 	public synchronized boolean doMove( Hexagon move )
 	{
+		xassert( !_hasWinner );
 		move=hexagonList.get(move.xid);
-		move.owner = playerTurn;
-		playerTurn = 1 - playerTurn;
+		move.owner = _player;
 		history.add( move );
+		if( move.neighbors[_player].contains( outer[_player][0] ) && move.neighbors[_player].contains( outer[_player][1] ) ){
+			_hasWinner = true;
+			return true;
+		}
+		_player = 1 - _player;
 		updateNeighbors(move);
-		return isWinner( 1-playerTurn );
+		return false;
 	}
 		
 	private void setupHexBoardListOfHexagons()
@@ -167,12 +201,20 @@ public class Board{
 			}
 	}
 
-	static void findNeighbors( ArrayList<Hexagon> a )
+	void findNeighbors()
 	{
-		for( Hexagon p : a ){ 
+		for( Hexagon p : hexagonList ){ 
 			p.neighbors[0] = new HexSet( p.adjacent );
 			p.neighbors[1] = new HexSet( p.adjacent );
 		}
+		for( int p =0; p<=1; ++p ) for( int k=0; k<=1; ++k ){
+			outer[p][k].neighbors[1-p] = new HexSet();
+			outer[p][k].neighbors[p] = new HexSet( outer[p][k].adjacent );
+			for( Hexagon hex :outer[p][k].adjacent ){
+				hex.neighbors[p].add( outer[p][k]);
+			}
+		}
+		consistency();
 	}
 	
 	static void findAdjacentHexagons( ArrayList<Hexagon> a )
@@ -197,21 +239,6 @@ public class Board{
 		for( Hexagon u : h.adjacent ){
 			if( u.owner == h.owner )
 				addToSetSameColor( s, u );
-		}
-	}
-	
-	private boolean isWinner( int p )
-	{
-		HashSet<Hexagon> s1 = new HashSet<Hexagon>();
-		HashSet<Hexagon> s2 = new HashSet<Hexagon>();
-		addToSetSameColor( s1, outer[p][0] );
-		addToSetSameColor( s2, outer[p][1] );
-		s1.retainAll(s2 );
-		if( s1.size() > 0 ){
-//			Log.i("hex", "WINNER!");
-			return true;
-		} else {
-			return false;
 		}
 	}
 

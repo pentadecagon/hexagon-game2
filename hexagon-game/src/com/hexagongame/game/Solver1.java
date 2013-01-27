@@ -3,39 +3,22 @@ package com.hexagongame.game;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import com.hexagongame.game.Hexagon.HexSet;
+
 public class Solver1 implements Solver {
 
-	private final float _lengthFactor;
+	private final double _ilengthFactor;
 	
-	public Solver1( float f ){
-		_lengthFactor = f;
-	}
-	public Solver1(){
-		_lengthFactor = 4.0f;
+	public Solver1( double f ){
+		_ilengthFactor = 1.0 / f;
 	}
 	
-	static HashSet<Hexagon> allNeighbors( Hexagon a, int owner )
+	static HexSet allNeighbors( Hexagon a, int owner )
 	{
-		HashSet<Hexagon> scol = new HashSet<Hexagon>();
-		for( Hexagon hex : a.adjacent ){
-			if( hex.owner == owner ){
-				Board.addToSetSameColor(scol, hex );
-			}
-		}
-		scol.add(a);
-
-		HashSet<Hexagon> erg = new HashSet<Hexagon>();
-		for( Hexagon hex : scol ){
-			for( Hexagon u : hex.adjacent ){
-				if( u.isEmpty() ){
-					erg.add(u);
-				}
-			}
-		}
-		return erg;
+		return a.neighbors[owner];
 	}
 			
-	HashMap<Hexagon, Double>	pathValue( HashSet<Hexagon> a, HashSet<Hexagon> a_opp, int color ){
+	HashMap<Hexagon, Double>	pathValue( HexSet a, HexSet a_opp, int color ){
 		HashMap<Hexagon, Double> erg = new HashMap<Hexagon, Double>();
 		HashSet<Hexagon> lastlevel = new HashSet<Hexagon>();
 		for( Hexagon hex : a ){
@@ -47,7 +30,7 @@ public class Solver1 implements Solver {
 			HashSet<Hexagon> nextlevel = new HashSet<Hexagon>();
 			lastlevel.removeAll(a_opp);
 			for( Hexagon hex : lastlevel ){
-				double newval = erg.get(hex) / _lengthFactor;
+				double newval = erg.get(hex) * _ilengthFactor;
 				for( Hexagon next : allNeighbors(hex, color )){
 					if( erg.containsKey(next))
 						continue;
@@ -66,21 +49,10 @@ public class Solver1 implements Solver {
 	}
 	
 	HashMap<Hexagon, Double> analyze( Board board,  int p ){
-		final HashSet<Hexagon> swhite[] = new HashSet[2];
-		final int thiscolor = board.outer[p][0].owner;
-		for( int i=0; i<2; ++i ){
-			final HashSet<Hexagon> sblue= new HashSet<Hexagon>();
-			Board.addToSetSameColor( sblue, board.outer[p][i] );
-			swhite[i]= new HashSet<Hexagon>();
-			for( Hexagon hb : sblue ){
-				for( Hexagon hex: hb.adjacent ){
-					if( hex.isEmpty() )
-						swhite[i].add(hex);
-				}
-			}
-		}
-		HashMap<Hexagon, Double> v1 = pathValue( swhite[0], swhite[1], thiscolor ); 
-		HashMap<Hexagon, Double> v2 = pathValue( swhite[1], swhite[0], thiscolor );
+		final HexSet s1 = board.outer[p][0].neighbors[p];
+		final HexSet s2 = board.outer[p][1].neighbors[p];
+		HashMap<Hexagon, Double> v1 = pathValue( s1, s2, p ); 
+		HashMap<Hexagon, Double> v2 = pathValue( s2, s1, p );
 		HashMap<Hexagon, Double> erg = new HashMap<Hexagon, Double>();		
 		for( Hexagon hex : v1.keySet() ) if( v2.containsKey(hex)){
 			double val = v1.get(hex) * v2.get(hex);
