@@ -49,9 +49,7 @@ public class UiView extends View{
 			android.graphics.Color.parseColor("#1010FF"), // Blue
 			android.graphics.Color.parseColor("#00FF00"), // Green
 	};
-	
-	public final float hexBorderWidth = 0.02f;
-	
+		
 	private boolean inWinnerMode = false;
 	private int winnerModeTickCount = 0;
 	private int winner = 0;
@@ -137,7 +135,7 @@ public class UiView extends View{
 	{
 		Bitmap bmp = BitmapFactory.decodeResource(getResources(), id);
 		Matrix matrix = new Matrix();
-		float scale = (1.0f - 2.0f * hexBorderWidth) * drawBoardHelper.getWCell()/ bmp.getWidth();
+		float scale = (drawBoardHelper.getWCell() + 1)/ bmp.getWidth();
 		matrix.postScale(scale, scale);
 		Bitmap resizedBitmap = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, true);
 		return resizedBitmap;
@@ -440,29 +438,6 @@ public class UiView extends View{
 		Path path;
 		
 		final float[] coords = drawBoardHelper.findPositionOfCenterOfHexagonalCell(hex.xi, hex.yi);
-
-		paint.setColor(android.graphics.Color.BLACK);
-		paint.setStrokeWidth(5);
-		paint.setStyle(Paint.Style.STROKE);
-
-		x = coords[0] - drawBoardHelper.getWCell()/2.0f;
-		y = coords[1] - drawBoardHelper.getHCell()/2.0f;
-
-		path = new Path();
-			
-		path.moveTo( x,  y );
-		for( int i=0; i<6; ++i ){
-			x += vx;
-			y += vy;
-			path.lineTo( x, y );
-			// now rotate the edge vector by Pi/3
-			float vx_temp = co * vx - si * vy;
-			vy = si * vx + co * vy;
-			vx=vx_temp;
-		}
-			
-		canvas.drawPath(path, paint);
-
 		Bitmap bmp;
 		if (inWinnerMode && winnerModeTickCount % 2 == 0
 				&& winner == hex.owner )
@@ -482,8 +457,9 @@ public class UiView extends View{
 			paint.setColorFilter(null);
 		}
 		
-		canvas.drawBitmap(bmp, coords[0] - drawBoardHelper.getWCell()/2.0f + hexBorderWidth * drawBoardHelper.getWCell(),coords[1] - drawBoardHelper.getHCell()/2.0f - drawBoardHelper.getSmallHexSideLength() * co + hexBorderWidth * drawBoardHelper.getWCell()/si, paint);
-		paint.setStrokeWidth(1);
-		canvas.drawText( ""+hex.xid, coords[0], coords[1], paint);
+		canvas.drawBitmap(bmp, coords[0] - drawBoardHelper.getWCell()/2.0f ,coords[1] - hexSide, paint);
+			
+//		paint.setStrokeWidth(1);
+//		canvas.drawText( ""+hex.xid, coords[0], coords[1], paint);
 	}
 }

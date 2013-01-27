@@ -17,9 +17,9 @@ public class DrawBoardHelper {
 	
 	private static float smallHexSideLength;
 	
-	//height of the rectangular grid cell
-	private static float hCell;
-	//width of the rectangular grid cell
+	// vertical distance of cell rows 
+	private static float dyCell;
+	//width of the hexagonal grid cell
 	private static float wCell;
 	
 	public DrawBoardHelper(float canvasHeight, float canvasWidth, Board board)
@@ -38,18 +38,18 @@ public class DrawBoardHelper {
 		
 		wCell = canvasWidth / ( xmax-xmin+2);
 		smallHexSideLength = wCell / (float)Math.sqrt(3.0);
-		hCell = smallHexSideLength * 1.5f;
+		dyCell = smallHexSideLength * 1.5f;
 		
 		x0 = wCell * (1-xmin); 
 		final float ymid = (ymax+ymin) * 0.5f; // this should be placed at canvasHeight/2
 		
-		y0 = canvasHeight * 0.5f - ymid * hCell + 0.25f * smallHexSideLength;
+		y0 = canvasHeight * 0.5f - ymid * dyCell;
 		Log.d("hex","calculated position of board on canvas: x0="+x0+", y0="+y0);
 	}
 	
 	public float[] findPositionOfCenterOfHexagonalCell( float xi, float yi )
 	{
-		float[] hexCellPos = {x0 + wCell * xi, y0+hCell*yi };
+		float[] hexCellPos = {x0 + wCell * xi, y0+dyCell*yi };
 		return hexCellPos; 
 	}
 	
@@ -78,7 +78,7 @@ public class DrawBoardHelper {
 	
 	public float getHCell()
 	{
-		return hCell;		
+		return dyCell;		
 	}
 	
 	public float getWCell()
