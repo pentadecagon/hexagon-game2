@@ -16,8 +16,8 @@ public class Hexagon {
 	
 	final ArrayList<Hexagon> adjacent = new ArrayList<Hexagon>();
 	final HexSet[] neighbors = new HexSet[2];
-	static class HexSet extends HashSet<Hexagon>{
-		HexSet( Collection<?extends Hexagon> c ) { super(c); }
+	public static class HexSet extends HashSet<Hexagon>{
+		public HexSet( Collection<?extends Hexagon> c ) { super(c); }
 		HexSet(){ super(); }
 	}
 	
