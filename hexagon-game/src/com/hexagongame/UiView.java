@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.os.CountDownTimer;
@@ -41,22 +42,13 @@ public class UiView extends View{
 	private Paint paint;
 
 	private long playerTurnToastStartTime = 0;
-	
-	public static final int BLUE_BG = android.graphics.Color.parseColor("#0000A0");
-	public static final int GREEN_BG = android.graphics.Color.parseColor("#208020");
-	
-	int HEX_COLORS_HIGHLIGHT[] = {
-			android.graphics.Color.parseColor("#00FFFF"), // Blue
-			android.graphics.Color.parseColor("#FFF380")  // Green
-	};
-	
-	public static final int HEX_UNUSED_COLOR = android.graphics.Color.parseColor("#E0E0E0");
 
 	int HEX_COLORS[] = {
 			android.graphics.Color.parseColor("#1010FF"), // Blue
 			android.graphics.Color.parseColor("#00FF00"), // Green
-			android.graphics.Color.parseColor("#E0E0E0") // empty
 	};
+	
+	public final float hexBorderWidth = 0.02f;
 	
 	private boolean inWinnerMode = false;
 	private int winnerModeTickCount = 0;
@@ -81,7 +73,10 @@ public class UiView extends View{
 	
 	//thread in which phone's next move is calculated in "play against phone" mode
 	Thread phoneMoveThread = null;
-	  
+	
+	Bitmap[] TILES = new Bitmap[3];
+	
+	Bitmap[] TILES_HIGHLIGHT = new Bitmap[2];
 	
 	public UiView(Context context, AttributeSet attrs) {
 		
@@ -100,7 +95,7 @@ public class UiView extends View{
 
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh)
-	{
+	{		
 		float canvasWidth = getWidth();
     	float canvasHeight = getHeight();
 		drawBoardHelper = new DrawBoardHelper(canvasHeight, canvasWidth, board);
@@ -109,18 +104,37 @@ public class UiView extends View{
 		{
 			doPhoneMove();
 		}
+		
+		TILES[0] = initializeImage(R.drawable.blue_tile);
+		TILES[1] = initializeImage(R.drawable.green_tile);
+		TILES[2] = initializeImage(R.drawable.unused_tile);
+
+		TILES_HIGHLIGHT[0] = initializeImage(R.drawable.blue_tile_highlight);
+		TILES_HIGHLIGHT[1] = initializeImage(R.drawable.green_tile_highlight);
+	}
+	
+	  /**
+	   * Create and resize the image.
+	   */
+	
+	private Bitmap initializeImage(int id)
+	{
+		Bitmap bmp = BitmapFactory.decodeResource(getResources(), id);
+		Matrix matrix = new Matrix();
+		float scale = (1.0f - 2.0f * hexBorderWidth) * drawBoardHelper.getWCell()/ bmp.getWidth();
+		matrix.postScale(scale, scale);
+		Bitmap resizedBitmap = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, true);
+		return resizedBitmap;
 	}
 	
 	@Override
 	protected void onDraw(Canvas canvas) {
 
-		if (inWinnerMode && winnerModeTickCount == 0)
+		if (inWinnerMode && !winnerNotification.isShown())
 		{
 			showWinnerCongratulationsMessage(canvas);
 		}
-		
-		drawBackground(canvas);
-	    
+
 		//draw the bottom nav containing turn indicator & undo functionality
 		drawBottomNav(canvas);
 
@@ -306,76 +320,7 @@ public class UiView extends View{
 		Intent i = new Intent(ac, ChooseBoardActivity.class);
 		ac.startActivity(i);
     }
-    
-    private void drawBackground(Canvas canvas)
-    {
-    	if (board.boardShape == Board.BOARD_GEOMETRY_RECT)
-		{
-    		drawSquareBackground(canvas);
-		} else
-		{
-			drawHexBackground(canvas);
-		}
-    }
-	
-    private void drawHexBackground(Canvas canvas)
-    {
-    	float canvasHeight = getHeight();
-    	float canvasWidth = getWidth();
 
-    	float padding = 0.01f * canvasHeight;
-    	
-    	paint.setColor(BLUE_BG);
-    	paint.setStyle(Paint.Style.FILL);
-    	Path path = new Path();
-    	path.moveTo(0.0f, 0.1f * canvasHeight);
-    	path.lineTo(0.4f * canvasWidth - padding, 0.1f * canvasHeight);
-    	path.lineTo(0.6f * canvasWidth + padding, 0.9f * canvasHeight);
-    	path.lineTo(canvasWidth, 0.9f * canvasHeight);
-    	path.lineTo(canvasWidth, 0.5f * canvasHeight + padding);
-    	path.lineTo(0.0f, 0.5f * canvasHeight - padding);
-    	path.lineTo(0.0f, 0.1f * canvasHeight);
-    	canvas.drawPath(path, paint);
-    	
-    	paint.setColor(GREEN_BG);
-    	paint.setStyle(Paint.Style.FILL);
-    	path = new Path();
-    	path.moveTo(0.5f * canvasWidth + padding, 0.1f * canvasHeight);
-    	path.lineTo(canvasWidth, 0.1f * canvasHeight);
-    	path.lineTo(canvasWidth, 0.5f * canvasHeight - padding);
-    	path.lineTo(0.0f, 0.5f * canvasHeight + padding);
-    	path.lineTo(0.0f, 0.9f * canvasHeight);
-    	path.lineTo(0.6f * canvasWidth - padding, 0.9f * canvasHeight);
-    	path.lineTo(0.4f * canvasWidth + padding, 0.1f * canvasHeight);
-    	canvas.drawPath(path, paint);
-    }
-    
-    private void drawSquareBackground(Canvas canvas)
-    {
-    	float canvasHeight = getHeight();
-    	float canvasWidth = getWidth();
-	
-    	paint.setColor(BLUE_BG);
-    	paint.setStyle(Paint.Style.FILL);
-    	Path path = new Path();
-    	path.moveTo(0.0f, 0.23f * canvasHeight);
-    	path.lineTo(0.0f, 0.77f * canvasHeight);
-    	path.lineTo(canvasWidth, 0.23f * canvasHeight);
-    	path.lineTo(canvasWidth, 0.77f * canvasHeight);
-    	path.lineTo(0.0f, 0.23f * canvasHeight);
-    	canvas.drawPath(path, paint);
-    	
-    	paint.setColor(GREEN_BG);
-    	paint.setStyle(Paint.Style.FILL);
-    	path = new Path();
-    	path.moveTo(0.0f, 0.19f * canvasHeight);
-    	path.lineTo(canvasWidth, 0.19f * canvasHeight);
-    	path.lineTo(0.0f, 0.81f * canvasHeight);
-    	path.lineTo(canvasWidth, 0.81f * canvasHeight);
-    	path.lineTo(0.0f, 0.19f * canvasHeight);
-    	canvas.drawPath(path, paint);
-    }
-    
 	private void drawBottomNav(Canvas canvas)
 	{
 		drawTurnIndicator(canvas);
@@ -446,48 +391,40 @@ public class UiView extends View{
 		Path path;
 		
 		final float[] coords = drawBoardHelper.findPositionOfCenterOfHexagonalCell(hex.xi, hex.yi);
-		for (int j = 0; j < 2; j++)
-		{
-			if (j == 1)
-			{
-				paint.setColor(android.graphics.Color.BLACK);
-		    	paint.setStrokeWidth(1);
-		    	paint.setStyle(Paint.Style.STROKE);
-			} else
-			{
-				int color;
-				//if we are in "congratulations, winner" mode, every second tick we show the winner's rectangles in an alternative color
-				if (inWinnerMode && winnerModeTickCount % 2 == 0
-						&& winner == hex.owner )
-				{
-					color = HEX_COLORS_HIGHLIGHT[winner];
-				} else
-				{
-					color = HEX_COLORS[hex.owner];
-				}
-				paint.setColor(color);
-		        paint.setStyle(Paint.Style.FILL);
-			}
-			
-			x = coords[0] - drawBoardHelper.getWCell()/2.0f;
-			y = coords[1] - drawBoardHelper.getHCell()/2.0f;
 
-			path = new Path();
+		paint.setColor(android.graphics.Color.BLACK);
+		paint.setStrokeWidth(5);
+		paint.setStyle(Paint.Style.STROKE);
+
+		x = coords[0] - drawBoardHelper.getWCell()/2.0f;
+		y = coords[1] - drawBoardHelper.getHCell()/2.0f;
+
+		path = new Path();
 			
-			path.moveTo( x,  y );
-			for( int i=0; i<6; ++i ){
-				x += vx;
-				y += vy;
-				path.lineTo( x, y );
-				// now rotate the edge vector by Pi/3
-				float vx_temp = co * vx - si * vy;
-				vy = si * vx + co * vy;
-				vx=vx_temp;
-			}
-			
-			canvas.drawPath(path, paint);
+		path.moveTo( x,  y );
+		for( int i=0; i<6; ++i ){
+			x += vx;
+			y += vy;
+			path.lineTo( x, y );
+			// now rotate the edge vector by Pi/3
+			float vx_temp = co * vx - si * vy;
+			vy = si * vx + co * vy;
+			vx=vx_temp;
 		}
-        paint.setStyle(Paint.Style.FILL);
+			
+		canvas.drawPath(path, paint);
+
+		Bitmap bmp;
+		if (inWinnerMode && winnerModeTickCount % 2 == 0
+				&& winner == hex.owner )
+		{
+			bmp = TILES_HIGHLIGHT[winner];
+		} else
+		{
+			bmp = TILES[hex.owner];
+		}
+		canvas.drawBitmap(bmp, coords[0] - drawBoardHelper.getWCell()/2.0f + hexBorderWidth * drawBoardHelper.getWCell(),coords[1] - drawBoardHelper.getHCell()/2.0f - drawBoardHelper.getSmallHexSideLength() * co + hexBorderWidth * drawBoardHelper.getWCell()/si, paint);
+		paint.setStrokeWidth(1);
 		canvas.drawText( ""+hex.xid, coords[0], coords[1], paint);
 	}
 }

@@ -30,5 +30,13 @@ public class HexActivity extends Activity {
         
         TextView winnerNotification = (TextView) findViewById(R.id.winnertext);
 		uiView.setWinnerNotification(winnerNotification);
+		
+		if (ChooseBoardView.boardShape == 1)
+		{
+			uiView.setBackgroundResource(R.drawable.square_background);
+		} else
+		{
+			uiView.setBackgroundResource(R.drawable.hex_background);
+		}
     }
 }
