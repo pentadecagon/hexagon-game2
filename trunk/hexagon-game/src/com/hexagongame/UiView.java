@@ -17,7 +17,12 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.TranslateAnimation;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,6 +62,10 @@ public class UiView extends View{
 	private TextView winnerNotification = null;
 	
 	private LinearLayout phoneThinkingNotification = null;
+	
+	private ImageView turnImageView = null;
+	
+	private TranslateAnimation slide;
 	
 	/**
 	 * Game mode
@@ -107,6 +116,11 @@ public class UiView extends View{
 		this.phoneThinkingNotification = phoneThinkingNotification;
 	}
 	
+	protected void setTurnImageView(ImageView turnImageView)
+	{
+		this.turnImageView = turnImageView;
+	}
+	
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh)
 	{		
@@ -125,6 +139,14 @@ public class UiView extends View{
 
 		TILES_HIGHLIGHT[0] = initializeImage(R.drawable.blue_tile_highlight);
 		TILES_HIGHLIGHT[1] = initializeImage(R.drawable.green_tile_highlight);
+			
+		turnImageView.setImageBitmap(TILES[0]);
+		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)turnImageView.getLayoutParams();
+		params.setMargins((int) (0.2f * canvasWidth), 0, 0, (int) (0.0f * canvasHeight));
+		params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+		turnImageView.setLayoutParams(params); //causes layout update
+		
+		turnImageView.setVisibility(View.VISIBLE);
 	}
 	
 	  /**
@@ -144,6 +166,9 @@ public class UiView extends View{
 	@Override
 	protected void onDraw(Canvas canvas) {
 
+		//turnImageView.setVisibility(View.VISIBLE); //xxx
+
+		
 		if (inWinnerMode && !winnerNotification.isShown())
 		{
 			showWinnerCongratulationsMessage(canvas);
@@ -253,10 +278,10 @@ public class UiView extends View{
 				String turnMessage = "";
 				if (board.getPlayerId() == 0)
 				{
-					turnMessage = "Blue's turn!";
+					turnMessage = "Blue's turn! Pick a hexagon.";
 				} else
 				{
-					turnMessage = "Green's turn!";
+					turnMessage = "Green's turn! Pick a hexagon.";
 				}
 				//make sure toast is not triggered multiple times
 				if ((System.currentTimeMillis() - playerTurnToastStartTime) > 2000)
@@ -321,18 +346,10 @@ public class UiView extends View{
 	    		} else if (hexagon.isEmpty() && ! inWinnerMode ) //hexagon is on board, but unused
 	    		{
 	    			Log.d("hex", "hex is white");
-	    			final int player = board.getPlayerId();
-	    			board2.doMove( hexagon );
-	    			if( board.doMove( hexagon ) )
-	    			{
-	    				inWinnerMode = true;
-	    				winner = player;
-	    			} else if (gameMode == 1)
-	    			{
-	    				//if it's phone's turn, do phone's move
-	    				doPhoneMove();
-	    			} 
-	    			invalidate();
+
+	    			
+	    			//animate the tile at the bottom of the page moving to its final position (the hexagon chosen)
+	    			animateNextTurnTileToFinalHexagonPosition(hexagon);
 	    		}
 	    		break;
 	    	default:
@@ -341,6 +358,51 @@ public class UiView extends View{
 	    
 		return true;
     };
+    
+    private void animateNextTurnTileToFinalHexagonPosition(Hexagon hexagon)
+    {
+		//animate the tile at the bottom of the page moving to its final position (the hexagon chosen)
+		float[] coords = drawBoardHelper.findPositionOfCenterOfHexagonalCell(hexagon.xi, hexagon.yi);
+		float xDisplacement = (int) (coords[0] - 0.26f * getWidth());
+		float yDisplacement = (int) (coords[1] - 0.948f * getHeight());
+		slide = new HexagonAnimation(0, xDisplacement, 0, yDisplacement, hexagon);
+		slide.setAnimationListener(hexAnimationListener);
+		slide.setDuration(500);
+		turnImageView.startAnimation(slide);
+
+    }
+    
+    private class HexagonAnimation extends TranslateAnimation {
+    	
+    	public Hexagon hexagon;
+    	
+    	public HexagonAnimation(float x1, float x2, float y1, float y2, Hexagon hexagon)
+    	{
+    		super(x1, x2, y1, y2);
+    		this.hexagon = hexagon;
+    	}
+    }
+    
+    private AnimationListener hexAnimationListener = new AnimationListener() {
+		public void onAnimationStart(Animation anim){};
+        public void onAnimationRepeat(Animation anim){};
+        public void onAnimationEnd(Animation anim)
+        {
+        	HexagonAnimation hexAnim = (HexagonAnimation) anim; 
+			final int player = board.getPlayerId();
+			board2.doMove( hexAnim.hexagon );
+			if( board.doMove( hexAnim.hexagon ) )
+			{
+				inWinnerMode = true;
+				winner = player;
+			} else if (gameMode == 1)
+			{
+				//if it's phone's turn, do phone's move
+				doPhoneMove();
+			}
+        	invalidate();
+        };
+	};
     
     private void doPhoneMove()
     {
@@ -378,7 +440,7 @@ public class UiView extends View{
 	private void drawTurnIndicator(Canvas canvas)
 	{
 		//indicate whose turn it is next
-		float canvasWidth = getWidth();
+		/*float canvasWidth = getWidth();
 		float canvasHeight = getHeight();
 		
 		paint.setColor( HEX_COLORS[board.getPlayerId()] );
@@ -387,7 +449,15 @@ public class UiView extends View{
     	float cx = 0.25f * canvasWidth;
     	float cy = 0.95f * canvasHeight;
     	
-		canvas.drawCircle(cx, cy, 0.15f * cx, paint);	
+		canvas.drawCircle(cx, cy, 0.15f * cx, paint);*/	
+		
+		if (board.getPlayerId() == 1)
+		{
+			turnImageView.setImageBitmap(TILES[1]);
+		} else
+		{
+			turnImageView.setImageBitmap(TILES[0]);
+		}
 	}
 	
 	private void drawUndoIcon(Canvas canvas) {
@@ -427,16 +497,7 @@ public class UiView extends View{
 	public void drawHexagon(Canvas canvas, Hexagon hex)
 	{
 		float hexSide = drawBoardHelper.getSmallHexSideLength();
-		
-		// vx, vy represents the vector of the first edge of the hexagon
-		float vx = hexSide * (float) Math.cos(Math.PI/6.0);
-		float vy = - hexSide * (float) Math.sin(Math.PI/6.0);
-		final float co = (float)Math.cos(Math.PI/3);
-		final float si = (float)Math.sin(Math.PI/3);
 
-		float x, y;
-		Path path;
-		
 		final float[] coords = drawBoardHelper.findPositionOfCenterOfHexagonalCell(hex.xi, hex.yi);
 		Bitmap bmp;
 		if (inWinnerMode && winnerModeTickCount % 2 == 0

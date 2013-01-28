@@ -2,6 +2,7 @@ package com.hexagongame;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -44,5 +45,8 @@ public class HexActivity extends Activity {
 		{
 			uiView.setBackgroundResource(R.drawable.hex_background);
 		}
+		
+		ImageView imageView = (ImageView) findViewById(R.id.tileimage);
+		uiView.setTurnImageView(imageView);
     }
 }
