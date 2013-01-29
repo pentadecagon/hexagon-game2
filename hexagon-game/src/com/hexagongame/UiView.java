@@ -248,7 +248,7 @@ public class UiView extends View{
 		float y = (float) event.getY();
 		if (y > 0.9f * canvasHeight)
 		{
-			if (x > 0.2 * canvasWidth && x < 0.3 * canvasWidth)
+			if (!inWinnerMode && x > 0.2 * canvasWidth && x < 0.3 * canvasWidth)
 			{
 				//turn indicator: if user taps on the circle, show a message showing whose turn it is next
 				Context context = getContext();
@@ -433,7 +433,13 @@ public class UiView extends View{
 		canvas.drawCircle(cx, cy, 0.15f * cx, paint);*/	
 
 		turnImageViews[((board.getPlayerId() == 1) ? 0 : 1)].setVisibility(View.GONE);
-		turnImageViews[board.getPlayerId()].setVisibility(View.VISIBLE);
+		if (inWinnerMode)
+		{
+			turnImageViews[board.getPlayerId()].setVisibility(View.GONE);
+		} else
+		{
+			turnImageViews[board.getPlayerId()].setVisibility(View.VISIBLE);
+		}
 	}
 	
 	private void drawUndoIcon(Canvas canvas) {
