@@ -513,13 +513,15 @@ public class UiView extends View{
 		if (hex.xid == hexSelected && hex.isEmpty())
 		{
 			paint.setColorFilter(highlightFilter);
-		} else
-		{
-			paint.setColorFilter(null);
 		}
 		
 		canvas.drawBitmap(bmp, coords[0] - drawBoardHelper.getWCell()/2.0f ,coords[1] - hexSide, paint);
 			
+    	//cancel the color filter that was used for drawing the highlighted hexagon
+		if (paint.getColorFilter() != null)
+		{
+			paint.setColorFilter(null);
+		}
 //		paint.setStrokeWidth(1);
 //		canvas.drawText( ""+hex.xid, coords[0], coords[1], paint);
 	}
