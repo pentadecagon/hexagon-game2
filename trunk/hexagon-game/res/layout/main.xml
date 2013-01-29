@@ -11,18 +11,6 @@
   android:layout_height="wrap_content"
   />
 
-      <TextView
-          android:id="@+id/winnertext"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:textColor="#ffffff"
-          android:textSize="25sp"
-          android:layout_centerHorizontal="true"
-		  android:layout_alignParentBottom="true"
-		  android:layout_marginBottom="70dip"
-		  android:visibility="gone"
-          android:background="@drawable/winner_message" />
-      
       <LinearLayout
         android:id="@+id/phonethinkingtext"
         android:layout_width="wrap_content"
