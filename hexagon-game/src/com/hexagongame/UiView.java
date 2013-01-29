@@ -91,7 +91,10 @@ public class UiView extends View{
 	public int hexSelected = -1;
 	
 	//filter for highlighting a hexagon
-	ColorFilter highlightFilter = new LightingColorFilter(android.graphics.Color.parseColor("#FFBF00"), 1);
+	ColorFilter[] highlightFilters = {
+			new LightingColorFilter(android.graphics.Color.parseColor("#FFBF00"), 1),
+			new LightingColorFilter(android.graphics.Color.parseColor("#E2725B"), 1)
+	};
 
 	public UiView(Context context, AttributeSet attrs) {
 		
@@ -193,26 +196,18 @@ public class UiView extends View{
 				  phoneThinkingNotification.setVisibility(View.VISIBLE);
 			  }});
 			  
-			  Hexagon move = solver.bestMove(board2);
-			  if( move != null ){
-				  board2.doMove(move);
-				  if( board.doMove( move ) ){
-					  inWinnerMode = true;
-					  winner = board.getPlayerId();
-				  }
-				  
-			  } else {
-				  Log.e("hex", "move is null");
-			  }
+			  final Hexagon move = solver.bestMove(board2);
+			  
+			  //highlight the hexagon chosen
+			  hexSelected = move.xid;
+			  postInvalidate();
 			  
 			  //hide "phone is thinking" message
 			  ac.runOnUiThread(new Runnable(){ public void run() {
 				  phoneThinkingNotification.setVisibility(View.GONE);
+				  //animate the tile at the bottom of the page moving to its final position (the hexagon chosen)
+				  animateNextTurnTileToFinalHexagonPosition(move, phoneMoveAnimationListener);
 			  }});
-			  
-			  //update the view
-			  postInvalidate();
-			  phoneMoveThread = null;
 		  }
 	  };
 	
@@ -326,7 +321,7 @@ public class UiView extends View{
 
 	    			
 	    			//animate the tile at the bottom of the page moving to its final position (the hexagon chosen)
-	    			animateNextTurnTileToFinalHexagonPosition(hexagon);
+	    			animateNextTurnTileToFinalHexagonPosition(hexagon, playerMoveAnimationListener);
 	    		}
 	    		break;
 	    	default:
@@ -336,14 +331,14 @@ public class UiView extends View{
 		return true;
     };
     
-    private void animateNextTurnTileToFinalHexagonPosition(Hexagon hexagon)
+    private void animateNextTurnTileToFinalHexagonPosition(Hexagon hexagon, AnimationListener listener)
     {
 		//animate the tile at the bottom of the page moving to its final position (the hexagon chosen)
 		float[] coords = drawBoardHelper.findPositionOfCenterOfHexagonalCell(hexagon.xi, hexagon.yi);
 		float xDisplacement = (int) (coords[0] - 0.26f * getWidth());
 		float yDisplacement = (int) (coords[1] - 0.948f * getHeight());
 		slide = new HexagonAnimation(0, xDisplacement, 0, yDisplacement, hexagon);
-		slide.setAnimationListener(hexAnimationListener);
+		slide.setAnimationListener(listener);
 		slide.setDuration(500);
 		turnImageViews[board.getPlayerId()].startAnimation(slide);
 
@@ -360,7 +355,7 @@ public class UiView extends View{
     	}
     }
     
-    private AnimationListener hexAnimationListener = new AnimationListener() {
+    private AnimationListener playerMoveAnimationListener = new AnimationListener() {
 		public void onAnimationStart(Animation anim){};
         public void onAnimationRepeat(Animation anim){};
         public void onAnimationEnd(Animation anim)
@@ -382,6 +377,32 @@ public class UiView extends View{
 				//if it's phone's turn, do phone's move
 				doPhoneMove();
         	}
+        };
+	};
+	
+	private AnimationListener phoneMoveAnimationListener = new AnimationListener() {
+		public void onAnimationStart(Animation anim){};
+        public void onAnimationRepeat(Animation anim){};
+        public void onAnimationEnd(Animation anim)
+        {
+        	HexagonAnimation hexAnim = (HexagonAnimation) anim;
+        	Hexagon move = hexAnim.hexagon;
+			if( move != null ){
+				board2.doMove(move);
+				if( board.doMove( move ) ){
+					inWinnerMode = true;
+					winner = board.getPlayerId();
+				}
+				  
+			} else {
+				Log.e("hex", "move is null");
+			}
+
+			hexSelected = -1; //for highlighting the currently touched hexagon: : -1 means no hexagon is touched
+			
+			//update the view
+			postInvalidate();
+			phoneMoveThread = null;
         };
 	};
     
@@ -494,7 +515,7 @@ public class UiView extends View{
 		//if this hexagon is currently highlighted, add an effect
 		if (hex.xid == hexSelected && hex.isEmpty())
 		{
-			paint.setColorFilter(highlightFilter);
+			paint.setColorFilter(highlightFilters[board.getPlayerId()]);
 		}
 		
 		canvas.drawBitmap(bmp, coords[0] - drawBoardHelper.getWCell()/2.0f ,coords[1] - hexSide, paint);
