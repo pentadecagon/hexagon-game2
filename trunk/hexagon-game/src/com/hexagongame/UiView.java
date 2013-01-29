@@ -63,7 +63,7 @@ public class UiView extends View{
 	
 	private LinearLayout phoneThinkingNotification = null;
 	
-	private ImageView turnImageView = null;
+	private ImageView [] turnImageViews = null;
 	
 	private TranslateAnimation slide;
 	
@@ -116,9 +116,9 @@ public class UiView extends View{
 		this.phoneThinkingNotification = phoneThinkingNotification;
 	}
 	
-	protected void setTurnImageView(ImageView turnImageView)
+	protected void setTurnImageViews(ImageView [] turnImageViews)
 	{
-		this.turnImageView = turnImageView;
+		this.turnImageViews = turnImageViews;
 	}
 	
 	@Override
@@ -140,13 +140,14 @@ public class UiView extends View{
 		TILES_HIGHLIGHT[0] = initializeImage(R.drawable.blue_tile_highlight);
 		TILES_HIGHLIGHT[1] = initializeImage(R.drawable.green_tile_highlight);
 			
-		turnImageView.setImageBitmap(TILES[0]);
-		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)turnImageView.getLayoutParams();
-		params.setMargins((int) (0.2f * canvasWidth), 0, 0, (int) (0.0f * canvasHeight));
-		params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-		turnImageView.setLayoutParams(params); //causes layout update
-		
-		turnImageView.setVisibility(View.VISIBLE);
+		for (int i = 0; i <2; i++)
+		{
+			turnImageViews[i].setImageBitmap(TILES[i]);
+			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)turnImageViews[i].getLayoutParams();
+			params.setMargins((int) (0.2f * canvasWidth), 0, 0, (int) (0.0f * canvasHeight));
+			params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+			turnImageViews[i].setLayoutParams(params); //causes layout update
+		}
 	}
 	
 	  /**
@@ -337,11 +338,11 @@ public class UiView extends View{
 	    		}
 	    		break;
 	    	case MotionEvent.ACTION_UP:
-	    		hexSelected = -1; //for highlighting the currently touched hexagon: : -1 means no hexagon is touched
 	    		//respond to user's touch on the screen
 	    		if (hexagon == null) //hexagon is out of scope of board
 	    		{
 	    			Log.d("hex", "hex is out of scope of board");
+	    			hexSelected = -1; //for highlighting the currently touched hexagon: : -1 means no hexagon is touched
 	    			tappedOutsideBoard(event);
 	    		} else if (hexagon.isEmpty() && ! inWinnerMode ) //hexagon is on board, but unused
 	    		{
@@ -368,7 +369,7 @@ public class UiView extends View{
 		slide = new HexagonAnimation(0, xDisplacement, 0, yDisplacement, hexagon);
 		slide.setAnimationListener(hexAnimationListener);
 		slide.setDuration(500);
-		turnImageView.startAnimation(slide);
+		turnImageViews[board.getPlayerId()].startAnimation(slide);
 
     }
     
@@ -395,12 +396,16 @@ public class UiView extends View{
 			{
 				inWinnerMode = true;
 				winner = player;
-			} else if (gameMode == 1)
-			{
+			}
+			
+			hexSelected = -1; //for highlighting the currently touched hexagon: : -1 means no hexagon is touched
+        	invalidate();
+        	
+        	if (!inWinnerMode && gameMode == 1)
+        	{
 				//if it's phone's turn, do phone's move
 				doPhoneMove();
-			}
-        	invalidate();
+        	}
         };
 	};
     
@@ -450,14 +455,9 @@ public class UiView extends View{
     	float cy = 0.95f * canvasHeight;
     	
 		canvas.drawCircle(cx, cy, 0.15f * cx, paint);*/	
-		
-		if (board.getPlayerId() == 1)
-		{
-			turnImageView.setImageBitmap(TILES[1]);
-		} else
-		{
-			turnImageView.setImageBitmap(TILES[0]);
-		}
+
+		turnImageViews[((board.getPlayerId() == 1) ? 0 : 1)].setVisibility(View.GONE);
+		turnImageViews[board.getPlayerId()].setVisibility(View.VISIBLE);
 	}
 	
 	private void drawUndoIcon(Canvas canvas) {
