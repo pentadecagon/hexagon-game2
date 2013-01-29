@@ -58,9 +58,7 @@ public class UiView extends View{
 	private boolean inWinnerMode = false;
 	private int winnerModeTickCount = 0;
 	private int winner = 0;
-	
-	private TextView winnerNotification = null;
-	
+
 	private LinearLayout phoneThinkingNotification = null;
 	
 	private ImageView [] turnImageViews = null;
@@ -104,12 +102,6 @@ public class UiView extends View{
 		board2 = new Board( ChooseBoardView.boardShape, ChooseBoardView.boardSize );
 		solver = new Solver6(4.0, 3);		
 	}
-			
-	public void setWinnerNotification(TextView winnerNotification)
-	{
-		this.winnerNotification = winnerNotification;
-	}
-
 	
 	protected void setPhoneThinkingNotification(LinearLayout phoneThinkingNotification)
 	{
@@ -166,14 +158,6 @@ public class UiView extends View{
 	
 	@Override
 	protected void onDraw(Canvas canvas) {
-
-		//turnImageView.setVisibility(View.VISIBLE); //xxx
-
-		
-		if (inWinnerMode && !winnerNotification.isShown())
-		{
-			showWinnerCongratulationsMessage(canvas);
-		}
 
 		//draw the bottom nav containing turn indicator & undo functionality
 		drawBottomNav(canvas);
@@ -243,19 +227,11 @@ public class UiView extends View{
         }
     };
 	
-	protected void showWinnerCongratulationsMessage(Canvas canvas)
-	{
-		//someone has won: congratulate the winner
-		winnerNotification.setText(((winner == 1) ? "Green" : "Blue") + " wins!");
-		winnerNotification.setVisibility(View.VISIBLE);		
-	}
-
 	void undo(){
 		//if we're in winner mode, revert it
 		if (inWinnerMode)
 		{
-			inWinnerMode = false;
-			winnerNotification.setVisibility(View.INVISIBLE);		
+			inWinnerMode = false;	
 		}
 		for( int i=0; i<gameMode+1; ++i ){ // need to undo twice when playing against the computer
 			board.undo();
