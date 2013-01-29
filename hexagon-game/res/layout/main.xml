@@ -48,7 +48,14 @@
   </LinearLayout>
   
       <ImageView
-  android:id="@+id/tileimage"
+  android:id="@+id/tileimage0"
+     android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+    android:visibility="gone"
+    />
+      
+    <ImageView
+  android:id="@+id/tileimage1"
      android:layout_width="wrap_content"
       android:layout_height="wrap_content"
     android:visibility="gone"

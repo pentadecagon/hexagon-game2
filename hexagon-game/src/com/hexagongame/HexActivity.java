@@ -46,7 +46,7 @@ public class HexActivity extends Activity {
 			uiView.setBackgroundResource(R.drawable.hex_background);
 		}
 		
-		ImageView imageView = (ImageView) findViewById(R.id.tileimage);
-		uiView.setTurnImageView(imageView);
+		ImageView [] imageViews = {(ImageView) findViewById(R.id.tileimage0), (ImageView) findViewById(R.id.tileimage1)};
+		uiView.setTurnImageViews(imageViews);
     }
 }
