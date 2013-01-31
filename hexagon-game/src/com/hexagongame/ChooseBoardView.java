@@ -22,6 +22,9 @@ public class ChooseBoardView extends View {
 	
 	public static int boardSize = 1;
 	
+	//how good the automatic phone opponent AI is
+	public static int opponentStrength = 3;
+	
 	public ChooseBoardView(Context context, AttributeSet attrs) {
 		
 		super(context, attrs);

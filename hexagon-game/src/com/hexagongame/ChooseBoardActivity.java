@@ -12,7 +12,7 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
-public class ChooseBoardActivity extends Activity implements OnSeekBarChangeListener {
+public class ChooseBoardActivity extends Activity {
 	
 	private int gameMode = 0;
 	
@@ -24,11 +24,18 @@ public class ChooseBoardActivity extends Activity implements OnSeekBarChangeList
 	
 	private SeekBar bar; // declare seekbar object variable
 	
+	private SeekBar bar2;
+	
 	// declare text label objects
-	private TextView textProgress;
+	private TextView boardSizeTextProgress;
+	
+	private TextView opponentStrengthTextProgress;
 	
 	//display the labels for the bar that the user can move to change the board size
 	private String[] sizeBarLabels = {"1", "2", "3"};
+	
+	//display the labels for the bar that the user can move to change the automatic phone AI opponent strength
+	private String[] opponentStrengthBarLabels = {"1", "2", "3", "4"};
 	
 	private ChooseBoardView chooseBoardView;
 	
@@ -51,14 +58,17 @@ public class ChooseBoardActivity extends Activity implements OnSeekBarChangeList
 		gameModeRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 	        public void onCheckedChanged(RadioGroup radioGroup, int i) {
 	        	LinearLayout gameModeLayout = (LinearLayout) ChooseBoardActivity.this.findViewById(R.id.player_order);
+	        	LinearLayout opponentStrengthSeekbar = (LinearLayout) ChooseBoardActivity.this.findViewById(R.id.opponent_strength_seekbar);
 	        	switch (i) {
 		        	case R.id.person:
 		        		gameMode = 0;
 		        		gameModeLayout.setVisibility(LinearLayout.GONE);
+		        		opponentStrengthSeekbar.setVisibility(LinearLayout.GONE);
 		        		break;
 		        	case R.id.phone:
 		        		gameMode = 1;
 		        		gameModeLayout.setVisibility(LinearLayout.VISIBLE);
+		        		opponentStrengthSeekbar.setVisibility(LinearLayout.VISIBLE);
 		        		break;
 	        	}
 	        }
@@ -95,31 +105,63 @@ public class ChooseBoardActivity extends Activity implements OnSeekBarChangeList
 		
 		//initialise slider
         bar = (SeekBar)findViewById(R.id.seekBar1); // make seekbar object
-        bar.setOnSeekBarChangeListener(this); // set seekbar listener.
+        bar.setOnSeekBarChangeListener(boardSizeSeekBarListener); // set seekbar listener.
         // since we are using this class as the listener the class is "this"        
         // make text label for progress value
-        textProgress = (TextView)findViewById(R.id.textViewProgress);
+        boardSizeTextProgress = (TextView)findViewById(R.id.textViewProgress);
+        
+        //set up seek bar for the opponent strength
+        bar2 = (SeekBar)findViewById(R.id.seekBar2); // make seekbar object
+        bar2.setOnSeekBarChangeListener(opponentStrengthSeekBarListener); // set seekbar listener.
+        
+        opponentStrengthTextProgress = (TextView)findViewById(R.id.textViewProgressOpponentStrength);
 
 		//populate the form based on initial values passed to the activity
 		populateForm();
     }
     
-    //set onchanged activity for sliders
-    public void onProgressChanged(SeekBar seekBar, int progress,
-    		boolean fromUser) {
-    	// change progress text label with current seekbar value
-    	textProgress.setText(sizeBarLabels[progress]);
-    	ChooseBoardView.boardSize = progress;
-    	chooseBoardView.postInvalidate();
-    }
+    private BoardSizeSeekBarListener boardSizeSeekBarListener = new BoardSizeSeekBarListener();
+    
+    private class BoardSizeSeekBarListener implements OnSeekBarChangeListener {
+    	//set onchanged activity for sliders
+        public void onProgressChanged(SeekBar seekBar, int progress,
+        		boolean fromUser) {
+        	// change progress text label with current seekbar value
+        	boardSizeTextProgress.setText(sizeBarLabels[progress]);
+        	ChooseBoardView.boardSize = progress;
+        	chooseBoardView.postInvalidate();
+        }
 
-    //set method for when user stops dragging slider
-    public void onStopTrackingTouch(SeekBar seekBar) {
-    	seekBar.setSecondaryProgress(seekBar.getProgress()); // set the shade of the previous value. 	
-    }
+        //set method for when user stops dragging slider
+        public void onStopTrackingTouch(SeekBar seekBar) {
+        	seekBar.setSecondaryProgress(seekBar.getProgress()); // set the shade of the previous value. 	
+        }
 
-    //set method for when user starts dragging slider
-    public void onStartTrackingTouch(SeekBar seekBar) {
+        //set method for when user starts dragging slider
+        public void onStartTrackingTouch(SeekBar seekBar) {
+        }	
+    }
+    
+    private OpponentStrengthSeekBarListener opponentStrengthSeekBarListener = new OpponentStrengthSeekBarListener();
+    
+    private class OpponentStrengthSeekBarListener implements OnSeekBarChangeListener {
+    	//set onchanged activity for sliders
+        public void onProgressChanged(SeekBar seekBar, int progress,
+        		boolean fromUser) {
+        	// change progress text label with current seekbar value
+        	opponentStrengthTextProgress.setText(opponentStrengthBarLabels[progress]);
+        	ChooseBoardView.opponentStrength = progress + 1;
+        	chooseBoardView.postInvalidate();
+        }
+
+        //set method for when user stops dragging slider
+        public void onStopTrackingTouch(SeekBar seekBar) {
+        	seekBar.setSecondaryProgress(seekBar.getProgress()); // set the shade of the previous value. 	
+        }
+
+        //set method for when user starts dragging slider
+        public void onStartTrackingTouch(SeekBar seekBar) {
+        }	
     }
     
     //populate the form based on initial values passed to the activity
@@ -153,8 +195,13 @@ public class ChooseBoardActivity extends Activity implements OnSeekBarChangeList
         		break;
         }
         
-        //set slider value
+        //set slider values
+        
+        //board size bar
         bar.setProgress(ChooseBoardView.boardSize);
+        
+        //opponent strength bar
+        bar2.setProgress(ChooseBoardView.opponentStrength - 1);
     }
 
 }

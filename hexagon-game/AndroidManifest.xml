@@ -21,6 +21,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ChooseBoardActivity"
+            android:screenOrientation="portrait"
             android:launchMode="singleInstance"></activity>
     </application>
 
