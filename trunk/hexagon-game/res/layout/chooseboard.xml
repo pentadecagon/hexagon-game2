@@ -9,7 +9,7 @@
       android:orientation="horizontal"
       android:layout_width="fill_parent"
       android:layout_height="wrap_content"
-      android:layout_weight="6">
+      android:layout_weight="10">
 	<TextView android:text="Board shape"
 	    android:layout_width="100dp"
 	    android:paddingLeft="16dp"
@@ -22,31 +22,26 @@
 	  />
   </LinearLayout>
 
-  <LinearLayout
-      android:orientation="horizontal"
-      android:layout_width="fill_parent"
-      android:layout_height="wrap_content"
-      android:layout_weight="1">
-		<TextView android:text="Board size"
-	    android:id="@+id/textViewBoardSize"
-	    android:layout_width="100dp"
-	    android:paddingLeft="16dp"
-	    android:paddingTop="5dp"
-  		android:layout_height="wrap_content"/>	
-  </LinearLayout>
+
   
   <LinearLayout
       android:orientation="horizontal"
       android:layout_width="fill_parent"
       android:layout_height="wrap_content"
       android:layout_weight="3">
+	        <TextView android:text="Board size"
+	    android:id="@+id/textViewBoardSize"
+	    android:layout_width="100dp"
+	    android:paddingLeft="16dp"
+	    android:paddingTop="5dp"
+  		android:layout_height="wrap_content"/>	
     <RelativeLayout android:id="@+id/relativeLayout1"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         xmlns:android="http://schemas.android.com/apk/res/android"
-        android:paddingLeft="70dp"
-        android:paddingRight="70dp"
-        android:paddingTop="20dp">
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
+
         <SeekBar android:id="@+id/seekBar1"
             android:max="2"
             android:layout_width="match_parent"
@@ -107,11 +102,50 @@
 		android:text="Phone is green (goes second)"/>
 	</RadioGroup>
   </LinearLayout>
+
+  <LinearLayout
+      android:id="@+id/opponent_strength_seekbar"
+      android:visibility="gone"
+      android:orientation="horizontal"
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:layout_weight="3">
+			<TextView android:text="Opponent Strength"
+	    android:id="@+id/textViewOpponentStrength"
+	    android:layout_width="100dp"
+	    android:paddingLeft="16dp"
+	    android:paddingTop="5dp"
+  		android:layout_height="wrap_content"/>
+    <RelativeLayout android:id="@+id/relativeLayout2"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
+        <SeekBar android:id="@+id/seekBar2"
+            android:max="3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"           
+            android:layout_alignParentLeft="true"
+			android:layout_alignParentTop="true">
+        </SeekBar>
+        <TextView
+            android:text="1"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:id="@+id/textViewProgressOpponentStrength"
+            android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:layout_centerInParent="true"
+			android:paddingTop="35dp">
+        </TextView>        	
+    </RelativeLayout>
+   </LinearLayout>
+  
   <LinearLayout
       android:orientation="horizontal"
       android:layout_width="fill_parent"
       android:layout_height="wrap_content"
-      android:layout_weight="5">
+      android:layout_weight="3">
 	<RelativeLayout 
     android:layout_width="fill_parent" 
     android:layout_height="fill_parent">

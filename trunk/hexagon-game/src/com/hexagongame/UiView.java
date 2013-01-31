@@ -103,7 +103,8 @@ public class UiView extends View{
 		paint = new Paint();
 		board = new Board( ChooseBoardView.boardShape, ChooseBoardView.boardSize );
 		board2 = new Board( ChooseBoardView.boardShape, ChooseBoardView.boardSize );
-		solver = new Solver6(4.0, 3);		
+		Log.d("hex", "setting AI strength to "+ChooseBoardView.opponentStrength);
+		solver = new Solver6(4.0, ChooseBoardView.opponentStrength);		
 	}
 	
 	protected void setPhoneThinkingNotification(LinearLayout phoneThinkingNotification)
