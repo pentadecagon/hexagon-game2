@@ -11,7 +11,7 @@ import android.graphics.ColorFilter;
 import android.graphics.LightingColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Path;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.CountDownTimer;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -23,7 +23,6 @@ import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.hexagongame.game.Board;
@@ -92,8 +91,13 @@ public class UiView extends View{
 	
 	//filter for highlighting a hexagon
 	ColorFilter[] highlightFilters = {
-			new LightingColorFilter(android.graphics.Color.parseColor("#FFBF00"), 1),
-			new LightingColorFilter(android.graphics.Color.parseColor("#E2725B"), 1)
+			new LightingColorFilter(android.graphics.Color.parseColor("#ff8000"), 1),
+			new LightingColorFilter(android.graphics.Color.parseColor("#ffC000"), 1)
+	};
+	
+	String[] playerNames = {
+		"Red",
+		"Yellow"
 	};
 
 	public UiView(Context context, AttributeSet attrs) {
@@ -129,28 +133,30 @@ public class UiView extends View{
 			doPhoneMove();
 		}
 		
-		TILES[0] = initializeImage(R.drawable.blue_tile);
-		TILES[1] = initializeImage(R.drawable.green_tile);
-		TILES[2] = initializeImage(R.drawable.unused_tile);
+		//initialize the images used for the individual tiles on the board
+		initializeTileImages();
 
-		TILES_HIGHLIGHT[0] = initializeImage(R.drawable.blue_tile_highlight);
-		TILES_HIGHLIGHT[1] = initializeImage(R.drawable.green_tile_highlight);
+		//initialize the images used for the "x's turn next" icon
+		initializeTurnIndicatorImages();
+	}
+	
+	//initialize the images used for the individual tiles on the board
+	private void initializeTileImages()
+	{
+		TILES[0] = initializeTileImage(R.drawable.blue_tile);
+		TILES[1] = initializeTileImage(R.drawable.green_tile);
+		TILES[2] = initializeTileImage(R.drawable.unused_tile);
+
+		TILES_HIGHLIGHT[0] = initializeTileImage(R.drawable.blue_tile_highlight);
+		TILES_HIGHLIGHT[1] = initializeTileImage(R.drawable.green_tile_highlight);
 			
-		for (int i = 0; i <2; i++)
-		{
-			turnImageViews[i].setImageBitmap(TILES[i]);
-			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)turnImageViews[i].getLayoutParams();
-			params.setMargins((int) (0.2f * canvasWidth), 0, 0, (int) (0.0f * canvasHeight));
-			params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-			turnImageViews[i].setLayoutParams(params); //causes layout update
-		}
 	}
 	
 	  /**
-	   * Create and resize the image.
+	   * Create and resize the tile image.
 	   */
 	
-	private Bitmap initializeImage(int id)
+	private Bitmap initializeTileImage(int id)
 	{
 		Bitmap bmp = BitmapFactory.decodeResource(getResources(), id);
 		Matrix matrix = new Matrix();
@@ -158,6 +164,23 @@ public class UiView extends View{
 		matrix.postScale(scale, scale);
 		Bitmap resizedBitmap = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, true);
 		return resizedBitmap;
+	}
+	
+	//initialize the images used for the "x's turn next" icon
+	private void initializeTurnIndicatorImages()
+	{
+    	Matrix matrix = new Matrix();
+    	float scale = 0.08f * getHeight() / TILES[0].getHeight();
+		matrix.postScale(scale, scale);
+		
+		for (int i = 0; i <2; i++)
+		{
+			turnImageViews[i].setImageBitmap(Bitmap.createBitmap(TILES[i], 0, 0, TILES[i].getWidth(), TILES[i].getHeight(), matrix, true));
+			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)turnImageViews[i].getLayoutParams();
+			params.setMargins((int) (0.2f * getWidth()), 0, 0, (int) (0.01f * getHeight()));
+			params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+			turnImageViews[i].setLayoutParams(params); //causes layout update
+		}
 	}
 	
 	@Override
@@ -248,14 +271,8 @@ public class UiView extends View{
 			{
 				//turn indicator: if user taps on the circle, show a message showing whose turn it is next
 				Context context = getContext();
-				String turnMessage = "";
-				if (board.getPlayerId() == 0)
-				{
-					turnMessage = "Blue's turn! Pick a hexagon.";
-				} else
-				{
-					turnMessage = "Green's turn! Pick a hexagon.";
-				}
+				String turnMessage = playerNames[board.getPlayerId()] + "'s turn! Pick a hexagon.";
+				
 				//make sure toast is not triggered multiple times
 				if ((System.currentTimeMillis() - playerTurnToastStartTime) > 2000)
 				{
@@ -336,8 +353,13 @@ public class UiView extends View{
     {
 		//animate the tile at the bottom of the page moving to its final position (the hexagon chosen)
 		float[] coords = drawBoardHelper.findPositionOfCenterOfHexagonalCell(hexagon.xi, hexagon.yi);
-		float xDisplacement = (int) (coords[0] - 0.26f * getWidth());
-		float yDisplacement = (int) (coords[1] - 0.948f * getHeight());
+    	
+    	RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) turnImageViews[0].getLayoutParams();
+    	Bitmap turnIndicatorBitmap = ((BitmapDrawable)turnImageViews[0].getDrawable()).getBitmap();
+    	
+		float xDisplacement = (int) (coords[0] - params.leftMargin - turnIndicatorBitmap.getWidth()/2.0);
+		float yDisplacement = (int) (coords[1] - (getHeight() - params.bottomMargin - turnIndicatorBitmap.getHeight() + turnIndicatorBitmap.getHeight()/2.0));
+
 		slide = new HexagonAnimation(0, xDisplacement, 0, yDisplacement, hexagon);
 		slide.setAnimationListener(listener);
 		slide.setDuration(500);
