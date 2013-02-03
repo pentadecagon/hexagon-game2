@@ -96,10 +96,10 @@
 	  android:layout_width="match_parent"
 	  android:layout_height="wrap_content">
 		<RadioButton android:id="@+id/blue"
-		android:text="Phone is blue (goes first)"
+		android:text="Phone goes first"
 		android:checked="true"/>
 		<RadioButton android:id="@+id/green"
-		android:text="Phone is green (goes second)"/>
+		android:text="Phone goes second"/>
 	</RadioGroup>
   </LinearLayout>
 
