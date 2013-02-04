@@ -34,15 +34,31 @@ public class HexActivity extends Activity {
 		LinearLayout phoneThinkingNotification = (LinearLayout) findViewById(R.id.phonethinkingtext);
 		uiView.setPhoneThinkingNotification(phoneThinkingNotification);
 		
+		setBackground(uiView);
+		
+		ImageView [] imageViews = {(ImageView) findViewById(R.id.tileimage0), (ImageView) findViewById(R.id.tileimage1)};
+		uiView.setTurnImageViews(imageViews);
+    }
+    
+    private void setBackground(UiView uiView)
+    {
 		if (ChooseBoardView.boardShape == 1)
 		{
 			uiView.setBackgroundResource(R.drawable.square_background);
 		} else
 		{
-			uiView.setBackgroundResource(R.drawable.hex_background);
-		}
-		
-		ImageView [] imageViews = {(ImageView) findViewById(R.id.tileimage0), (ImageView) findViewById(R.id.tileimage1)};
-		uiView.setTurnImageViews(imageViews);
+			switch (ChooseBoardView.boardSize)
+			{
+				case 0:
+					uiView.setBackgroundResource(R.drawable.hex_background_1);
+					break;
+				case 1:
+					uiView.setBackgroundResource(R.drawable.hex_background_2);
+					break;
+				case 2:
+					uiView.setBackgroundResource(R.drawable.hex_background_3);
+					break;
+			}			
+		}	
     }
 }
