@@ -82,9 +82,12 @@ public class UiView extends View{
 	//thread in which phone's next move is calculated in "play against phone" mode
 	Thread phoneMoveThread = null;
 	
-	Bitmap[] TILES = new Bitmap[3];
+	private Bitmap[] TILES = new Bitmap[3];
 	
-	Bitmap[] TILES_HIGHLIGHT = new Bitmap[2];
+	private Bitmap[] TILES_HIGHLIGHT = new Bitmap[2];
+	
+	//images used in the bottom navigation
+	private Bitmap undoImageWhite, undoImageBlack, refreshImage; 
 	
 	 //for highlighting the currently touched hexagon: -1 means no hexagon is touched
 	public int hexSelected = -1;
@@ -99,6 +102,12 @@ public class UiView extends View{
 		"Red",
 		"Yellow"
 	};
+	
+	//point, as a fraction of the height, where the bottom nav starts
+	private static final float bottomNavTop = 0.844f;
+	
+	//point, as a fraction of the height, where the bottom nav midpoint is
+	private static final float bottomNavMidPoint = 0.922f;
 
 	public UiView(Context context, AttributeSet attrs) {
 		
@@ -138,6 +147,9 @@ public class UiView extends View{
 
 		//initialize the images used for the "x's turn next" icon
 		initializeTurnIndicatorImages();
+		
+		//initialize images used in the bottom nav
+		initializeBottomNavImages();
 	}
 	
 	//initialize the images used for the individual tiles on the board
@@ -169,18 +181,22 @@ public class UiView extends View{
 	//initialize the images used for the "x's turn next" icon
 	private void initializeTurnIndicatorImages()
 	{
-    	Matrix matrix = new Matrix();
-    	float scale = 0.08f * getHeight() / TILES[0].getHeight();
-		matrix.postScale(scale, scale);
-		
 		for (int i = 0; i <2; i++)
 		{
-			turnImageViews[i].setImageBitmap(Bitmap.createBitmap(TILES[i], 0, 0, TILES[i].getWidth(), TILES[i].getHeight(), matrix, true));
+			turnImageViews[i].setImageBitmap(TILES[i]);
 			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)turnImageViews[i].getLayoutParams();
-			params.setMargins((int) (0.2f * getWidth()), 0, 0, (int) (0.01f * getHeight()));
+			params.setMargins((int) (0.2f * getWidth()), 0, 0, (int) ((1.0f - bottomNavMidPoint) * getHeight() - TILES[i].getHeight()/2.0));
 			params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
 			turnImageViews[i].setLayoutParams(params); //causes layout update
 		}
+	}
+	
+	//initialize images used in the bottom nav
+	private void initializeBottomNavImages()
+	{
+		undoImageWhite = BitmapFactory.decodeResource(getResources(), R.drawable.undo);
+		undoImageBlack = BitmapFactory.decodeResource(getResources(), R.drawable.undo_black);
+		refreshImage = BitmapFactory.decodeResource(getResources(), R.drawable.refresh);
 	}
 	
 	@Override
@@ -265,9 +281,10 @@ public class UiView extends View{
 		float canvasHeight = getHeight();
 		float x = (float) event.getX();
 		float y = (float) event.getY();
-		if (y > 0.9f * canvasHeight)
+		//if the user has clicked in the bottom navigation
+		if (y > bottomNavTop * canvasHeight)
 		{
-			if (!inWinnerMode && x > 0.2 * canvasWidth && x < 0.3 * canvasWidth)
+			if (!inWinnerMode && tappedOnTurnIndicatorImage(canvasWidth, canvasHeight, x, y))
 			{
 				//turn indicator: if user taps on the circle, show a message showing whose turn it is next
 				Context context = getContext();
@@ -281,11 +298,11 @@ public class UiView extends View{
     				toast.show();	    					
 				}
 					
-			} else if (x >= 0.45 * canvasWidth && x <= 0.55 * canvasWidth)
+			} else if (tappedOnTurnUndoImage(canvasWidth, canvasHeight, x, y))
 			{
 				//undo button clicked
 				undo();
-			} else if (x >= 0.7 * canvasWidth && x <= 0.8 * canvasWidth)
+			} else if (tappedOnRefreshImage(canvasWidth, canvasHeight, x, y))
 			{
 				//restart button clicked
 				doRestartButtonOnClick();
@@ -293,6 +310,33 @@ public class UiView extends View{
 		}
 			
 		//do nothing
+	}
+	
+	//if the user has tapped on the "whose turn is it next" indicator
+	private boolean tappedOnTurnIndicatorImage(float canvasWidth, float canvasHeight, float x, float y)
+	{
+		return (x > 0.2 * canvasWidth
+				&& x < 0.3 * canvasWidth
+				&& y > (bottomNavMidPoint * canvasHeight - TILES[0].getHeight()/2.0)
+				&& y < (bottomNavMidPoint * canvasHeight + TILES[0].getHeight()/2.0));
+	}
+	
+	//if the user has tapped on the undo image
+	private boolean tappedOnTurnUndoImage(float canvasWidth, float canvasHeight, float x, float y)
+	{
+		return (x >= 0.45 * canvasWidth
+				&& x <= 0.55 * canvasWidth
+				&& y > (bottomNavMidPoint * canvasHeight - undoImageWhite.getHeight()/2.0)
+				&& y < (bottomNavMidPoint * canvasHeight + undoImageWhite.getHeight()/2.0));
+	}
+	
+	//if the user has tapped on the refresh image
+	private boolean tappedOnRefreshImage(float canvasWidth, float canvasHeight, float x, float y)
+	{
+		return (x >= 0.7 * canvasWidth
+				&& x <= 0.8 * canvasWidth
+				&& y > (bottomNavMidPoint * canvasHeight - refreshImage.getHeight()/2.0)
+				&& y < (bottomNavMidPoint * canvasHeight + refreshImage.getHeight()/2.0));
 	}
 	
 	@Override
@@ -465,17 +509,6 @@ public class UiView extends View{
 	private void drawTurnIndicator(Canvas canvas)
 	{
 		//indicate whose turn it is next
-		/*float canvasWidth = getWidth();
-		float canvasHeight = getHeight();
-		
-		paint.setColor( HEX_COLORS[board.getPlayerId()] );
-    	paint.setStyle(Paint.Style.FILL);
-    	
-    	float cx = 0.25f * canvasWidth;
-    	float cy = 0.95f * canvasHeight;
-    	
-		canvas.drawCircle(cx, cy, 0.15f * cx, paint);*/	
-
 		turnImageViews[((board.getPlayerId() == 1) ? 0 : 1)].setVisibility(View.GONE);
 		if (inWinnerMode)
 		{
@@ -494,13 +527,13 @@ public class UiView extends View{
 		Bitmap bmp;
 		if ( board.haveHistory() )
 		{
-			bmp = BitmapFactory.decodeResource(getResources(), R.drawable.undo);
+			bmp = undoImageWhite;
 		} else {
-			bmp = BitmapFactory.decodeResource(getResources(), R.drawable.undo_black);
+			bmp = undoImageBlack;
 		}
 		
 		float cx = 0.5f * canvasWidth - bmp.getWidth()/2.0f;
-		float cy = 0.95f * canvasHeight - bmp.getHeight()/2.0f;
+		float cy = bottomNavMidPoint * canvasHeight - bmp.getHeight()/2.0f;
 
 		canvas.drawBitmap(bmp, cx, cy, paint);
 	}
@@ -511,10 +544,10 @@ public class UiView extends View{
 		float canvasWidth = getWidth();
 		float canvasHeight = getHeight();
 
-		Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.refresh);
+		Bitmap bmp = refreshImage;
 	
 		float cx = 0.75f * canvasWidth - bmp.getWidth()/2.0f;
-		float cy = 0.95f * canvasHeight - bmp.getHeight()/2.0f;
+		float cy = bottomNavMidPoint * canvasHeight - bmp.getHeight()/2.0f;
 
 		canvas.drawBitmap(bmp, cx, cy, paint);
 	}
