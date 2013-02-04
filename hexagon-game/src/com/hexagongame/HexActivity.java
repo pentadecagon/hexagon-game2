@@ -2,9 +2,9 @@ package com.hexagongame;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.Window;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 public class HexActivity extends Activity {
 
@@ -12,6 +12,7 @@ public class HexActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+          requestWindowFeature(Window.FEATURE_NO_TITLE);
     	  initializeLayout();
     }
     

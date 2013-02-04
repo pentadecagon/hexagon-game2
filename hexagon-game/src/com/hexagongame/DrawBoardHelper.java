@@ -43,7 +43,7 @@ public class DrawBoardHelper {
 		x0 = (int)(wCell * (1-xmin)); 
 		final float ymid = (ymax+ymin) * 0.5f; // this should be placed at canvasHeight/2
 		
-		y0 = (int)(canvasHeight * 0.5 - ymid * dyCell+0.5);
+		y0 = (int)(canvasHeight * 0.449 - ymid * dyCell+0.5);
 		Log.d("hex","calculated position of board on canvas: x0="+x0+", y0="+y0);
 	}
 	
