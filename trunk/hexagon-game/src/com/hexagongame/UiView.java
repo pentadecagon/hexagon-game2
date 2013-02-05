@@ -92,6 +92,9 @@ public class UiView extends View{
 	 //for highlighting the currently touched hexagon: -1 means no hexagon is touched
 	public int hexSelected = -1;
 	
+	//whether or not the user is allowed to undo the last move
+	private boolean canUndo = false;
+	
 	//filter for highlighting a hexagon
 	ColorFilter[] highlightFilters = {
 			new LightingColorFilter(android.graphics.Color.parseColor("#ff8000"), 1),
@@ -324,7 +327,8 @@ public class UiView extends View{
 	//if the user has tapped on the undo image
 	private boolean tappedOnTurnUndoImage(float canvasWidth, float canvasHeight, float x, float y)
 	{
-		return (x >= 0.45 * canvasWidth
+		return (canUndo
+				&& x >= 0.45 * canvasWidth
 				&& x <= 0.55 * canvasWidth
 				&& y > (bottomNavMidPoint * canvasHeight - undoImageWhite.getHeight()/2.0)
 				&& y < (bottomNavMidPoint * canvasHeight + undoImageWhite.getHeight()/2.0));
@@ -525,10 +529,15 @@ public class UiView extends View{
 		float canvasHeight = getHeight();
 
 		Bitmap bmp;
-		if ( board.haveHistory() )
+		if ( board.haveHistory()
+				//don't let player undo last move if the phone goes first & has only made one move
+				&& !(gameMode == 1 && phonePlayerId == 0 && board.history.size() == 1)
+		)
 		{
+			canUndo = true;
 			bmp = undoImageWhite;
 		} else {
+			canUndo = false;
 			bmp = undoImageBlack;
 		}
 		
