@@ -40,7 +40,7 @@
         android:layout_height="wrap_content"
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:paddingLeft="10dp"
-        android:paddingRight="10dp">
+        android:paddingRight="20dp">
 
         <SeekBar android:id="@+id/seekBar1"
             android:max="2"
@@ -121,7 +121,7 @@
         android:layout_height="wrap_content"
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:paddingLeft="10dp"
-        android:paddingRight="10dp">
+        android:paddingRight="20dp">
         <SeekBar android:id="@+id/seekBar2"
             android:max="3"
             android:layout_width="match_parent"
