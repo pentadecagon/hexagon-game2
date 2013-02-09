@@ -16,10 +16,6 @@ import android.widget.TextView;
 
 public class ChooseBoardActivity extends Activity {
 
-	public final static String ID_GAME_MODE = "com.hexagongame._ID_GAME_MODE";
-	
-	public final static String ID_PHONE_PLAYER_ID = "com.hexagongame._ID_PHONE_PLAYER_ID";
-	
 	private SeekBar bar; // declare seekbar object variable
 	
 	private SeekBar bar2;
