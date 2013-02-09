@@ -21,7 +21,7 @@ public class HexActivity extends Activity {
     	setContentView(R.layout.main);	
 
     	String gameModeStr = getIntent().getStringExtra(ChooseBoardActivity.ID_GAME_MODE);
-        int gameMode = (gameModeStr != null) ? Integer.valueOf(gameModeStr) : 0;
+        int gameMode = (gameModeStr != null) ? Integer.valueOf(gameModeStr) : 1;
         
         String phonePlayerIdStr = getIntent().getStringExtra(ChooseBoardActivity.ID_PHONE_PLAYER_ID);
         int phonePlayerId = (phonePlayerIdStr != null) ? Integer.valueOf(phonePlayerIdStr) : 0;

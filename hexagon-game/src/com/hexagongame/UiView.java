@@ -66,16 +66,16 @@ public class UiView extends View{
 	
 	/**
 	 * Game mode
-	 * 0 = 2-player (default)
-	 * 1 = play against phone
+	 * 0 = 2-player
+	 * 1 = play against phone (default)
 	 */
-	public int gameMode = 0;
+	public int gameMode = 1;
 	
 	/**
 	 * Phone player ID
 	 * only used if gameMode = 1 (play against phone)
-	 * 0 = player goes first
-	 * 1 = phone goes first
+	 * 0 = phone goes first
+	 * 1 = player goes first
 	 */
 	public int phonePlayerId = 0;
 	
@@ -97,8 +97,8 @@ public class UiView extends View{
 	
 	//filter for highlighting a hexagon
 	ColorFilter[] highlightFilters = {
-			new LightingColorFilter(android.graphics.Color.parseColor("#ff8000"), 1),
-			new LightingColorFilter(android.graphics.Color.parseColor("#ffC000"), 1)
+			new LightingColorFilter(android.graphics.Color.parseColor("#d01b1b"), 1),
+			new LightingColorFilter(android.graphics.Color.parseColor("#fdf9c2"), 1)
 	};
 	
 	String[] playerNames = {

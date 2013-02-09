@@ -18,7 +18,7 @@ public class ChooseBoardView extends View {
 	//the paint object used by the canvas
 	private Paint paint;
 	
-	public static int boardShape = 0;
+	public static int boardShape = 1;
 	
 	public static int boardSize = 1;
 	
@@ -55,7 +55,7 @@ public class ChooseBoardView extends View {
 			}
 		});
 	}
-	
+
 	public void onDraw(Canvas canvas) {	
 		drawNavHexagon(canvas);
 		drawNavSquare(canvas);
