@@ -1,10 +1,6 @@
 package com.hexagongame;
 
-import com.hexagongame.game.Board;
-
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
@@ -12,6 +8,8 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+
+import com.hexagongame.game.Board;
 
 public class ChooseBoardView extends View {
 	
