@@ -63,22 +63,7 @@ public class UiView extends View{
 	private ImageView [] turnImageViews = null;
 	
 	private TranslateAnimation slide;
-	
-	/**
-	 * Game mode
-	 * 0 = 2-player
-	 * 1 = play against phone (default)
-	 */
-	public int gameMode = 1;
-	
-	/**
-	 * Phone player ID
-	 * only used if gameMode = 1 (play against phone)
-	 * 0 = phone goes first
-	 * 1 = player goes first
-	 */
-	public int phonePlayerId = 0;
-	
+
 	//thread in which phone's next move is calculated in "play against phone" mode
 	Thread phoneMoveThread = null;
 	
@@ -117,10 +102,10 @@ public class UiView extends View{
 		super(context, attrs);
 
 		paint = new Paint();
-		board = new Board( ChooseBoardView.boardShape, ChooseBoardView.boardSize );
-		board2 = new Board( ChooseBoardView.boardShape, ChooseBoardView.boardSize );
-		Log.d("hex", "setting AI strength to "+ChooseBoardView.opponentStrength);
-		solver = new Solver6(4.0, ChooseBoardView.opponentStrength);		
+		board = new Board( ChooseBoardActivity.config.boardShape, ChooseBoardActivity.config.boardSize );
+		board2 = new Board( ChooseBoardActivity.config.boardShape, ChooseBoardActivity.config.boardSize );
+		Log.d("hex", "setting AI strength to "+ChooseBoardActivity.config.opponentStrength);
+		solver = new Solver6(4.0, ChooseBoardActivity.config.opponentStrength);		
 	}
 	
 	protected void setPhoneThinkingNotification(LinearLayout phoneThinkingNotification)
@@ -140,7 +125,7 @@ public class UiView extends View{
     	float canvasHeight = getHeight();
 		drawBoardHelper = new DrawBoardHelper(canvasHeight, canvasWidth, board);
 		//if we are in "play against phone" mode and the phone has to go first, calculate the phone's first move
-		if (gameMode == 1 && phonePlayerId == 0)
+		if (ChooseBoardActivity.config.gameMode == 1 && ChooseBoardActivity.config.phonePlayerId == 0)
 		{
 			doPhoneMove();
 		}
@@ -271,7 +256,7 @@ public class UiView extends View{
 		{
 			inWinnerMode = false;	
 		}
-		for( int i=0; i<gameMode+1; ++i ){ // need to undo twice when playing against the computer
+		for( int i=0; i<ChooseBoardActivity.config.gameMode+1; ++i ){ // need to undo twice when playing against the computer
 			board.undo();
 			board2.undo();
 		}
@@ -443,7 +428,7 @@ public class UiView extends View{
 			hexSelected = -1; //for highlighting the currently touched hexagon: : -1 means no hexagon is touched
         	invalidate();
         	
-        	if (!inWinnerMode && gameMode == 1)
+        	if (!inWinnerMode && ChooseBoardActivity.config.gameMode == 1)
         	{
 				//if it's phone's turn, do phone's move
 				doPhoneMove();
@@ -496,10 +481,10 @@ public class UiView extends View{
     {
 		Log.d("hex", "restart button clicked");
 
-		//as we are in "singleInstance" mode, this will go to the existing instance of the "ChooseBoardActivity" mode,
-		//so we don't have to tell it the preferences: it will remember the existing ones
+		//as we are in "singleInstance" mode, this will create a new instance of "ChooseBoardActivity" and destroy the old one
 		Activity ac = (Activity) getContext();
 		Intent i = new Intent(ac, ChooseBoardActivity.class);
+		i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 		ac.startActivity(i);
     }
 
@@ -531,7 +516,7 @@ public class UiView extends View{
 		Bitmap bmp;
 		if ( board.haveHistory()
 				//don't let player undo last move if the phone goes first & has only made one move
-				&& !(gameMode == 1 && phonePlayerId == 0 && board.history.size() == 1)
+				&& !(ChooseBoardActivity.config.gameMode == 1 && ChooseBoardActivity.config.phonePlayerId == 0 && board.history.size() == 1)
 		)
 		{
 			canUndo = true;
