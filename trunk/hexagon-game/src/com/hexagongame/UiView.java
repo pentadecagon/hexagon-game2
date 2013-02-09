@@ -15,6 +15,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.CountDownTimer;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
@@ -23,6 +24,7 @@ import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.hexagongame.game.Board;
@@ -58,6 +60,8 @@ public class UiView extends View{
 	private int winnerModeTickCount = 0;
 	private int winner = 0;
 
+	private boolean inIntroMode = false;
+	
 	private LinearLayout phoneThinkingNotification = null;
 	
 	private ImageView [] turnImageViews = null;
@@ -87,9 +91,14 @@ public class UiView extends View{
 	};
 	
 	String[] playerNames = {
-		"Red",
-		"Yellow"
+		"red",
+		"yellow"
 	};
+	
+	String[] playerNamesCap = {
+			"Red",
+			"Yellow"
+		};
 	
 	//point, as a fraction of the height, where the bottom nav starts
 	private static final float bottomNavTop = 0.844f;
@@ -106,24 +115,36 @@ public class UiView extends View{
 		board2 = new Board( ChooseBoardActivity.config.boardShape, ChooseBoardActivity.config.boardSize );
 		Log.d("hex", "setting AI strength to "+ChooseBoardActivity.config.opponentStrength);
 		solver = new Solver6(4.0, ChooseBoardActivity.config.opponentStrength);		
+
+    	inIntroMode = true;
 	}
 	
 	protected void setPhoneThinkingNotification(LinearLayout phoneThinkingNotification)
 	{
 		this.phoneThinkingNotification = phoneThinkingNotification;
 	}
-	
+
 	protected void setTurnImageViews(ImageView [] turnImageViews)
 	{
 		this.turnImageViews = turnImageViews;
 	}
-	
+
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh)
-	{		
+	{
 		float canvasWidth = getWidth();
     	float canvasHeight = getHeight();
 		drawBoardHelper = new DrawBoardHelper(canvasHeight, canvasWidth, board);
+
+		//if it's the first move & the user has to go first, trigger the turn indicator message
+		if (
+			ChooseBoardActivity.config.gameMode == 0
+			|| (ChooseBoardActivity.config.gameMode == 1 && ChooseBoardActivity.config.phonePlayerId == 1)
+		)
+		{
+			doTurnIndicatorButtonClick();
+		}
+		
 		//if we are in "play against phone" mode and the phone has to go first, calculate the phone's first move
 		if (ChooseBoardActivity.config.gameMode == 1 && ChooseBoardActivity.config.phonePlayerId == 0)
 		{
@@ -139,6 +160,8 @@ public class UiView extends View{
 		//initialize images used in the bottom nav
 		initializeBottomNavImages();
 	}
+	
+
 	
 	//initialize the images used for the individual tiles on the board
 	private void initializeTileImages()
@@ -203,7 +226,7 @@ public class UiView extends View{
     		countdownTimer.start();
 		}
 	}
-	
+
 	  /**
 	   * Runnable with which the phone will calculate its next move (in "play against phone" mode) in a separate thread.
 	   */
@@ -275,16 +298,7 @@ public class UiView extends View{
 			if (!inWinnerMode && tappedOnTurnIndicatorImage(canvasWidth, canvasHeight, x, y))
 			{
 				//turn indicator: if user taps on the circle, show a message showing whose turn it is next
-				Context context = getContext();
-				String turnMessage = playerNames[board.getPlayerId()] + "'s turn! Pick a hexagon.";
-				
-				//make sure toast is not triggered multiple times
-				if ((System.currentTimeMillis() - playerTurnToastStartTime) > 2000)
-				{
-    				Toast toast = Toast.makeText(context, turnMessage, Toast.LENGTH_SHORT);
-    				playerTurnToastStartTime = System.currentTimeMillis();
-    				toast.show();	    					
-				}
+				doTurnIndicatorButtonClick();
 					
 			} else if (tappedOnTurnUndoImage(canvasWidth, canvasHeight, x, y))
 			{
@@ -298,6 +312,66 @@ public class UiView extends View{
 		}
 			
 		//do nothing
+	}
+	
+	//turn indicator: if user taps on the circle, show a message showing whose turn it is next
+	private void doTurnIndicatorButtonClick()
+	{
+		Log.d("hex", "called doTurnIndicatorButtonClick");
+		Context context = getContext();
+
+		String turnMessage = getTurnIndicatorMessage();
+		
+		int toastLength = Toast.LENGTH_SHORT;
+		int toastDuration = 2000;
+		if (inIntroMode)
+		{
+			toastLength = Toast.LENGTH_LONG;
+			toastDuration = 3500;
+			inIntroMode = false;
+		}
+		
+		//make sure toast is not triggered multiple times
+		if ((System.currentTimeMillis() - playerTurnToastStartTime) > toastDuration)
+		{
+			Toast toast = Toast.makeText(context, turnMessage, toastLength);
+			TextView v = (TextView) toast.getView().findViewById(android.R.id.message);
+			if( v != null) v.setGravity(Gravity.CENTER);
+			playerTurnToastStartTime = System.currentTimeMillis();
+			toast.show();	    					
+		}
+	}
+	
+	//construct the message to be shown when the turn indicator is triggered
+	private String getTurnIndicatorMessage()
+	{
+		String message = "";
+		if (inIntroMode)
+		{
+			if (ChooseBoardActivity.config.gameMode == 1)
+			{
+				//play against phone mode
+				message += "You are " + playerNames[board.getPlayerId()];
+				message += ". Connect your two sides to win. ";
+				message += "Pick any hexagon!";
+			} else
+			{
+				//two player mode			
+				message += playerNamesCap[board.getPlayerId()] + " goes first!";
+				message += " Connect your two sides to win. ";
+				message += "Pick any hexagon!";
+			}
+		} else
+		{
+			if (ChooseBoardActivity.config.gameMode == 1)
+			{
+				message = "Your turn! Pick a hexagon.";
+			} else
+			{
+				message = playerNamesCap[board.getPlayerId()] + "'s turn! Pick a hexagon.";
+			}
+		}
+		return message;
 	}
 	
 	//if the user has tapped on the "whose turn is it next" indicator
@@ -330,8 +404,8 @@ public class UiView extends View{
 	
 	@Override
     public boolean onTouchEvent(MotionEvent event) {
-        //if we are in "play against phone" mode and the phone is calculating its next move, board is deactivated
-        if ( phoneMoveThread != null )
+		//if we are in "play against phone" mode and the phone is calculating its next move, board is deactivated
+        if (phoneMoveThread != null)
         {
         	return false;
         }
@@ -459,6 +533,12 @@ public class UiView extends View{
 			//update the view
 			postInvalidate();
 			phoneMoveThread = null;
+			
+			//if that was the phone's first move, tell the user to move
+			if (board.history.size() == 1)
+			{
+				doTurnIndicatorButtonClick();
+			}
         };
 	};
     
