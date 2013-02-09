@@ -74,8 +74,7 @@
 	  android:layout_width="match_parent"
 	  android:layout_height="wrap_content">
 		<RadioButton android:id="@+id/person"
-		android:text="2 Person"
-		android:checked="true"/>
+		android:text="2 Person"/>
 		<RadioButton android:id="@+id/phone"
 		android:text="Play against phone"/>
 	</RadioGroup>

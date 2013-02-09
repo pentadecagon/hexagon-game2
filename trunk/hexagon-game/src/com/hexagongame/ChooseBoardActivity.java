@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 public class ChooseBoardActivity extends Activity {
 	
-	private int gameMode = 0;
+	private int gameMode = 1;
 	
 	private int phonePlayerId = 0;
 
