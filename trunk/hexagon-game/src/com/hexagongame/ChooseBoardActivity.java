@@ -3,6 +3,7 @@ package com.hexagongame;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -14,10 +15,6 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
 public class ChooseBoardActivity extends Activity {
-	
-	private int gameMode = 1;
-	
-	private int phonePlayerId = 0;
 
 	public final static String ID_GAME_MODE = "com.hexagongame._ID_GAME_MODE";
 	
@@ -40,12 +37,32 @@ public class ChooseBoardActivity extends Activity {
 	
 	private ChooseBoardView chooseBoardView;
 	
+	//global copy of config
+	public static ChooseBoardConfig config = new ChooseBoardConfig();
+	
+	//local copy of config: settings will be discarded if user exits activity without confirming choices
+	static ChooseBoardConfig _configLocal = null;
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
+    	Log.d("hex", "ChooseBoardActivity.onCreate called");
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
+        //initialize the local config object
+        initConfig();
+        //initialize the layout
         initializeLayout();
+		//populate the form based on initial values passed to the activity
+		populateForm();
+    }
+
+    //initialize the local config object
+    private void initConfig()
+    {
+    	//copy the global config to the local config. this is so that if the user makes local modifications but does not
+    	//save them, they are discarded the next time the activity is called
+    	ChooseBoardActivity._configLocal = ChooseBoardActivity.config.clone();
     }
 
     private void initializeLayout()
@@ -62,12 +79,12 @@ public class ChooseBoardActivity extends Activity {
 	        	LinearLayout opponentStrengthSeekbar = (LinearLayout) ChooseBoardActivity.this.findViewById(R.id.opponent_strength_seekbar);
 	        	switch (i) {
 		        	case R.id.person:
-		        		gameMode = 0;
+		        		ChooseBoardActivity._configLocal.gameMode = 0;
 		        		gameModeLayout.setVisibility(LinearLayout.GONE);
 		        		opponentStrengthSeekbar.setVisibility(LinearLayout.GONE);
 		        		break;
 		        	case R.id.phone:
-		        		gameMode = 1;
+		        		ChooseBoardActivity._configLocal.gameMode = 1;
 		        		gameModeLayout.setVisibility(LinearLayout.VISIBLE);
 		        		opponentStrengthSeekbar.setVisibility(LinearLayout.VISIBLE);
 		        		break;
@@ -80,10 +97,10 @@ public class ChooseBoardActivity extends Activity {
 	        public void onCheckedChanged(RadioGroup radioGroup, int i) {
 	        	switch (i) {
 		        	case R.id.blue:
-		        		phonePlayerId = 0;
+		        		ChooseBoardActivity._configLocal.phonePlayerId = 0;
 		        		break;
 		        	case R.id.green:
-		        		phonePlayerId = 1;
+		        		ChooseBoardActivity._configLocal.phonePlayerId = 1;
 		        		break;
 	        	}
 	        }
@@ -98,8 +115,8 @@ public class ChooseBoardActivity extends Activity {
 				  Activity ac = ChooseBoardActivity.this;
 				  Intent i = new Intent(ac, HexActivity.class);
 				  i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-				  i.putExtra(ID_GAME_MODE, String.valueOf(gameMode));
-				  i.putExtra(ID_PHONE_PLAYER_ID, String.valueOf(phonePlayerId));
+				  //update global config with the local config
+				  ChooseBoardActivity.config = ChooseBoardActivity._configLocal;
 				  ac.startActivity(i);
 			  }
 		  });
@@ -116,9 +133,6 @@ public class ChooseBoardActivity extends Activity {
         bar2.setOnSeekBarChangeListener(opponentStrengthSeekBarListener); // set seekbar listener.
         
         opponentStrengthTextProgress = (TextView)findViewById(R.id.textViewProgressOpponentStrength);
-
-		//populate the form based on initial values passed to the activity
-		populateForm();
     }
     
     private BoardSizeSeekBarListener boardSizeSeekBarListener = new BoardSizeSeekBarListener();
@@ -129,7 +143,7 @@ public class ChooseBoardActivity extends Activity {
         		boolean fromUser) {
         	// change progress text label with current seekbar value
         	boardSizeTextProgress.setText(sizeBarLabels[progress]);
-        	ChooseBoardView.boardSize = progress;
+        	ChooseBoardActivity._configLocal.boardSize = progress;
         	chooseBoardView.postInvalidate();
         }
 
@@ -151,7 +165,7 @@ public class ChooseBoardActivity extends Activity {
         		boolean fromUser) {
         	// change progress text label with current seekbar value
         	opponentStrengthTextProgress.setText(opponentStrengthBarLabels[progress]);
-        	ChooseBoardView.opponentStrength = progress + 1;
+        	ChooseBoardActivity._configLocal.opponentStrength = progress + 1;
         	chooseBoardView.postInvalidate();
         }
 
@@ -172,7 +186,7 @@ public class ChooseBoardActivity extends Activity {
         RadioButton phone = (RadioButton) findViewById(R.id.phone);
        
         //set game Mode radio button
-        switch(gameMode)
+        switch(ChooseBoardActivity._configLocal.gameMode)
         {
         	case 0:
         		person.performClick();
@@ -186,7 +200,7 @@ public class ChooseBoardActivity extends Activity {
         RadioButton green = (RadioButton) findViewById(R.id.green);
         
         //set phone ID radio button
-        switch(phonePlayerId)
+        switch(ChooseBoardActivity._configLocal.phonePlayerId)
         {
         	case 0:
         		blue.performClick();
@@ -199,10 +213,10 @@ public class ChooseBoardActivity extends Activity {
         //set slider values
         
         //board size bar
-        bar.setProgress(ChooseBoardView.boardSize);
+        bar.setProgress(ChooseBoardActivity._configLocal.boardSize);
         
         //opponent strength bar
-        bar2.setProgress(ChooseBoardView.opponentStrength - 1);
+        bar2.setProgress(ChooseBoardActivity._configLocal.opponentStrength - 1);
     }
 
 }

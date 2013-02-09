@@ -17,14 +17,7 @@ public class ChooseBoardView extends View {
 	
 	//the paint object used by the canvas
 	private Paint paint;
-	
-	public static int boardShape = 1;
-	
-	public static int boardSize = 1;
-	
-	//how good the automatic phone opponent AI is
-	public static int opponentStrength = 3;
-	
+
 	public ChooseBoardView(Context context, AttributeSet attrs) {
 		
 		super(context, attrs);
@@ -42,11 +35,11 @@ public class ChooseBoardView extends View {
 				if ((float) event.getX() < 0.5f * canvasWidth)
 				{
 					//hex
-					boardShape = Board.BOARD_GEOMETRY_HEX;
+					ChooseBoardActivity._configLocal.boardShape = Board.BOARD_GEOMETRY_HEX;
 				} else
 				{
 					//square
-					boardShape = Board.BOARD_GEOMETRY_RECT;
+					ChooseBoardActivity._configLocal.boardShape = Board.BOARD_GEOMETRY_RECT;
 				}
 				
 				ChooseBoardView.this.postInvalidate();
@@ -65,9 +58,9 @@ public class ChooseBoardView extends View {
 		float canvasWidth = getWidth();
 		final float ybase=canvas.getHeight() * 0.5f; // 0.25f * canvasWidth
 		float hexSide, x0, y0, lineWidth;
-		if (boardShape == Board.BOARD_GEOMETRY_HEX)
+		if (ChooseBoardActivity._configLocal.boardShape == Board.BOARD_GEOMETRY_HEX)
 		{
-			hexSide = (0.06f + 0.02f * boardSize) * canvasWidth; //hexSide = 0.07f * canvasWidth;
+			hexSide = (0.06f + 0.02f * ChooseBoardActivity._configLocal.boardSize) * canvasWidth;
 			x0 = 0.25f * canvasWidth - hexSide * (float) Math.cos(Math.PI/6.0);
 			y0 = ybase - hexSide * 0.5f;
 			lineWidth = 10;
@@ -131,9 +124,9 @@ public class ChooseBoardView extends View {
 
 		float squareWidth, x0, y0, lineWidth;
 		final float ybase=canvas.getHeight() * 0.5f; // 0.25f * canvasWidth
-		if (boardShape == Board.BOARD_GEOMETRY_RECT)
+		if (ChooseBoardActivity._configLocal.boardShape == Board.BOARD_GEOMETRY_RECT)
 		{
-			squareWidth = (0.085f + 0.025f * boardSize)* canvasWidth; //squareWidth = 0.1f * canvasWidth;
+			squareWidth = (0.085f + 0.025f * ChooseBoardActivity._configLocal.boardSize)* canvasWidth;
 			x0 = 0.65f * canvasWidth - squareWidth/2.0f;
 			y0 = ybase - squareWidth/2.0f;
 			lineWidth = 10;	
