@@ -50,7 +50,7 @@
 			android:layout_alignParentTop="true">
         </SeekBar>
         <TextView
-            android:text="smallest"
+            android:text="1"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:id="@+id/textViewProgress"
             android:layout_height="wrap_content"
