@@ -2,8 +2,11 @@ package com.hexagongame;
 
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -60,8 +63,6 @@ public class UiView extends View{
 	private int winnerModeTickCount = 0;
 	private int winner = 0;
 
-	private boolean inIntroMode = false;
-	
 	private LinearLayout phoneThinkingNotification = null;
 	
 	private ImageView [] turnImageViews = null;
@@ -89,12 +90,7 @@ public class UiView extends View{
 			new LightingColorFilter(android.graphics.Color.parseColor("#d01b1b"), 1),
 			new LightingColorFilter(android.graphics.Color.parseColor("#fdf9c2"), 1)
 	};
-	
-	String[] playerNames = {
-		"red",
-		"yellow"
-	};
-	
+
 	String[] playerNamesCap = {
 			"Red",
 			"Yellow"
@@ -115,8 +111,6 @@ public class UiView extends View{
 		board2 = new Board( ChooseBoardActivity.config.boardShape, ChooseBoardActivity.config.boardSize );
 		Log.d("hex", "setting AI strength to "+ChooseBoardActivity.config.opponentStrength);
 		solver = new Solver6(4.0, ChooseBoardActivity.config.opponentStrength);		
-
-    	inIntroMode = true;
 	}
 	
 	protected void setPhoneThinkingNotification(LinearLayout phoneThinkingNotification)
@@ -136,21 +130,23 @@ public class UiView extends View{
     	float canvasHeight = getHeight();
 		drawBoardHelper = new DrawBoardHelper(canvasHeight, canvasWidth, board);
 
-		//if it's the first move & the user has to go first, trigger the turn indicator message
-		if (
-			ChooseBoardActivity.config.gameMode == 0
-			|| (ChooseBoardActivity.config.gameMode == 1 && ChooseBoardActivity.config.phonePlayerId == 1)
-		)
+		if (isFirstRun())
 		{
-			doTurnIndicatorButtonClick();
-		}
-		
-		//if we are in "play against phone" mode and the phone has to go first, calculate the phone's first move
-		if (ChooseBoardActivity.config.gameMode == 1 && ChooseBoardActivity.config.phonePlayerId == 0)
+			//if this is the first run, show the introductory dialog
+			showIntroDialog();
+		} else
 		{
-			doPhoneMove();
+			//if we are in "play against phone" mode and the phone has to go first, calculate the phone's first move
+			if (ChooseBoardActivity.config.gameMode == 1 && ChooseBoardActivity.config.phonePlayerId == 0)
+			{
+				doPhoneMove();
+			} else
+			{
+				//show an alert telling the user to move
+				doTurnIndicatorButtonClick();
+			}
 		}
-		
+
 		//initialize the images used for the individual tiles on the board
 		initializeTileImages();
 
@@ -161,7 +157,51 @@ public class UiView extends View{
 		initializeBottomNavImages();
 	}
 	
-
+	//check if this is the first run
+	private boolean isFirstRun()
+	{
+		SharedPreferences settings = this.getContext().getSharedPreferences("HexOptions", HexActivity.MODE_PRIVATE);
+        
+		if (settings.getBoolean("isHexFirstRun", false))
+		{
+			Log.d("hex", "is first run");
+		} else
+		{
+			Log.d("hex", "is not first run");
+		}
+		if (!settings.getBoolean("isHexFirstRun", false)) {
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putBoolean("isHexFirstRun", true);
+            editor.commit();
+            return true;
+        }
+        return false;
+	}
+	
+	//if this is the first run, show the introductory dialog
+	private void showIntroDialog()
+	{
+		AlertDialog.Builder alertDialog = new AlertDialog.Builder(this.getContext());
+		alertDialog.setTitle("Welcome to Hex!");
+		alertDialog.setMessage("Two players, red and yellow.\n\n Each of them owns two territories, separated by a neutral zone." +
+		  " Each one tries to connect their areas by occupying pieces in between.\n\n Only one will succeed.\n\n Be the one!");
+		alertDialog.setCancelable(false);
+		alertDialog.setIcon(R.drawable.ic_launcher);
+		alertDialog.setPositiveButton("Start",new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				//if we are in "play against phone" mode and the phone has to go first, calculate the phone's first move
+				if (ChooseBoardActivity.config.gameMode == 1 && ChooseBoardActivity.config.phonePlayerId == 0)
+				{
+					doPhoneMove();
+				} else
+				{
+					//show an alert telling the user to move
+					doTurnIndicatorButtonClick();
+				}
+			}
+		  });
+		alertDialog.show();
+	}
 	
 	//initialize the images used for the individual tiles on the board
 	private void initializeTileImages()
@@ -171,8 +211,7 @@ public class UiView extends View{
 		TILES[2] = initializeTileImage(R.drawable.unused_tile);
 
 		TILES_HIGHLIGHT[0] = initializeTileImage(R.drawable.blue_tile_highlight);
-		TILES_HIGHLIGHT[1] = initializeTileImage(R.drawable.green_tile_highlight);
-			
+		TILES_HIGHLIGHT[1] = initializeTileImage(R.drawable.green_tile_highlight);		
 	}
 	
 	  /**
@@ -324,13 +363,7 @@ public class UiView extends View{
 		
 		int toastLength = Toast.LENGTH_SHORT;
 		int toastDuration = 2000;
-		if (inIntroMode)
-		{
-			toastLength = Toast.LENGTH_LONG;
-			toastDuration = 3500;
-			inIntroMode = false;
-		}
-		
+
 		//make sure toast is not triggered multiple times
 		if ((System.currentTimeMillis() - playerTurnToastStartTime) > toastDuration)
 		{
@@ -345,32 +378,16 @@ public class UiView extends View{
 	//construct the message to be shown when the turn indicator is triggered
 	private String getTurnIndicatorMessage()
 	{
-		String message = "";
-		if (inIntroMode)
+		String message;
+
+		if (ChooseBoardActivity.config.gameMode == 1)
 		{
-			if (ChooseBoardActivity.config.gameMode == 1)
-			{
-				//play against phone mode
-				message += "You are " + playerNames[board.getPlayerId()];
-				message += ". Connect your two sides to win. ";
-				message += "Pick any hexagon!";
-			} else
-			{
-				//two player mode			
-				message += playerNamesCap[board.getPlayerId()] + " goes first!";
-				message += " Connect your two sides to win. ";
-				message += "Pick any hexagon!";
-			}
+			message = "Your turn! Pick a hexagon.";
 		} else
 		{
-			if (ChooseBoardActivity.config.gameMode == 1)
-			{
-				message = "Your turn! Pick a hexagon.";
-			} else
-			{
-				message = playerNamesCap[board.getPlayerId()] + "'s turn! Pick a hexagon.";
-			}
+			message = playerNamesCap[board.getPlayerId()] + "'s turn! Pick a hexagon.";
 		}
+
 		return message;
 	}
 	
