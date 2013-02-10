@@ -54,7 +54,8 @@ public class ChooseBoardView extends View {
 
 	protected void drawNavHexagon(Canvas canvas) {
 		float canvasWidth = getWidth();
-		final float ybase=canvas.getHeight() * 0.5f; // 0.25f * canvasWidth
+
+		final float ybase=getHeight() * 0.5f;
 		float hexSide, x0, y0, lineWidth;
 		if (ChooseBoardActivity._configLocal.boardShape == Board.BOARD_GEOMETRY_HEX)
 		{
@@ -121,7 +122,7 @@ public class ChooseBoardView extends View {
 		float canvasWidth = getWidth();
 
 		float squareWidth, x0, y0, lineWidth;
-		final float ybase=canvas.getHeight() * 0.5f; // 0.25f * canvasWidth
+		final float ybase=getHeight() * 0.5f;
 		if (ChooseBoardActivity._configLocal.boardShape == Board.BOARD_GEOMETRY_RECT)
 		{
 			squareWidth = (0.085f + 0.025f * ChooseBoardActivity._configLocal.boardSize)* canvasWidth;
