@@ -2,6 +2,7 @@ package com.hexagongame;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -29,7 +30,7 @@ public class ChooseBoardActivity extends Activity {
 	private String[] sizeBarLabels = {"1", "2", "3"};
 	
 	//display the labels for the bar that the user can move to change the automatic phone AI opponent strength
-	private String[] opponentStrengthBarLabels = {"1", "2", "3", "4"};
+	private String[] opponentStrengthBarLabels = {"1", "2", "3", "4", "5", "6"};
 	
 	private ChooseBoardView chooseBoardView;
 	
@@ -38,12 +39,19 @@ public class ChooseBoardActivity extends Activity {
 	
 	//local copy of config: settings will be discarded if user exits activity without confirming choices
 	static ChooseBoardConfig _configLocal = null;
+	
+	//work around for non functioning FLAG_ACTIVITY_CLEAR_TASK flag in Android 2.3.3
+	public static ChooseBoardActivity instance = null;
 
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
     	Log.d("hex", "ChooseBoardActivity.onCreate called");
         super.onCreate(savedInstanceState);
+        
+        //work around for non functioning FLAG_ACTIVITY_CLEAR_TASK flag in Android 2.3.3
+        instance = this;
+        
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         //initialize the local config object
         initConfig();
@@ -108,6 +116,12 @@ public class ChooseBoardActivity extends Activity {
 		  {
 			  public void onClick(View v)
 			  {
+				  //work around for non functioning FLAG_ACTIVITY_CLEAR_TASK flag in Android 2.3.3
+				  if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB && HexActivity.instance != null)
+				  {
+					  HexActivity.instance.finish();
+				  }
+
 				  Activity ac = ChooseBoardActivity.this;
 				  Intent i = new Intent(ac, HexActivity.class);
 				  i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

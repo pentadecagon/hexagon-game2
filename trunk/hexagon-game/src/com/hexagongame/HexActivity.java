@@ -9,13 +9,20 @@ import android.widget.LinearLayout;
 
 public class HexActivity extends Activity {
 
+	//work around for non functioning FLAG_ACTIVITY_CLEAR_TASK flag in Android 2.3.3
+	public static HexActivity instance = null;
+	
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
     	Log.d("hex", "HexActivity.onCreate called");
         super.onCreate(savedInstanceState);
-          requestWindowFeature(Window.FEATURE_NO_TITLE);
-    	  initializeLayout();
+        
+        //work around for non functioning FLAG_ACTIVITY_CLEAR_TASK flag in Android 2.3.3
+        instance = this;
+        
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+    	initializeLayout();
     }
     
     private void initializeLayout()
