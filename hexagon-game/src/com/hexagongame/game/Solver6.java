@@ -2,9 +2,10 @@ package com.hexagongame.game;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+
+import android.os.SystemClock;
 
 import com.hexagongame.game.Hexagon.HexSet;
 
@@ -12,10 +13,13 @@ public class Solver6 implements Solver {
 
 	private final double _ilengthFactor;
 	final int depth0;
-	
-	public Solver6( double f, int d0 ){
+	private long _endTime; 
+	final private long _maxTime; // maximum milliseconds for analysis
+
+	public Solver6( double f, int d0, long maxt ){
 		_ilengthFactor = 1.0/f;
 		depth0 = d0;
+		_maxTime = maxt;
 	}
 	
 	static HexSet allNeighbors( Hexagon a, int owner )
@@ -109,7 +113,6 @@ public class Solver6 implements Solver {
 		final int dmax =  recursion < depth0 ? depth0-recursion : 1;
 		final 	ArrayList<ValHex> vh = calcValues( board );
 		final ArrayList<ValHex> rh = new ArrayList<ValHex>();
-		
 		for( int i=0; i<Math.min(dmax, vh.size()); ++i ){
 			if( board.doMove(vh.get(i)._h) ){
 				board.undo();
@@ -117,6 +120,9 @@ public class Solver6 implements Solver {
 			}
 			rh.add( new ValHex( -0.5*canWin(board, recursion+1)._v, vh.get(i)._h));
 			board.undo();
+			if( SystemClock.uptimeMillis()  > _endTime ){
+				break;
+			}
 		}
 		Collections.sort(rh);
 		
@@ -124,6 +130,10 @@ public class Solver6 implements Solver {
 	}
 	
 	public Hexagon bestMove( Board board ){
+		if( board.haveHistory() )
+			_endTime = SystemClock.uptimeMillis() + _maxTime;
+		else // the phone should make the first move quickly
+			_endTime = SystemClock.uptimeMillis() + _maxTime / 3;
 		Hexagon erg =  canWin(board, 0)._h;
 //		System.out.println(k1+" "+k2);
 		return erg;
