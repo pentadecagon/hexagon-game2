@@ -15,6 +15,7 @@ import android.graphics.LightingColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.Build;
 import android.os.CountDownTimer;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -184,7 +185,7 @@ public class UiView extends View{
 		AlertDialog.Builder alertDialog = new AlertDialog.Builder(this.getContext());
 		alertDialog.setTitle("Welcome to Hex!");
 		alertDialog.setMessage("Two players, red and yellow.\n\n Each of them owns two territories, separated by a neutral zone." +
-		  " Each one tries to connect their areas by occupying pieces in between.\n\n Only one will succeed.\n\n Be the one!");
+		  " Each one tries to connect their areas by occupying pieces in between.\n\n Only one will succeed.");
 		alertDialog.setCancelable(false);
 		alertDialog.setIcon(R.drawable.ic_launcher);
 		alertDialog.setPositiveButton("Start",new DialogInterface.OnClickListener() {
@@ -577,6 +578,11 @@ public class UiView extends View{
     private void doRestartButtonOnClick()
     {
 		Log.d("hex", "restart button clicked");
+
+		//work around for non functioning FLAG_ACTIVITY_CLEAR_TASK flag in Android 2.3.3
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB && ChooseBoardActivity.instance != null) {
+			ChooseBoardActivity.instance.finish();
+		}
 
 		//as we are in "singleInstance" mode, this will create a new instance of "ChooseBoardActivity" and destroy the old one
 		Activity ac = (Activity) getContext();

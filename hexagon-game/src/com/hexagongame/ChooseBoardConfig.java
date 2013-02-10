@@ -35,7 +35,7 @@ public class ChooseBoardConfig implements Cloneable {
 	
 	/**
 	 * Strength of automatic opponent in "play against phone" mode
-	 * From 1-4, with 1 the weakest, 3 the strongest
+	 * From 1-6, with 1 the weakest, 6 the strongest
 	 */
 	public int opponentStrength = 3;
 	
