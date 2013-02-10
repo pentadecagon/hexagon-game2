@@ -110,7 +110,7 @@ public class UiView extends View{
 		board = new Board( ChooseBoardActivity.config.boardShape, ChooseBoardActivity.config.boardSize );
 		board2 = new Board( ChooseBoardActivity.config.boardShape, ChooseBoardActivity.config.boardSize );
 		Log.d("hex", "setting AI strength to "+ChooseBoardActivity.config.opponentStrength);
-		solver = new Solver6(4.0, ChooseBoardActivity.config.opponentStrength);		
+		solver = new Solver6(4.0, ChooseBoardActivity.config.opponentStrength, 15000);		
 	}
 	
 	protected void setPhoneThinkingNotification(LinearLayout phoneThinkingNotification)
