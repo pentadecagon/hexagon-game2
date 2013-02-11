@@ -22,13 +22,8 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
-import android.view.animation.AnimationSet;
-import android.view.animation.DecelerateInterpolator;
-import android.view.animation.LinearInterpolator;
-import android.view.animation.RotateAnimation;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -71,17 +66,9 @@ public class UiView extends View{
 
 	private LinearLayout phoneThinkingNotification = null;
 	
-	//image views for the different color turn indicators
 	private ImageView [] turnImageViews = null;
 	
-	//image views for the undo and refresh images
-	private ImageView undoImageView, refreshImageView;
-	
-	//slide animation for the turn indicator image
 	private TranslateAnimation slide;
-	
-	//animation for the refresh icon to indicate to the user that they should click there
-	private AnimationSet refreshAnimation = null;
 
 	//thread in which phone's next move is calculated in "play against phone" mode
 	Thread phoneMoveThread = null;
@@ -91,7 +78,7 @@ public class UiView extends View{
 	private Bitmap[] TILES_HIGHLIGHT = new Bitmap[2];
 	
 	//images used in the bottom navigation
-	private Bitmap bmpUndo, bmpRefresh;
+	private Bitmap undoImageWhite, undoImageBlack, refreshImage; 
 	
 	 //for highlighting the currently touched hexagon: -1 means no hexagon is touched
 	public int hexSelected = -1;
@@ -135,16 +122,6 @@ public class UiView extends View{
 	protected void setTurnImageViews(ImageView [] turnImageViews)
 	{
 		this.turnImageViews = turnImageViews;
-	}
-	
-	protected void setUndoImageView(ImageView undoImageView)
-	{
-		this.undoImageView = undoImageView;
-	}
-	
-	protected void setRefreshImageView(ImageView refreshImageView)
-	{
-		this.refreshImageView = refreshImageView;
 	}
 
 	@Override
@@ -268,20 +245,9 @@ public class UiView extends View{
 	//initialize images used in the bottom nav
 	private void initializeBottomNavImages()
 	{
-		bmpUndo = BitmapFactory.decodeResource(getResources(), R.drawable.undo);
-		undoImageView.setImageBitmap(bmpUndo);
-		RelativeLayout.LayoutParams paramsUndo = (RelativeLayout.LayoutParams) undoImageView.getLayoutParams();
-		paramsUndo.setMargins((int) (0.5f * getWidth() - bmpUndo.getWidth()/2.0), 0, 0, (int) ((1.0f - bottomNavMidPoint) * getHeight() - bmpUndo.getHeight()/2.0));
-		paramsUndo.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-		undoImageView.setLayoutParams(paramsUndo); //causes layout update
-		
-		bmpRefresh = BitmapFactory.decodeResource(getResources(), R.drawable.refresh);
-		refreshImageView.setImageBitmap(bmpRefresh);
-		RelativeLayout.LayoutParams paramsRefresh = (RelativeLayout.LayoutParams) refreshImageView.getLayoutParams();
-		paramsRefresh.setMargins((int) (0.75f * getWidth() - bmpRefresh.getWidth()/2.0), 0, 0, (int) ((1.0f - bottomNavMidPoint) * getHeight() - bmpRefresh.getHeight()/2.0));
-		paramsRefresh.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-		refreshImageView.setLayoutParams(paramsRefresh); //causes layout update
-		refreshImageView.setVisibility(View.VISIBLE);
+		undoImageWhite = BitmapFactory.decodeResource(getResources(), R.drawable.undo);
+		undoImageBlack = BitmapFactory.decodeResource(getResources(), R.drawable.undo_black);
+		refreshImage = BitmapFactory.decodeResource(getResources(), R.drawable.refresh);
 	}
 	
 	@Override
@@ -441,8 +407,8 @@ public class UiView extends View{
 		return (canUndo
 				&& x >= 0.45 * canvasWidth
 				&& x <= 0.55 * canvasWidth
-				&& y > (bottomNavMidPoint * canvasHeight - bmpUndo.getHeight()/2.0)
-				&& y < (bottomNavMidPoint * canvasHeight + bmpUndo.getHeight()/2.0));
+				&& y > (bottomNavMidPoint * canvasHeight - undoImageWhite.getHeight()/2.0)
+				&& y < (bottomNavMidPoint * canvasHeight + undoImageWhite.getHeight()/2.0));
 	}
 	
 	//if the user has tapped on the refresh image
@@ -450,8 +416,8 @@ public class UiView extends View{
 	{
 		return (x >= 0.7 * canvasWidth
 				&& x <= 0.8 * canvasWidth
-				&& y > (bottomNavMidPoint * canvasHeight - bmpRefresh.getHeight()/2.0)
-				&& y < (bottomNavMidPoint * canvasHeight + bmpRefresh.getHeight()/2.0));
+				&& y > (bottomNavMidPoint * canvasHeight - refreshImage.getHeight()/2.0)
+				&& y < (bottomNavMidPoint * canvasHeight + refreshImage.getHeight()/2.0));
 	}
 	
 	@Override
@@ -647,65 +613,42 @@ public class UiView extends View{
 	
 	private void drawUndoIcon(Canvas canvas) {
 		//indicate whose turn it is next
+		float canvasWidth = getWidth();
+		float canvasHeight = getHeight();
+
+		Bitmap bmp;
 		if ( board.haveHistory()
 				//don't let player undo last move if the phone goes first & has only made one move
 				&& !(ChooseBoardActivity.config.gameMode == 1 && ChooseBoardActivity.config.phonePlayerId == 0 && board.history.size() == 1)
 		)
 		{
 			canUndo = true;
-			undoImageView.setVisibility(View.VISIBLE);
+			bmp = undoImageWhite;
 		} else {
 			canUndo = false;
-			undoImageView.setVisibility(View.GONE);
+			bmp = undoImageBlack;
 		}
+		
+		float cx = 0.5f * canvasWidth - bmp.getWidth()/2.0f;
+		float cy = bottomNavMidPoint * canvasHeight - bmp.getHeight()/2.0f;
+
+		canvas.drawBitmap(bmp, cx, cy, paint);
 	}
 	
 	public void drawRestartIcon(Canvas canvas)
 	{
-		if (inWinnerMode && refreshAnimation == null)
-		{
-			//start an animation on the refresh icon to indicate to the user that they should click there
-			refreshAnimation = createRefreshAnimation();
-			refreshImageView.startAnimation(refreshAnimation);
+		//indicate whose turn it is next
+		float canvasWidth = getWidth();
+		float canvasHeight = getHeight();
 
-			//show a message telling the user that they can start a new game
-			Context context = getContext();
-			Toast toast = Toast.makeText(context, "start new game", Toast.LENGTH_SHORT);
-			toast.setGravity(Gravity.RIGHT | Gravity.BOTTOM, (int) (0.05 * getWidth()), toast.getYOffset());
-			toast.show();
-			
-		} else if (!inWinnerMode && refreshAnimation != null)
-		{
-			refreshAnimation.cancel();
-			refreshImageView.clearAnimation();
-			refreshAnimation = null;
-		}
+		Bitmap bmp = refreshImage;
+	
+		float cx = 0.75f * canvasWidth - bmp.getWidth()/2.0f;
+		float cy = bottomNavMidPoint * canvasHeight - bmp.getHeight()/2.0f;
+
+		canvas.drawBitmap(bmp, cx, cy, paint);
 	}
 	
-	//create an animation for the refresh icon to indicate to the user that they should click there
-	private AnimationSet createRefreshAnimation()
-	{
-		AnimationSet animSet = new AnimationSet(false);
-		
-		//add a rotation
-		RotateAnimation r = new RotateAnimation(0.0f, 360.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-		r.setInterpolator(new LinearInterpolator());
-		r.setRepeatCount(Animation.INFINITE);
-		r.setDuration(1500);
-
-		animSet.addAnimation(r);
-		
-		//add a fade-in effect
-		Animation fadeIn = new AlphaAnimation(0, 1);
-		fadeIn.setInterpolator(new DecelerateInterpolator());
-		fadeIn.setDuration(750);
-		fadeIn.setRepeatCount(Animation.INFINITE);
-		fadeIn.setRepeatMode(Animation.REVERSE);
-		
-		animSet.addAnimation(fadeIn);
-
-		return animSet;
-	}
 	
 	public void drawHexagon(Canvas canvas, Hexagon hex)
 	{
