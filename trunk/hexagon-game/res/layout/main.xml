@@ -48,19 +48,5 @@
       android:layout_height="wrap_content"
     android:visibility="gone"
     />
-    
-    <ImageView
-     android:id="@+id/undo_image"
-     android:layout_width="wrap_content"
-     android:layout_height="wrap_content"
-     android:visibility="gone"
-    />
-    
-    <ImageView
-     android:id="@+id/refresh_image"
-     android:layout_width="wrap_content"
-     android:layout_height="wrap_content"
-     android:visibility="gone"
-    />
  
 </RelativeLayout>
