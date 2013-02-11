@@ -80,6 +80,9 @@ public class UiView extends View{
 	//images used in the bottom navigation
 	private Bitmap undoImageWhite, undoImageBlack, refreshImage; 
 	
+	//matrix used for positioning the refresh icon
+	Matrix refreshMatrix = null;
+	
 	 //for highlighting the currently touched hexagon: -1 means no hexagon is touched
 	public int hexSelected = -1;
 	
@@ -302,7 +305,7 @@ public class UiView extends View{
 		  }
 	  };
 	
-	private CountDownTimer countdownTimer = new CountDownTimer(250, 250){
+	private CountDownTimer countdownTimer = new CountDownTimer(125, 125){
 
         @Override
         public void onTick(long miliseconds){}
@@ -640,13 +643,39 @@ public class UiView extends View{
 		//indicate whose turn it is next
 		float canvasWidth = getWidth();
 		float canvasHeight = getHeight();
+		
+		float imageWidth = refreshImage.getWidth();
+		float imageHeight = refreshImage.getHeight();
 
-		Bitmap bmp = refreshImage;
-	
-		float cx = 0.75f * canvasWidth - bmp.getWidth()/2.0f;
-		float cy = bottomNavMidPoint * canvasHeight - bmp.getHeight()/2.0f;
+		float cx = 0.75f * canvasWidth - imageWidth/2.0f;
+		float cy = bottomNavMidPoint * canvasHeight - imageHeight/2.0f;
+		
+		if (refreshMatrix == null)
+		{
+			refreshMatrix = new Matrix();
+			refreshMatrix.setTranslate(cx, cy);
+		}
+		
+		//if in winner mode, do a rotation and changing opacity
+		if (inWinnerMode)
+		{
+			refreshMatrix.postRotate(20.0f, cx + imageWidth/2.0f, cy + imageHeight/2.0f);
+			
+			int alpha;
+			if (winnerModeTickCount % 20 > 9)
+			{
+				alpha = (int) (255.0f * (float) (20 - (winnerModeTickCount % 20)) * 0.1f);
+			} else
+			{
+				alpha = (int) (255.0f * (float) (winnerModeTickCount % 20) * 0.1f);
+			}
 
-		canvas.drawBitmap(bmp, cx, cy, paint);
+			paint.setAlpha(alpha);
+		}
+
+		canvas.drawBitmap(refreshImage, refreshMatrix, paint);
+		paint.setAlpha(255);
+		
 	}
 	
 	
@@ -656,7 +685,7 @@ public class UiView extends View{
 
 		final float[] coords = drawBoardHelper.findPositionOfCenterOfHexagonalCell(hex.xi, hex.yi);
 		Bitmap bmp;
-		if (inWinnerMode && winnerModeTickCount % 2 == 0
+		if (inWinnerMode && winnerModeTickCount % 4 < 2
 				&& winner == hex.owner )
 		{
 			bmp = TILES_HIGHLIGHT[winner];
