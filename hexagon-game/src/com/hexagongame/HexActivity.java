@@ -39,6 +39,13 @@ public class HexActivity extends Activity {
 		
 		ImageView [] imageViews = {(ImageView) findViewById(R.id.tileimage0), (ImageView) findViewById(R.id.tileimage1)};
 		uiView.setTurnImageViews(imageViews);
+		
+		ImageView undoImageView = (ImageView) findViewById(R.id.undo_image);
+		uiView.setUndoImageView(undoImageView);
+		
+		ImageView refreshImageView = (ImageView) findViewById(R.id.refresh_image);
+		uiView.setRefreshImageView(refreshImageView);
+
     }
     
     private void setBackground(UiView uiView)
