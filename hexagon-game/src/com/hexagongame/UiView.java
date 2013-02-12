@@ -114,7 +114,7 @@ public class UiView extends View{
 		board = new Board( ChooseBoardActivity.config.boardShape, ChooseBoardActivity.config.boardSize );
 		board2 = new Board( ChooseBoardActivity.config.boardShape, ChooseBoardActivity.config.boardSize );
 		Log.d("hex", "setting AI strength to "+ChooseBoardActivity.config.opponentStrength);
-		solver = new Solver6(4.0, ChooseBoardActivity.config.opponentStrength, 15000);		
+		solver = new Solver6(4.0, ChooseBoardActivity.config.opponentStrength, 5000 * ChooseBoardActivity.config.opponentStrength );		
 	}
 	
 	protected void setPhoneThinkingNotification(LinearLayout phoneThinkingNotification)
@@ -285,10 +285,6 @@ public class UiView extends View{
 		  public void run()
 		  {
 			  HexActivity ac = (HexActivity) UiView.this.getContext();
-			  //show "phone is thinking" message
-			  ac.runOnUiThread(new Runnable(){ public void run() {
-				  phoneThinkingNotification.setVisibility(View.VISIBLE);
-			  }});
 			  
 			  final Hexagon move = solver.bestMove(board2);
 			  
@@ -318,11 +314,14 @@ public class UiView extends View{
 	
 	void undo(){
 		//if we're in winner mode, revert it
+		int undo_count=ChooseBoardActivity.config.gameMode+1;
 		if (inWinnerMode)
 		{
 			inWinnerMode = false;	
+			if( ChooseBoardActivity.config.gameMode == 1 && ChooseBoardActivity.config.phonePlayerId != winner )
+				undo_count = 1;
 		}
-		for( int i=0; i<ChooseBoardActivity.config.gameMode+1; ++i ){ // need to undo twice when playing against the computer
+		for( int i=0; i<undo_count; ++i ){ // need to undo twice when playing against the computer
 			board.undo();
 			board2.undo();
 		}
@@ -565,7 +564,6 @@ public class UiView extends View{
     
     private void doPhoneMove()
     {
-		//if it's phone's turn, do phone's move
 		if (phoneMoveThread != null)
 		{
 			Log.e("hex", "phone move is running unexpectedly");
@@ -573,6 +571,7 @@ public class UiView extends View{
 			phoneMoveThread = null;
 		}
 		
+		phoneThinkingNotification.setVisibility(View.VISIBLE);
 		phoneMoveThread = new Thread(doPhoneMoveTask);
 		phoneMoveThread.start();    	
     }
