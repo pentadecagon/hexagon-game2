@@ -120,7 +120,7 @@ public class Solver6 implements Solver {
 			}
 			rh.add( new ValHex( -0.5*canWin(board, recursion+1)._v, vh.get(i)._h));
 			board.undo();
-			if( SystemClock.uptimeMillis()  > _endTime ){
+			if(  System.currentTimeMillis()  > _endTime ){
 				break;
 			}
 		}
@@ -131,9 +131,9 @@ public class Solver6 implements Solver {
 	
 	public Hexagon bestMove( Board board ){
 		if( board.haveHistory() )
-			_endTime = SystemClock.uptimeMillis() + _maxTime;
+			_endTime =  System.currentTimeMillis() + _maxTime;
 		else // the phone should make the first move quickly
-			_endTime = SystemClock.uptimeMillis() + _maxTime / 3;
+			_endTime =  System.currentTimeMillis() + _maxTime / 3;
 		Hexagon erg =  canWin(board, 0)._h;
 //		System.out.println(k1+" "+k2);
 		return erg;
