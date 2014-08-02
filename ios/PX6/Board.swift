@@ -31,6 +31,21 @@ class Board {
         [Hexagon(u: 0, v: 0, owner: OWNER_SECOND, id: -3),
             Hexagon(u: 0, v: 0, owner: OWNER_SECOND, id: -4)]]
     
+    func showEdge(){
+        for u in [0,1] {
+            for v in [0,1] {
+                for hex in outer[u][v].adjacent {
+                    if hex.isEmpty() {
+                        hex.owner = u
+                    } else {
+                        assert( hex.owner + u == 1 )
+                        hex.owner = 3
+                    }
+                }
+            }
+        }
+    }
+    
     init( boardShape : BOARD_GEOMETRY, boardSize : Int) {
         self.boardShape = boardShape
         self.boardSize = boardSize
@@ -43,6 +58,7 @@ class Board {
         }
         findAdjacentHexagons()
         findNeighbors()
+//        showEdge()
         for u in [0,1] {
             for v in [0,1]{
                 for nei in [0,1]{
@@ -143,6 +159,7 @@ class Board {
     func setupHexBoardListOfHexagons(){
         let r : Int = 1+boardSize
         var id : Int = 0
+        let xlim = boardSize-1
         for i in -r...r  { for k in -r...r {
             if abs(i+k) <= r {
                 let f : Float = Float(i) + Float(k) * 0.5
@@ -150,16 +167,16 @@ class Board {
                 id += 1
                 if abs(i) == r || abs(k) == r || abs(i+k) == r { // at the edge
                     let x = 2 * i + k
-                    if x >= boardSize && k>=0 {
+                    if x >= xlim && k>=0 {
                         outer[0][0].adjacent.append(hex)
                     }
-                    if x >= -boardSize && k<=0 {
+                    if x >= -xlim && k<=0 {
                         outer[1][0].adjacent.append(hex)
                     }
-                    if x <= boardSize && k>=0 {
+                    if x <= xlim && k>=0 {
                         outer[1][1].adjacent.append(hex)
                     }
-                    if x <= -boardSize && k<=0 {
+                    if x <= -xlim && k<=0 {
                         outer[0][1].adjacent.append(hex)
                     }
                 }
