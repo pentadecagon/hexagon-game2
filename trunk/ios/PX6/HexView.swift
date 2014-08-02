@@ -244,7 +244,8 @@ class HexView : UIView {
         let x = cx - Float(helper.wCell) / 2.0
         let y = cy - Float(helper.smallHexSideLength)
         let rect = CGRect(x:  CGFloat(x), y: CGFloat(y), width: CGFloat(helper.wCell)*1.02, height: CGFloat(helper.smallHexSideLength*2)*1.02)
-        let tile = (gameStatus == .winner && showWinnerTile && hex.owner == board.getPlayerId() ) ? tiles_winner[hex.owner] : tiles[hex.owner]
+        let tile = hex.owner == 3 ? tiles_winner[0] :
+            (gameStatus == .winner && showWinnerTile && hex.owner == board.getPlayerId() ) ? tiles_winner[hex.owner] : tiles[hex.owner]
         CGContextDrawImage(ctx, rect, tile.CGImage)
     }
 }
