@@ -127,8 +127,8 @@ class HexView : UIView {
         yourmoveview.textColor = UIColor.whiteColor()
         yourmoveview.alpha = 0.0
         super.init( frame: rect )
-        tileview.frame = xrect( 10.0, rect.minY.native+bg_hei+5, helper.wCell, 2.0*helper.smallHexSideLength )
-        refreshview.frame = xrect( wid*0.8, ymin+bg_hei+5, wid*0.12, wid*0.1 )
+        tileview.frame = xrect( 20.0, rect.minY.native+bg_hei+15, helper.wCell, 2.0*helper.smallHexSideLength )
+        refreshview.frame = xrect( wid*0.8, ymin+bg_hei+15, wid*0.12, wid*0.1 )
         
         addSubview(tileview)
         addSubview(refreshview)
@@ -164,12 +164,19 @@ class HexView : UIView {
         dispatch_async( queue, { () in self.doPhoneMove() } )
     }
     
+    var restartAng: CGFloat = 2
+    
     func updateWinnerBlink(){
         if gameStatus == .winner {
             showWinnerTile = !showWinnerTile
             setNeedsDisplay()
-            dispatch_after( dispatch_time(DISPATCH_TIME_NOW, 500_000_000), dispatch_get_main_queue(),
-                { () in self.updateWinnerBlink() }
+            restartAng += 2
+            let transform = CGAffineTransformMakeRotation(CGFloat(restartAng))
+            UIView.animateWithDuration(0.5, animations:  {() in
+                self.refreshview.transform = transform
+                }, completion:{(Bool)  in
+                    self.updateWinnerBlink()
+                }
             )
         } else {
             showWinnerTile = false
