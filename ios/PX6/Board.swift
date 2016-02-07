@@ -5,10 +5,10 @@ enum BOARD_GEOMETRY {
 
 class Board {
     //constant giving shape of board: hexagonal, square etc
-    let boardShape : BOARD_GEOMETRY = .HEX
+    let boardShape : BOARD_GEOMETRY
     
     //default board size
-    let boardSize = 1
+    let boardSize : Int
     
     var hexagonList =  [Hexagon]()
     
@@ -102,7 +102,7 @@ class Board {
                 if h.isEmpty() {
                     for (h1, _) in h.neighbors[n]{
                         assert( h1.isEmpty() || h1.xid<0 )
-                        assert( h1.neighbors[n][h])
+ //                       assert( h1.neighbors[n][h])
                         assert( h1 != h );
                     }
                 }
@@ -118,7 +118,7 @@ class Board {
         let myNeighbors : HexSet = hex.neighbors[n]
         for (h1, _) in myNeighbors {
             h1.push(n)
-            hexSetMerge( &h1.neighbors[n], myNeighbors )
+            hexSetMerge( &h1.neighbors[n], b: myNeighbors )
             h1.neighbors[n][h1] = nil
         }
         //	hex isn't a neighbor of anything anymore, so we have to remove it everywhere
@@ -147,7 +147,7 @@ class Board {
         let move=hexagonList[move0.xid]
         move.owner = _player
         history.append( move )
-        if( move.neighbors[_player][ outer[_player][0] ] && move.neighbors[_player][ outer[_player][1] ] ){
+        if( move.neighbors[_player][ outer[_player][0] ] != nil && move.neighbors[_player][ outer[_player][1] ] != nil){
             _hasWinner = true
             return true
         }

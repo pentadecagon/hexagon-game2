@@ -46,7 +46,7 @@ class ViewController: UIViewController {
         viewController = self
         let applicationFrame : CGRect = UIScreen.mainScreen().applicationFrame;
         NSBundle.mainBundle().loadNibNamed( "SettingsView", owner:self, options:nil  )
-        assert( settingsView? )
+
         settingsView!.frame = applicationFrame
         startGame1()
     }

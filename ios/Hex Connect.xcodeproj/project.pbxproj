@@ -14,7 +14,6 @@
 		3399D67A1987860D00388CAD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3399D6791987860D00388CAD /* AppDelegate.swift */; };
 		3399D67C1987860D00388CAD /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3399D67B1987860D00388CAD /* ViewController.swift */; };
 		3399D6811987860D00388CAD /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3399D6801987860D00388CAD /* Images.xcassets */; };
-		3399D68D1987860D00388CAD /* PX6Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3399D68C1987860D00388CAD /* PX6Tests.swift */; };
 		3399D697198791D800388CAD /* HexView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3399D696198791D800388CAD /* HexView.swift */; };
 		3399D6A41987CDD600388CAD /* blue_tile_highlight.png in Resources */ = {isa = PBXBuildFile; fileRef = 3399D6981987CDD600388CAD /* blue_tile_highlight.png */; };
 		3399D6A51987CDD600388CAD /* blue_tile.png in Resources */ = {isa = PBXBuildFile; fileRef = 3399D6991987CDD600388CAD /* blue_tile.png */; };
@@ -37,16 +36,6 @@
 		33E6CC7B198B88150009679A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33E6CC7A198B88150009679A /* SettingsView.swift */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXContainerItemProxy section */
-		3399D6871987860D00388CAD /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3399D66C1987860D00388CAD /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 3399D6731987860D00388CAD;
-			remoteInfo = PX6;
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXFileReference section */
 		331ABF9C198C6C60001ABC8A /* square-outline-xxl.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "square-outline-xxl.png"; sourceTree = "<group>"; };
 		331ABF9D198C6C60001ABC8A /* hexagon-outline-xxl.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "hexagon-outline-xxl.png"; sourceTree = "<group>"; };
@@ -57,7 +46,6 @@
 		3399D6791987860D00388CAD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		3399D67B1987860D00388CAD /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		3399D6801987860D00388CAD /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		3399D6861987860D00388CAD /* Hex ConnectTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Hex ConnectTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3399D68B1987860D00388CAD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3399D68C1987860D00388CAD /* PX6Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PX6Tests.swift; sourceTree = "<group>"; };
 		3399D696198791D800388CAD /* HexView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HexView.swift; sourceTree = "<group>"; };
@@ -91,13 +79,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		3399D6831987860D00388CAD /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -114,7 +95,6 @@
 			isa = PBXGroup;
 			children = (
 				3399D6741987860D00388CAD /* Hex Connect.app */,
-				3399D6861987860D00388CAD /* Hex ConnectTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -201,39 +181,20 @@
 			productReference = 3399D6741987860D00388CAD /* Hex Connect.app */;
 			productType = "com.apple.product-type.application";
 		};
-		3399D6851987860D00388CAD /* Hex ConnectTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 3399D6931987860D00388CAD /* Build configuration list for PBXNativeTarget "Hex ConnectTests" */;
-			buildPhases = (
-				3399D6821987860D00388CAD /* Sources */,
-				3399D6831987860D00388CAD /* Frameworks */,
-				3399D6841987860D00388CAD /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				3399D6881987860D00388CAD /* PBXTargetDependency */,
-			);
-			name = "Hex ConnectTests";
-			productName = PX6Tests;
-			productReference = 3399D6861987860D00388CAD /* Hex ConnectTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		3399D66C1987860D00388CAD /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftMigration = 0720;
+				LastSwiftUpdateCheck = 0720;
 				LastUpgradeCheck = 0600;
 				ORGANIZATIONNAME = "Thomas Kunert";
 				TargetAttributes = {
 					3399D6731987860D00388CAD = {
 						CreatedOnToolsVersion = 6.0;
-					};
-					3399D6851987860D00388CAD = {
-						CreatedOnToolsVersion = 6.0;
-						TestTargetID = 3399D6731987860D00388CAD;
+						DevelopmentTeam = D7YB63LY6Q;
 					};
 				};
 			};
@@ -251,7 +212,6 @@
 			projectRoot = "";
 			targets = (
 				3399D6731987860D00388CAD /* Hex Connect */,
-				3399D6851987860D00388CAD /* Hex ConnectTests */,
 			);
 		};
 /* End PBXProject section */
@@ -284,13 +244,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		3399D6841987860D00388CAD /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -308,23 +261,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		3399D6821987860D00388CAD /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				3399D68D1987860D00388CAD /* PX6Tests.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		3399D6881987860D00388CAD /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 3399D6731987860D00388CAD /* Hex Connect */;
-			targetProxy = 3399D6871987860D00388CAD /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		3399D68E1987860D00388CAD /* Debug */ = {
@@ -409,10 +346,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = PX6/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "Hex Connect";
+				PROVISIONING_PROFILE = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -422,45 +362,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = PX6/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "Hex Connect";
+				PROVISIONING_PROFILE = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
-		3399D6941987860D00388CAD /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/PX6.app/PX6";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-				);
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = PX6Tests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_NAME = "Hex ConnectTests";
-				TEST_HOST = "$(BUNDLE_LOADER)";
-			};
-			name = Debug;
-		};
-		3399D6951987860D00388CAD /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/PX6.app/PX6";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = PX6Tests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_NAME = "Hex ConnectTests";
-				TEST_HOST = "$(BUNDLE_LOADER)";
 			};
 			name = Release;
 		};
@@ -481,15 +390,6 @@
 			buildConfigurations = (
 				3399D6911987860D00388CAD /* Debug */,
 				3399D6921987860D00388CAD /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		3399D6931987860D00388CAD /* Build configuration list for PBXNativeTarget "Hex ConnectTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				3399D6941987860D00388CAD /* Debug */,
-				3399D6951987860D00388CAD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

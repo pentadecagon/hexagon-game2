@@ -38,15 +38,15 @@ class Solver1 {
         while lastlevel.count > 0 {
             var erg2 = [Hexagon:Double]()
             var nextlevel = HexSet()
-            removeAll(&lastlevel, a_opp)
+            removeAll(&lastlevel, b: a_opp)
             for (hex, _) in lastlevel {
                 let newval = erg[hex]! * _ilengthFactor
                 for (next, _) in hex.neighbors[color] {
-                    if erg[next]? {
+                    if erg[next] != nil {
                         continue
                     }
-                    let curval = erg2[next]?
-                    erg2[next] = curval ? curval! + newval : newval
+                    let curval = erg2[next]
+                    erg2[next] = curval != nil ? curval! + newval : newval
                     nextlevel[next] = true
                 }
             }
@@ -55,7 +55,7 @@ class Solver1 {
             }
             lastlevel = nextlevel
         }
-        println("pathvalue: \(erg.count)")
+        print("pathvalue: \(erg.count)")
         return erg
     }
 
@@ -66,7 +66,7 @@ class Solver1 {
         let v2 = pathValue( s2, a_opp: s1, color: p );
         var erg = [Hexagon : Double]()
         for (hex, y1) in v1 {
-            if v2[hex]? {
+            if (v2[hex] != nil) {
                 let val = y1 * v2[hex]!
                 erg[hex] = val
             }
@@ -81,7 +81,7 @@ class Solver1 {
         var besthex: Hexagon?
         var bestval: Double = 0
         for( hex, y1) in v1 {
-            if v2[hex]? {
+            if (v2[hex] != nil) {
                 let val = y1 + v2[hex]! * (1.0+Double(hex.xid)*1e-13)
                 if val > bestval {
                     bestval = val
