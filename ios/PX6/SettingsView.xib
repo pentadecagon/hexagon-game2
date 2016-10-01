@@ -16,9 +16,10 @@
             <rect key="frame" x="0.0" y="0.0" width="320" height="500"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ph1-CU-pQZ">
-                    <frame key="frameInset" minX="184" minY="304" width="46" height="30"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ph1-CU-pQZ">
+                    <constraints>
+                        <constraint firstAttribute="width" constant="46" id="aLc-do-Vva"/>
+                    </constraints>
                     <state key="normal" title="Start">
                         <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </state>
@@ -26,9 +27,7 @@
                         <action selector="startButtonPressed" destination="-1" eventType="touchUpInside" id="5Bn-uv-YhT"/>
                     </connections>
                 </button>
-                <segmentedControl opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="1" translatesAutoresizingMaskIntoConstraints="NO" id="EWu-De-4vN">
-                    <frame key="frameInset" minX="147" minY="54" width="120" height="29"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="1" translatesAutoresizingMaskIntoConstraints="NO" id="EWu-De-4vN">
                     <segments>
                         <segment title="" image="hexagon-outline-xxl.png" width="59.5"/>
                         <segment title="" image="square-outline-xxl.png" width="59.5"/>
@@ -37,9 +36,7 @@
                         <action selector="shapeValueChanged:" destination="-1" eventType="valueChanged" id="7Qh-1B-cot"/>
                     </connections>
                 </segmentedControl>
-                <segmentedControl opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="1" translatesAutoresizingMaskIntoConstraints="NO" id="U7t-dJ-7un">
-                    <frame key="frameInset" minX="146" minY="139" width="123" height="29"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="1" translatesAutoresizingMaskIntoConstraints="NO" id="U7t-dJ-7un">
                     <segments>
                         <segment title="1"/>
                         <segment title="2"/>
@@ -50,39 +47,28 @@
                         <action selector="boardSizeChanged:" destination="-1" eventType="valueChanged" id="eyV-L7-Nbc"/>
                     </connections>
                 </segmentedControl>
-                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Board Shape:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MLT-Yk-E6g">
-                    <frame key="frameInset" minX="20" minY="57" width="113" height="21"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Board Shape:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MLT-Yk-E6g">
                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                     <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <nil key="highlightedColor"/>
                 </label>
-                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Board Size:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4re-uG-gK8">
-                    <frame key="frameInset" minX="20" minY="146" width="107" height="21"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Board Size:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4re-uG-gK8">
                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                     <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <nil key="highlightedColor"/>
                 </label>
-                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Phone goes ..." lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xW7-Zc-0O0">
-                    <frame key="frameInset" minX="20" minY="216" width="113" height="21"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Phone goes ..." lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xW7-Zc-0O0">
                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                     <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <nil key="highlightedColor"/>
                 </label>
-                <stackView opaque="NO" contentMode="scaleToFill" fixedFrame="YES" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="n6i-02-7Iz">
-                    <frame key="frameInset" minX="146" minY="209" width="121" height="28"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="n6i-02-7Iz">
                     <subviews>
-                        <stackView opaque="NO" contentMode="scaleToFill" ambiguous="YES" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="zAJ-Ee-RXf">
-                            <frame key="frameInset" width="121" height="28"/>
+                        <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="zAJ-Ee-RXf">
                             <subviews>
-                                <stackView opaque="NO" contentMode="scaleToFill" ambiguous="YES" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="RcB-l9-XrW">
-                                    <frame key="frameInset" width="121" height="28"/>
+                                <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="RcB-l9-XrW">
                                     <subviews>
-                                        <segmentedControl opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="uOh-8e-EKe">
-                                            <frame key="frameInset" width="121" height="29"/>
+                                        <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="uOh-8e-EKe">
                                             <segments>
                                                 <segment title="First"/>
                                                 <segment title="Second"/>
@@ -99,6 +85,27 @@
                 </stackView>
             </subviews>
             <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstItem="MLT-Yk-E6g" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="20" id="1xS-64-wUF"/>
+                <constraint firstItem="4re-uG-gK8" firstAttribute="bottom" secondItem="U7t-dJ-7un" secondAttribute="bottom" id="2fL-L0-9qu"/>
+                <constraint firstAttribute="trailing" secondItem="U7t-dJ-7un" secondAttribute="trailing" constant="51" id="3rq-nO-8bf"/>
+                <constraint firstItem="MLT-Yk-E6g" firstAttribute="leading" secondItem="4re-uG-gK8" secondAttribute="leading" id="6fX-Vb-LpU"/>
+                <constraint firstItem="n6i-02-7Iz" firstAttribute="top" secondItem="U7t-dJ-7un" secondAttribute="bottom" constant="42" id="IAq-jT-sZ9"/>
+                <constraint firstItem="n6i-02-7Iz" firstAttribute="leading" secondItem="xW7-Zc-0O0" secondAttribute="trailing" constant="13" id="Ill-Zm-N1g"/>
+                <constraint firstItem="EWu-De-4vN" firstAttribute="centerX" secondItem="n6i-02-7Iz" secondAttribute="centerX" id="JuQ-Pt-GpV"/>
+                <constraint firstItem="4re-uG-gK8" firstAttribute="leading" secondItem="xW7-Zc-0O0" secondAttribute="leading" id="Kpf-Uo-2rm"/>
+                <constraint firstItem="U7t-dJ-7un" firstAttribute="leading" secondItem="n6i-02-7Iz" secondAttribute="leading" id="TKw-Rf-gFK"/>
+                <constraint firstAttribute="trailing" secondItem="Ph1-CU-pQZ" secondAttribute="trailing" constant="90" id="UBF-uk-FES"/>
+                <constraint firstItem="n6i-02-7Iz" firstAttribute="centerX" secondItem="Ph1-CU-pQZ" secondAttribute="centerX" id="UPl-Yf-NLt"/>
+                <constraint firstItem="U7t-dJ-7un" firstAttribute="top" secondItem="EWu-De-4vN" secondAttribute="bottom" constant="57" id="a0z-8E-fDO"/>
+                <constraint firstItem="EWu-De-4vN" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="54" id="f7r-eQ-jGn"/>
+                <constraint firstItem="MLT-Yk-E6g" firstAttribute="trailing" secondItem="xW7-Zc-0O0" secondAttribute="trailing" id="mje-xZ-jTF"/>
+                <constraint firstItem="U7t-dJ-7un" firstAttribute="leading" secondItem="4re-uG-gK8" secondAttribute="trailing" constant="19" id="nj8-CK-WR6"/>
+                <constraint firstItem="xW7-Zc-0O0" firstAttribute="bottom" secondItem="n6i-02-7Iz" secondAttribute="bottom" id="qQ5-AP-iIK"/>
+                <constraint firstItem="EWu-De-4vN" firstAttribute="centerX" secondItem="U7t-dJ-7un" secondAttribute="centerX" id="qde-Uf-Hrw"/>
+                <constraint firstItem="MLT-Yk-E6g" firstAttribute="centerY" secondItem="EWu-De-4vN" secondAttribute="centerY" id="tP7-yU-DEZ"/>
+                <constraint firstItem="Ph1-CU-pQZ" firstAttribute="top" secondItem="n6i-02-7Iz" secondAttribute="bottom" constant="67" id="ufW-Gz-ojo"/>
+            </constraints>
             <simulatedStatusBarMetrics key="simulatedStatusBarMetrics" statusBarStyle="lightContent"/>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <point key="canvasLocation" x="133" y="154"/>
