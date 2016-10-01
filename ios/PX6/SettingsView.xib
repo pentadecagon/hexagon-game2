@@ -16,10 +16,8 @@
             <rect key="frame" x="0.0" y="0.0" width="320" height="500"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ph1-CU-pQZ">
-                    <constraints>
-                        <constraint firstAttribute="width" constant="46" id="6IA-wT-9vi"/>
-                    </constraints>
+                <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ph1-CU-pQZ">
+                    <frame key="frameInset" minX="184" minY="304" width="46" height="30"/>
                     <state key="normal" title="Start">
                         <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </state>
@@ -27,7 +25,11 @@
                         <action selector="startButtonPressed" destination="-1" eventType="touchUpInside" id="5Bn-uv-YhT"/>
                     </connections>
                 </button>
-                <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="1" translatesAutoresizingMaskIntoConstraints="NO" id="EWu-De-4vN">
+                <segmentedControl opaque="NO" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="1" translatesAutoresizingMaskIntoConstraints="NO" id="EWu-De-4vN">
+                    <frame key="frameInset" minX="147" minY="54" width="120" height="29"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="60" id="Yek-nE-9UU"/>
+                    </constraints>
                     <segments>
                         <segment title="" image="hexagon-outline-xxl.png" width="59.5"/>
                         <segment title="" image="square-outline-xxl.png" width="59.5"/>
@@ -36,7 +38,8 @@
                         <action selector="shapeValueChanged:" destination="-1" eventType="valueChanged" id="7Qh-1B-cot"/>
                     </connections>
                 </segmentedControl>
-                <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="1" translatesAutoresizingMaskIntoConstraints="NO" id="U7t-dJ-7un">
+                <segmentedControl opaque="NO" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="1" translatesAutoresizingMaskIntoConstraints="NO" id="U7t-dJ-7un">
+                    <frame key="frameInset" minX="146" minY="139" width="123" height="29"/>
                     <segments>
                         <segment title="1"/>
                         <segment title="2"/>
@@ -47,22 +50,26 @@
                         <action selector="boardSizeChanged:" destination="-1" eventType="valueChanged" id="eyV-L7-Nbc"/>
                     </connections>
                 </segmentedControl>
-                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Board Shape:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MLT-Yk-E6g">
+                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" misplaced="YES" text="Board Shape:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MLT-Yk-E6g">
+                    <frame key="frameInset" minX="20" minY="57" width="113" height="21"/>
                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                     <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <nil key="highlightedColor"/>
                 </label>
-                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Board Size:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4re-uG-gK8">
+                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" misplaced="YES" text="Board Size:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4re-uG-gK8">
+                    <frame key="frameInset" minX="20" minY="146" width="107" height="21"/>
                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                     <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <nil key="highlightedColor"/>
                 </label>
-                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Phone goes ..." lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xW7-Zc-0O0">
+                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" misplaced="YES" text="Phone goes ..." lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xW7-Zc-0O0">
+                    <frame key="frameInset" minX="20" minY="216" width="113" height="21"/>
                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                     <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <nil key="highlightedColor"/>
                 </label>
-                <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="uOh-8e-EKe">
+                <segmentedControl opaque="NO" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="uOh-8e-EKe">
+                    <frame key="frameInset" minX="146" minY="209" width="123" height="29"/>
                     <segments>
                         <segment title="First"/>
                         <segment title="Second"/>
@@ -74,27 +81,14 @@
             </subviews>
             <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
-                <constraint firstItem="xW7-Zc-0O0" firstAttribute="leading" secondItem="4re-uG-gK8" secondAttribute="leading" id="1P1-RF-u4Q"/>
-                <constraint firstItem="EWu-De-4vN" firstAttribute="leading" secondItem="MLT-Yk-E6g" secondAttribute="trailing" constant="14" id="1kZ-Ee-gWI"/>
-                <constraint firstItem="4re-uG-gK8" firstAttribute="bottom" secondItem="U7t-dJ-7un" secondAttribute="bottom" id="3bs-xh-g8R"/>
-                <constraint firstItem="U7t-dJ-7un" firstAttribute="leading" secondItem="4re-uG-gK8" secondAttribute="trailing" constant="19" id="4fH-Kt-2J7"/>
-                <constraint firstItem="xW7-Zc-0O0" firstAttribute="bottom" secondItem="uOh-8e-EKe" secondAttribute="bottom" id="6fI-Ye-8C9"/>
                 <constraint firstItem="Ph1-CU-pQZ" firstAttribute="centerX" secondItem="U7t-dJ-7un" secondAttribute="centerX" id="AlE-v6-0o0"/>
-                <constraint firstItem="Ph1-CU-pQZ" firstAttribute="top" secondItem="uOh-8e-EKe" secondAttribute="bottom" constant="67" id="DrI-e5-vB8"/>
-                <constraint firstItem="4re-uG-gK8" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="146" id="TDa-JM-DlX"/>
-                <constraint firstAttribute="trailing" secondItem="U7t-dJ-7un" secondAttribute="trailing" constant="51" id="Zgk-eT-mg7"/>
-                <constraint firstAttribute="trailing" secondItem="Ph1-CU-pQZ" secondAttribute="trailing" constant="90" id="acc-6i-kVo"/>
-                <constraint firstAttribute="bottom" secondItem="Ph1-CU-pQZ" secondAttribute="bottom" constant="166" id="fSg-qR-OaM"/>
-                <constraint firstItem="4re-uG-gK8" firstAttribute="top" secondItem="MLT-Yk-E6g" secondAttribute="bottom" constant="68" id="gOi-0j-4ne"/>
-                <constraint firstAttribute="trailing" secondItem="EWu-De-4vN" secondAttribute="trailing" constant="53" id="j1T-IG-oM7"/>
-                <constraint firstItem="xW7-Zc-0O0" firstAttribute="leading" secondItem="MLT-Yk-E6g" secondAttribute="leading" id="k1o-8v-fg1"/>
+                <constraint firstItem="Ph1-CU-pQZ" firstAttribute="centerX" secondItem="EWu-De-4vN" secondAttribute="centerX" id="HRx-gT-6Lz"/>
+                <constraint firstItem="xW7-Zc-0O0" firstAttribute="leading" secondItem="MLT-Yk-E6g" secondAttribute="leading" id="HpD-SG-DbB"/>
+                <constraint firstItem="EWu-De-4vN" firstAttribute="centerY" secondItem="MLT-Yk-E6g" secondAttribute="centerY" id="Jac-w5-OYm"/>
+                <constraint firstItem="4re-uG-gK8" firstAttribute="centerY" secondItem="U7t-dJ-7un" secondAttribute="centerY" id="fCq-PJ-jxa"/>
+                <constraint firstItem="xW7-Zc-0O0" firstAttribute="centerY" secondItem="uOh-8e-EKe" secondAttribute="centerY" id="kjx-jp-DVS"/>
                 <constraint firstItem="Ph1-CU-pQZ" firstAttribute="centerX" secondItem="uOh-8e-EKe" secondAttribute="centerX" id="pmv-Yi-doq"/>
-                <constraint firstItem="EWu-De-4vN" firstAttribute="centerX" secondItem="U7t-dJ-7un" secondAttribute="centerX" id="qPH-7Y-agp"/>
-                <constraint firstItem="U7t-dJ-7un" firstAttribute="leading" secondItem="uOh-8e-EKe" secondAttribute="leading" id="qfQ-iz-Nk5"/>
-                <constraint firstItem="xW7-Zc-0O0" firstAttribute="trailing" secondItem="MLT-Yk-E6g" secondAttribute="trailing" id="rvD-b6-Lrt"/>
-                <constraint firstItem="EWu-De-4vN" firstAttribute="centerY" secondItem="MLT-Yk-E6g" secondAttribute="centerY" id="tsq-1b-kcn"/>
-                <constraint firstItem="4re-uG-gK8" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="20" id="wX0-eY-nCM"/>
-                <constraint firstItem="uOh-8e-EKe" firstAttribute="top" secondItem="U7t-dJ-7un" secondAttribute="bottom" constant="42" id="xMH-Wu-CUD"/>
+                <constraint firstItem="xW7-Zc-0O0" firstAttribute="leading" secondItem="4re-uG-gK8" secondAttribute="leading" id="rGx-Vz-sJM"/>
             </constraints>
             <simulatedStatusBarMetrics key="simulatedStatusBarMetrics" statusBarStyle="lightContent"/>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
