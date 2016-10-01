@@ -11,7 +11,7 @@ class Hexagon : Hashable {
     
     var adjacent = [Hexagon]()
     
-    var neighbors = [HexSet] ( count : 2, repeatedValue:HexSet() )
+    var neighbors = [HexSet] ( repeating: HexSet(), count: 2 )
     init( u : Float, v : Float, owner : Int, id : Int){
         self.xi = u
         self.yi = v
@@ -25,10 +25,10 @@ class Hexagon : Hashable {
     }
 
     var stack = [HexSet]()
-    func push( n:Int ){
+    func push( _ n:Int ){
         stack.append( neighbors[n] )
     }
-    func pop( n:Int ){
+    func pop( _ n:Int ){
         neighbors[n] = stack.removeLast()
     }
 }
@@ -39,13 +39,13 @@ func==(lhs:Hexagon, rhs:Hexagon)->Bool {
 
 typealias HexSet = [Hexagon:Bool]
 
-func hexSetMerge( inout a : HexSet, b : HexSet ){
+func hexSetMerge( _ a : inout HexSet, b : HexSet ){
     for( u, v ) in b {
         a[u] = v
     }
 }
 
-func array2set( a : [Hexagon] ) -> HexSet
+func array2set( _ a : [Hexagon] ) -> HexSet
 {
     var b = HexSet()
     for x in a {

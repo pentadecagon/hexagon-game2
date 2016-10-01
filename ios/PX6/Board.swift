@@ -1,6 +1,6 @@
 enum BOARD_GEOMETRY {
-    case HEX
-    case RECT
+    case hex
+    case rect
 }
 
 class Board {
@@ -13,12 +13,12 @@ class Board {
     var hexagonList =  [Hexagon]()
     
     // _player that must do the next move
-    private var _player : Int = 0
+    fileprivate var _player : Int = 0
     
     /* _hasWinner indicates if we have a winner.
     If _hasWinner is true, no move must be done
     and _player indicates who won. */
-    private  var _hasWinner : Bool = false
+    fileprivate  var _hasWinner : Bool = false
     var history = [Hexagon]()
     
     /* 'outer' represents the four outer regions of the board.  The first index indicates the player (0 or 1),
@@ -51,7 +51,7 @@ class Board {
         self.boardSize = boardSize
         
         //construct the list of hexagons that will make up the board
-        if (boardShape == .RECT){
+        if (boardShape == .rect){
             setupRectBoardListOfHexagons()
         } else {
             setupHexBoardListOfHexagons()
@@ -113,7 +113,7 @@ class Board {
         }
     }
     
-    func updateNeighbors( hex : Hexagon ){
+    func updateNeighbors( _ hex : Hexagon ){
         let n = hex.owner
         let myNeighbors : HexSet = hex.neighbors[n]
         for (h1, _) in myNeighbors {
@@ -130,7 +130,7 @@ class Board {
         consistency();
     }
     
-    private func undoNeighbors( hex : Hexagon ){
+    fileprivate func undoNeighbors( _ hex : Hexagon ){
         let n = hex.owner
         let myNeighbors = hex.neighbors[n];
         for (h1, _) in  myNeighbors {
@@ -141,7 +141,7 @@ class Board {
         }
     }
     
-    func doMove( move0 : Hexagon ) -> Bool {
+    func doMove( _ move0 : Hexagon ) -> Bool {
         assert( !_hasWinner )
         assert( move0.isEmpty() )
         let move=hexagonList[move0.xid]
@@ -187,13 +187,15 @@ class Board {
         consistency()
     }
     
-    private func setupRectBoardListOfHexagons(){
+    fileprivate func setupRectBoardListOfHexagons(){
         let ymax = 2 + 2 * boardSize
         let xmax : Int = ymax
         var id = 0
         for yi in 0...ymax {
-            for var xi : Float = Float(yi%2)*0.5; xi<=Float(xmax); ++xi {
-                let hex = Hexagon(u: xi, v:Float(yi), owner:OWNER_EMPTY, id:id++ )
+            var xi : Float = Float(yi%2)*0.5
+            while xi<=Float(xmax) {
+                let hex = Hexagon(u: xi, v:Float(yi), owner:OWNER_EMPTY, id:id )
+                id += 1
                 hexagonList.append(hex)
                 if yi == 0 {
                     outer[1][0].adjacent.append(hex)
@@ -207,6 +209,7 @@ class Board {
                 if xi>Float(xmax-1) {
                     outer[0][1].adjacent.append(hex)
                 }
+                xi += 1
             }
         }
         consistency()

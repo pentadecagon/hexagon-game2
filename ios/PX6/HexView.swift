@@ -31,11 +31,11 @@ class DrawBoardHelper {
         y0 = ymid - (ymax+ymin) * 0.5 * dyCell
     }
     
-    func findPositionOfCenterOfHexagonalCell( xi : Float, yi : Float ) -> (Float, Float ){
+    func findPositionOfCenterOfHexagonalCell( _ xi : Float, yi : Float ) -> (Float, Float ){
         return (Float(x0) + Float(wCell) * xi, Float(y0)+Float(dyCell)*yi )
     }
 
-    func findHexagon( x: Float, y: Float ) -> Hexagon? {
+    func findHexagon( _ x: Float, y: Float ) -> Hexagon? {
         var besthex : Hexagon? = nil
         var besthex_dist : Float = smallHexSideLength*smallHexSideLength
         
@@ -53,8 +53,8 @@ class DrawBoardHelper {
     }
 }
 
-func load_image( name:String ) -> UIImage {
-    let imagePath = NSBundle.mainBundle().pathForResource(name, ofType:"png")
+func load_image( _ name:String ) -> UIImage {
+    let imagePath = Bundle.main.path(forResource: name, ofType:"png")
     let im = UIImage(contentsOfFile: imagePath!)
     assert(im != nil)
     return im!
@@ -69,7 +69,7 @@ enum GameStatus {
 
 var gameStatus = GameStatus.busy
 
-func xrect( x:Float, y:Float, w:Float, h:Float ) -> CGRect {
+func xrect( _ x:Float, y:Float, w:Float, h:Float ) -> CGRect {
     return CGRect( x:CGFloat(x), y:CGFloat(y), width:CGFloat(w), height:CGFloat(h) )
 }
 
@@ -98,7 +98,7 @@ class HexView : UIView {
         let wid = Float(rect.width)
         var bg_hei: Float = wid * 1.1
         let ymin = Float(rect.minY)
-        if( board.boardShape == BOARD_GEOMETRY.RECT ){
+        if( board.boardShape == BOARD_GEOMETRY.rect ){
             bg_image = load_image("square_back")
         } else {
             switch board.boardSize {
@@ -123,9 +123,9 @@ class HexView : UIView {
         let labelframe = xrect( 0.0, y: 20, w: wid, h: 40 )
         yourmoveview = UILabel(frame:labelframe)
         yourmoveview.text = "Your turn!"
-        yourmoveview.textAlignment = NSTextAlignment.Center
-        yourmoveview.backgroundColor = UIColor.blackColor()
-        yourmoveview.textColor = UIColor.whiteColor()
+        yourmoveview.textAlignment = NSTextAlignment.center
+        yourmoveview.backgroundColor = UIColor.black
+        yourmoveview.textColor = UIColor.white
         yourmoveview.alpha = 0.0
         super.init( frame: rect )
         tileview.frame = xrect( 20.0, y: Float(rect.minY)+bg_hei+15, w: Float(helper.wCell), h: 2.0*helper.smallHexSideLength )
@@ -147,10 +147,10 @@ class HexView : UIView {
 
     func initUserMove(){
         gameStatus = .waitingForUser
-        UIView.animateWithDuration( 1, animations: {() in
+        UIView.animate( withDuration: 1, animations: {() in
             self.yourmoveview.alpha = 1
             }, completion: {(Bool) in
-                UIView.animateWithDuration( 1, animations: {() in
+                UIView.animate( withDuration: 1, animations: {() in
                     self.yourmoveview.alpha = 0.0
                     })
         })
@@ -158,15 +158,14 @@ class HexView : UIView {
     
     func doPhoneMove() {
         let hex2 = solver.bestMove(board)
-        dispatch_async( dispatch_get_main_queue(),
-            { () in self.do_move( hex2, owner: self.phonePlayer ) }
+        DispatchQueue.main.async(execute: { () in self.do_move( hex2, owner: self.phonePlayer ) }
         )
     }
     
     func initPhoneMove() {
         gameStatus = .waitingForPhone
-        let queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
-        dispatch_async( queue, { () in self.doPhoneMove() } )
+        let queue = DispatchQueue.global()
+        queue.async(execute: { () in self.doPhoneMove() } )
     }
     
     var restartAng: CGFloat = 2
@@ -176,8 +175,8 @@ class HexView : UIView {
             showWinnerTile = !showWinnerTile
             setNeedsDisplay()
             restartAng += 2
-            let transform = CGAffineTransformMakeRotation(CGFloat(restartAng))
-            UIView.animateWithDuration(0.5, animations:  {() in
+            let transform = CGAffineTransform(rotationAngle: CGFloat(restartAng))
+            UIView.animate(withDuration: 0.5, animations:  {() in
                 self.refreshview.transform = transform
                 }, completion:{(Bool)  in
                     self.updateWinnerBlink()
@@ -193,13 +192,13 @@ class HexView : UIView {
         updateWinnerBlink()
     }
     
-    func do_move( hex: Hexagon, owner: Int ){
+    func do_move( _ hex: Hexagon, owner: Int ){
         gameStatus = .busy
         let (px, py) = helper.findPositionOfCenterOfHexagonalCell( hex.xi, yi: hex.yi )
         let newcenter = CGPoint( x: CGFloat(px), y: CGFloat(py) )
         self.tileview.image = tiles[owner]
         let origcenter = self.tileview.center
-        UIView.animateWithDuration(0.5, animations:  {() in
+        UIView.animate(withDuration: 0.5, animations:  {() in
             self.tileview.center = newcenter
             }, completion:{(Bool)  in
                 print("move animation finished")
@@ -218,18 +217,18 @@ class HexView : UIView {
             })
     }
     
-    override func drawRect(rect: CGRect) {
+    override func draw(_ rect: CGRect) {
         let ctx = UIGraphicsGetCurrentContext();
 //        CGContextDrawImage(ctx, bg_rect, bg_image.CGImage)
-        bg_image.drawInRect( bg_rect )
+        bg_image.draw( in: bg_rect )
         print("bgrect: \(bg_rect)")
         for hex in board.hexagonList {
             drawHexagon(ctx!, hex: hex)
         }
     }
     
-    func checkForRestartTouch( pos : CGPoint ) -> Bool {
-        if CGRectContainsPoint( refreshview.frame, pos ){
+    func checkForRestartTouch( _ pos : CGPoint ) -> Bool {
+        if refreshview.frame.contains(pos ){
             viewController.view = viewController.settingsView
 //            mainApp!.window.rootViewController = ViewController()
             return true
@@ -237,10 +236,10 @@ class HexView : UIView {
         return false
     }
     
-    override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent!){
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent!){
         if touches.count == 1 {
             let touch: UITouch = touches.first!
-            let pos = touch.locationInView(self)
+            let pos = touch.location(in: self)
             if( !checkForRestartTouch(pos) && gameStatus == .waitingForUser ){
                 let hex = helper.findHexagon( Float(pos.x), y: Float(pos.y) )
                 if (hex != nil) {
@@ -251,13 +250,13 @@ class HexView : UIView {
         }
     }
     
-    func drawHexagon( ctx:CGContext, hex:Hexagon ){
+    func drawHexagon( _ ctx:CGContext, hex:Hexagon ){
         let (cx, cy) = helper.findPositionOfCenterOfHexagonalCell( hex.xi, yi: hex.yi )
         let x = cx - Float(helper.wCell) / 2.0
         let y = cy - Float(helper.smallHexSideLength)
         let rect = CGRect(x:  CGFloat(x), y: CGFloat(y), width: CGFloat(helper.wCell)*1.02, height: CGFloat(helper.smallHexSideLength*2)*1.02)
         let tile = hex.owner == 3 ? tiles_winner[0] :
             (gameStatus == .winner && showWinnerTile && hex.owner == board.getPlayerId() ) ? tiles_winner[hex.owner] : tiles[hex.owner]
-        CGContextDrawImage(ctx, rect, tile.CGImage)
+        ctx.draw(tile.cgImage!, in: rect)
     }
 }

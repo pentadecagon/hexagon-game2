@@ -10,7 +10,7 @@ import UIKit
 
 var viewController: ViewController!
 var boardSize: Int = 2
-var boardShape: BOARD_GEOMETRY = .RECT
+var boardShape: BOARD_GEOMETRY = .rect
 var phonePlayerId: Int = 0
 
 class ViewController: UIViewController {
@@ -18,18 +18,18 @@ class ViewController: UIViewController {
     func startSettings(){
         self.view = settingsView
     }
-    @IBAction func phoneGoes(sender: UISegmentedControl) {
+    @IBAction func phoneGoes(_ sender: UISegmentedControl) {
         phonePlayerId = sender.selectedSegmentIndex
     }
 
-    @IBAction func shapeValueChanged(sender: UISegmentedControl) {
+    @IBAction func shapeValueChanged(_ sender: UISegmentedControl) {
         if sender.selectedSegmentIndex == 0 {
-            boardShape = .HEX
+            boardShape = .hex
         } else {
-            boardShape = .RECT
+            boardShape = .rect
         }
     }
-    @IBAction func boardSizeChanged(sender: UISegmentedControl) {
+    @IBAction func boardSizeChanged(_ sender: UISegmentedControl) {
         boardSize = sender.selectedSegmentIndex + 1
     }
 
@@ -37,15 +37,15 @@ class ViewController: UIViewController {
         startGame1()
     }
     func startGame1(){
-        let applicationFrame : CGRect = UIScreen.mainScreen().applicationFrame;
+        let applicationFrame : CGRect = UIScreen.main.applicationFrame;
         let contentView = HexView(frame: applicationFrame)
         self.view = contentView
     }
     
     override func loadView(){
         viewController = self
-        let applicationFrame : CGRect = UIScreen.mainScreen().applicationFrame;
-        NSBundle.mainBundle().loadNibNamed( "SettingsView", owner:self, options:nil  )
+        let applicationFrame : CGRect = UIScreen.main.applicationFrame;
+        Bundle.main.loadNibNamed( "SettingsView", owner:self, options:nil  )
 
         settingsView!.frame = applicationFrame
         startGame1()
@@ -59,8 +59,8 @@ class ViewController: UIViewController {
         // Do any additional setup after loading the view, typically from a nib.
     }
     
-    override func preferredStatusBarStyle() -> UIStatusBarStyle {
-        return UIStatusBarStyle.LightContent;
+    override var preferredStatusBarStyle : UIStatusBarStyle {
+        return UIStatusBarStyle.lightContent;
     }
 
     override func didReceiveMemoryWarning() {

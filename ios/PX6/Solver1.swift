@@ -8,7 +8,7 @@
 
 import Foundation
 
-func removeAll( inout a : HexSet, b : HexSet )
+func removeAll( _ a : inout HexSet, b : HexSet )
 {
     for (hex, _) in b {
         a[hex] = nil
@@ -28,7 +28,7 @@ class Solver1 {
         return a.neighbors[owner];
     }*/
     
-    func pathValue( a: HexSet, a_opp: HexSet, color: Int ) -> [Hexagon : Double]{
+    func pathValue( _ a: HexSet, a_opp: HexSet, color: Int ) -> [Hexagon : Double]{
         var erg = [Hexagon:Double]()
         var lastlevel = HexSet()
         for (hex, _) in a {
@@ -59,7 +59,7 @@ class Solver1 {
         return erg
     }
 
-    func analyze( board: Board, p: Int ) -> [Hexagon : Double]{
+    func analyze( _ board: Board, p: Int ) -> [Hexagon : Double]{
         let s1: HexSet = board.outer[p][0].neighbors[p]
         let s2: HexSet = board.outer[p][1].neighbors[p]
         let v1: [Hexagon : Double] = pathValue( s1, a_opp: s2, color: p )
@@ -75,7 +75,7 @@ class Solver1 {
         return erg
     }
     
-    func bestMove( board:Board ) ->Hexagon {
+    func bestMove( _ board:Board ) ->Hexagon {
         let v1 = analyze( board, p: 0 )
         let v2 = analyze( board, p: 1 )
         var besthex: Hexagon?
